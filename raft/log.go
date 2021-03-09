@@ -14,7 +14,9 @@
 
 package raft
 
-import pb "github.com/pingcap-incubator/tinykv/proto/pkg/eraftpb"
+import (
+	pb "github.com/pingcap-incubator/tinykv/proto/pkg/eraftpb"
+)
 
 // RaftLog manage the log entries, its struct look like:
 //
@@ -56,7 +58,12 @@ type RaftLog struct {
 // to the state that it just commits and applies the latest snapshot.
 func newLog(storage Storage) *RaftLog {
 	// Your Code Here (2A).
-	return nil
+	return &RaftLog{
+		storage:   storage,
+		committed: 0,
+		applied:   0,
+		entries:   make([]pb.Entry, 0),
+	}
 }
 
 // We need to compact the log entries in some point of time like
@@ -69,23 +76,42 @@ func (l *RaftLog) maybeCompact() {
 // unstableEntries return all the unstable entries
 func (l *RaftLog) unstableEntries() []pb.Entry {
 	// Your Code Here (2A).
-	return nil
+	return l.entries[l.stabled-l.entries[0].Index:]
 }
 
 // nextEnts returns all the committed but not applied entries
 func (l *RaftLog) nextEnts() (ents []pb.Entry) {
 	// Your Code Here (2A).
-	return nil
+	if l.committed == l.applied {
+		return make([]pb.Entry, 0)
+	}
+	var c_index = l.committed - l.entries[0].Index
+	a_index := l.applied - l.entries[0].Index
+	return l.entries[a_index:c_index]
 }
 
 // LastIndex return the last index of the log entries
 func (l *RaftLog) LastIndex() uint64 {
 	// Your Code Here (2A).
-	return 0
+	if len(l.entries) == 0 {
+		index, _ := l.storage.LastIndex()
+		return index
+	}
+	return l.entries[len(l.entries)-1].Index
 }
 
 // Term return the term of the entry in the given index
 func (l *RaftLog) Term(i uint64) (uint64, error) {
 	// Your Code Here (2A).
-	return 0, nil
+	last_index := l.LastIndex()
+	if last_index == 0 {
+		return 0, nil
+	} else if i > last_index {
+		return 0, ErrUnavailable
+	}
+	s_last_index, _ := l.storage.LastIndex()
+	if i <= s_last_index {
+		return l.storage.Term(i)
+	}
+	return l.entries[i-l.entries[0].Index].Term, nil
 }
