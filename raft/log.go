@@ -15,6 +15,9 @@
 package raft
 
 import (
+	"reflect"
+
+	"github.com/pingcap-incubator/tinykv/log"
 	pb "github.com/pingcap-incubator/tinykv/proto/pkg/eraftpb"
 )
 
@@ -58,11 +61,24 @@ type RaftLog struct {
 // to the state that it just commits and applies the latest snapshot.
 func newLog(storage Storage) *RaftLog {
 	// Your Code Here (2A).
+	hi, herr := storage.LastIndex()
+	lo, lerr := storage.FirstIndex()
+	if herr != nil {
+		panic(herr)
+	}
+	if lerr != nil {
+		panic(lerr)
+	}
+	entries, err := storage.Entries(lo, hi+1)
+	if err != nil {
+		entries = make([]pb.Entry, 0)
+	}
 	return &RaftLog{
 		storage:   storage,
 		committed: 0,
 		applied:   0,
-		entries:   make([]pb.Entry, 0),
+		stabled:   hi,
+		entries:   entries,
 	}
 }
 
@@ -76,18 +92,33 @@ func (l *RaftLog) maybeCompact() {
 // unstableEntries return all the unstable entries
 func (l *RaftLog) unstableEntries() []pb.Entry {
 	// Your Code Here (2A).
-	return l.entries[l.stabled-l.entries[0].Index:]
+	if l.stabled == l.LastIndex() {
+		return make([]pb.Entry, 0)
+	}
+	if entries, err := l.Slice(l.stabled+1, l.LastIndex()+1); err != nil {
+		log.Errorf(err.Error())
+		return make([]pb.Entry, 0)
+	} else if entries == nil {
+		return make([]pb.Entry, 0)
+	} else {
+		return entries
+	}
 }
 
 // nextEnts returns all the committed but not applied entries
 func (l *RaftLog) nextEnts() (ents []pb.Entry) {
 	// Your Code Here (2A).
-	if l.committed == l.applied {
+	if l.applied == l.LastIndex() {
 		return make([]pb.Entry, 0)
 	}
-	var c_index = l.committed - l.entries[0].Index
-	a_index := l.applied - l.entries[0].Index
-	return l.entries[a_index:c_index]
+	if entries, err := l.Slice(l.applied+1, l.committed+1); err != nil {
+		log.Errorf(err.Error())
+		return make([]pb.Entry, 0)
+	} else if entries == nil {
+		return make([]pb.Entry, 0)
+	} else {
+		return entries
+	}
 }
 
 // LastIndex return the last index of the log entries
@@ -114,4 +145,105 @@ func (l *RaftLog) Term(i uint64) (uint64, error) {
 		return l.storage.Term(i)
 	}
 	return l.entries[i-l.entries[0].Index].Term, nil
+}
+func (l *RaftLog) SetLog(entry pb.Entry) bool {
+	if l.LastIndex() < entry.Index {
+		l.entries = append(l.entries, entry)
+		return false
+	}
+	temp := l.entries[entry.Index-l.entries[0].Index]
+	flag := !reflect.DeepEqual(temp, entry)
+	if flag {
+		l.entries = l.entries[:entry.Index-l.entries[0].Index]
+		l.entries = append(l.entries, entry)
+	} else {
+		l.entries[entry.Index-l.entries[0].Index] = entry
+	}
+	return flag
+}
+func (l *RaftLog) Advance(ready Ready) {
+	var appliedIndex uint64
+	if len(ready.CommittedEntries) > 0 {
+		appliedIndex = ready.CommittedEntries[len(ready.CommittedEntries)-1].Index
+	}
+	if appliedIndex > l.committed || appliedIndex < l.applied {
+		log.Panicf("[advance] new applied index %d is not in range [%d, %d]",
+			appliedIndex, l.applied, l.committed)
+	}
+	l.applied = appliedIndex
+	var stableIndex uint64
+	if len(ready.Entries) > 0 {
+		stableIndex = ready.Entries[len(ready.Entries)-1].Index
+	}
+	l.UpdateEntries(stableIndex)
+}
+func (l *RaftLog) UpdateEntries(stableIndex uint64) {
+	l.stabled = stableIndex
+	if len(l.entries) != 0 && l.stabled >= l.entries[0].Index {
+		l.entries = l.entries[l.stabled-l.entries[0].Index+1:]
+	}
+	l.stabled = max(l.stabled, stableIndex)
+}
+func (l *RaftLog) Slice(lo, hi uint64) ([]pb.Entry, error) {
+	if lo > hi {
+		log.Panicf("Invaild slice [%d:%d]", lo, hi)
+	}
+	lastIndex := l.LastIndex()
+	if lastIndex < lo || hi > lastIndex+1 {
+		log.Panicf("lo or hi can`t be bigger than lastIndex.lo=%d.hi=%d,lastIndex=%d", lo, hi, lastIndex)
+	}
+	if lo == hi {
+		return nil, nil
+	}
+	sLastIndex := l.stabled
+	if sLastIndex >= hi {
+		return l.storage.Entries(lo, hi)
+	}
+	if sLastIndex < lo {
+		if len(l.entries) != 0 {
+			return l.entries[lo-l.entries[0].Index : hi-l.entries[0].Index], nil
+		}
+		return nil, nil
+	}
+	entries, err := l.storage.Entries(lo, sLastIndex+1)
+	if err != nil {
+		return nil, err
+	}
+	if len(l.entries) != 0 {
+		if sLastIndex >= l.entries[0].Index {
+			entries = append(entries, l.entries[sLastIndex-l.entries[0].Index+1:hi-l.entries[0].Index]...)
+		} else {
+			entries = append(entries, l.entries[:hi-l.entries[0].Index]...)
+		}
+	}
+	return entries, nil
+}
+
+func (l *RaftLog) Append(entries []*pb.Entry) {
+	if len(entries) == 0 {
+		return
+	}
+	if entries[0].Index <= l.stabled {
+		preStable, err := l.storage.Entries(entries[0].Index, l.stabled+1)
+		if err != nil {
+			log.Panicf(err.Error())
+		}
+		var i int
+		for i = 0; i < len(preStable) && i < len(entries); i++ {
+			if preStable[i].Term != entries[i].Term {
+				l.stabled = preStable[i].Index - 1
+				break
+			}
+		}
+		entries = entries[i:]
+	}
+	if len(entries) == 0 {
+		return
+	}
+	if len(l.entries) != 0 && l.entries[len(l.entries)-1].Index >= entries[0].Index {
+		l.entries = l.entries[:entries[0].Index-l.entries[0].Index]
+	}
+	for _, entry := range entries {
+		l.entries = append(l.entries, *entry)
+	}
 }

@@ -70,12 +70,15 @@ type Ready struct {
 type RawNode struct {
 	Raft *Raft
 	// Your Data Here (2A).
+	preHardState pb.HardState
+	preSoftState *SoftState
 }
 
 // NewRawNode returns a new RawNode given configuration and a list of raft peers.
 func NewRawNode(config *Config) (*RawNode, error) {
 	// Your Code Here (2A).
-	return nil, nil
+	raft := newRaft(config)
+	return &RawNode{Raft: raft, preHardState: raft.GetHardState(), preSoftState: raft.GetSoftState()}, nil
 }
 
 // Tick advances the internal logical clock by a single tick.
@@ -143,12 +146,28 @@ func (rn *RawNode) Step(m pb.Message) error {
 // Ready returns the current point-in-time state of this RawNode.
 func (rn *RawNode) Ready() Ready {
 	// Your Code Here (2A).
-	return Ready{}
+	hardState, softState := rn.FetchRaftState()
+	ready := Ready{
+		Entries:          rn.Raft.RaftLog.unstableEntries(),
+		CommittedEntries: rn.Raft.RaftLog.nextEnts(),
+		Messages:         rn.Raft.msgs,
+		HardState:        hardState,
+		SoftState:        softState,
+	}
+	rn.Raft.msgs = rn.Raft.msgs[:0]
+	return ready
 }
 
 // HasReady called when RawNode user need to check if any Ready pending.
 func (rn *RawNode) HasReady() bool {
 	// Your Code Here (2A).
+	hardState, softState := rn.FetchRaftState()
+	if !IsEmptyHardState(hardState) || softState != nil {
+		return true
+	}
+	if len(rn.Raft.msgs) > 0 || len(rn.Raft.RaftLog.unstableEntries()) > 0 || len(rn.Raft.RaftLog.nextEnts()) > 0 {
+		return true
+	}
 	return false
 }
 
@@ -156,6 +175,7 @@ func (rn *RawNode) HasReady() bool {
 // last Ready results.
 func (rn *RawNode) Advance(rd Ready) {
 	// Your Code Here (2A).
+	rn.Raft.Advance(rd)
 }
 
 // GetProgress return the the Progress of this node and its peers, if this
@@ -173,4 +193,19 @@ func (rn *RawNode) GetProgress() map[uint64]Progress {
 // TransferLeader tries to transfer leadership to the given transferee.
 func (rn *RawNode) TransferLeader(transferee uint64) {
 	_ = rn.Raft.Step(pb.Message{MsgType: pb.MessageType_MsgTransferLeader, From: transferee})
+}
+func (rn *RawNode) FetchRaftState() (hardState pb.HardState, softState *SoftState) {
+	nowHardState := rn.Raft.GetHardState()
+	nowSoftState := rn.Raft.GetSoftState()
+	if isHardStateEqual(nowHardState, rn.preHardState) {
+		hardState = pb.HardState{}
+	} else {
+		hardState = nowHardState
+	}
+	if nowSoftState.Lead == rn.preSoftState.Lead && nowSoftState.RaftState == rn.preSoftState.RaftState {
+		softState = nil
+	} else {
+		softState = nowSoftState
+	}
+	return
 }
