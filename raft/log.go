@@ -15,8 +15,6 @@
 package raft
 
 import (
-	"reflect"
-
 	"github.com/pingcap-incubator/tinykv/log"
 	pb "github.com/pingcap-incubator/tinykv/proto/pkg/eraftpb"
 )
@@ -55,6 +53,7 @@ type RaftLog struct {
 	pendingSnapshot *pb.Snapshot
 
 	// Your Data Here (2A).
+	FirstIndex uint64
 }
 
 // newLog returns log using the given storage. It recovers the log
@@ -74,11 +73,12 @@ func newLog(storage Storage) *RaftLog {
 		entries = make([]pb.Entry, 0)
 	}
 	return &RaftLog{
-		storage:   storage,
-		committed: 0,
-		applied:   0,
-		stabled:   hi,
-		entries:   entries,
+		storage:    storage,
+		committed:  lo - 1,
+		applied:    lo - 1,
+		stabled:    hi,
+		entries:    entries,
+		FirstIndex: lo,
 	}
 }
 
@@ -91,34 +91,24 @@ func (l *RaftLog) maybeCompact() {
 
 // unstableEntries return all the unstable entries
 func (l *RaftLog) unstableEntries() []pb.Entry {
-	// Your Code Here (2A).
-	if l.stabled == l.LastIndex() {
-		return make([]pb.Entry, 0)
+	if len(l.entries) > 0 {
+		return l.entries[l.stabled-l.FirstIndex+1:]
 	}
-	if entries, err := l.Slice(l.stabled+1, l.LastIndex()+1); err != nil {
-		log.Errorf(err.Error())
-		return make([]pb.Entry, 0)
-	} else if entries == nil {
-		return make([]pb.Entry, 0)
-	} else {
-		return entries
-	}
+	return nil
 }
 
 // nextEnts returns all the committed but not applied entries
 func (l *RaftLog) nextEnts() (ents []pb.Entry) {
-	// Your Code Here (2A).
-	if l.applied == l.LastIndex() {
-		return make([]pb.Entry, 0)
+	if len(l.entries) > 0 {
+		return l.entries[l.applied-l.FirstIndex+1 : l.committed-l.FirstIndex+1]
 	}
-	if entries, err := l.Slice(l.applied+1, l.committed+1); err != nil {
-		log.Errorf(err.Error())
-		return make([]pb.Entry, 0)
-	} else if entries == nil {
-		return make([]pb.Entry, 0)
-	} else {
-		return entries
+	return nil
+}
+func (l *RaftLog) uncommitEnts() (ents []pb.Entry) {
+	if len(l.entries) > 0 {
+		return l.entries[l.committed-l.FirstIndex+1:]
 	}
+	return nil
 }
 
 // LastIndex return the last index of the log entries
@@ -146,104 +136,75 @@ func (l *RaftLog) Term(i uint64) (uint64, error) {
 	}
 	return l.entries[i-l.entries[0].Index].Term, nil
 }
-func (l *RaftLog) SetLog(entry pb.Entry) bool {
-	if l.LastIndex() < entry.Index {
-		l.entries = append(l.entries, entry)
-		return false
-	}
-	temp := l.entries[entry.Index-l.entries[0].Index]
-	flag := !reflect.DeepEqual(temp, entry)
-	if flag {
-		l.entries = l.entries[:entry.Index-l.entries[0].Index]
-		l.entries = append(l.entries, entry)
-	} else {
-		l.entries[entry.Index-l.entries[0].Index] = entry
-	}
-	return flag
-}
 func (l *RaftLog) Advance(ready Ready) {
-	var appliedIndex uint64
-	if len(ready.CommittedEntries) > 0 {
-		appliedIndex = ready.CommittedEntries[len(ready.CommittedEntries)-1].Index
-	}
-	if appliedIndex > l.committed || appliedIndex < l.applied {
-		log.Panicf("[advance] new applied index %d is not in range [%d, %d]",
-			appliedIndex, l.applied, l.committed)
-	}
-	l.applied = appliedIndex
-	var stableIndex uint64
 	if len(ready.Entries) > 0 {
-		stableIndex = ready.Entries[len(ready.Entries)-1].Index
+		l.stabled = ready.Entries[len(ready.Entries)-1].Index
 	}
-	l.UpdateEntries(stableIndex)
+	if len(ready.CommittedEntries) > 0 {
+		l.applied = ready.CommittedEntries[len(ready.CommittedEntries)-1].Index
+		if l.applied > l.committed {
+			log.Panicf("[Advance]applied index %d bigger than commit index %d", l.applied, l.committed)
+		}
+	}
 }
 func (l *RaftLog) UpdateEntries(stableIndex uint64) {
-	l.stabled = stableIndex
-	if len(l.entries) != 0 && l.stabled >= l.entries[0].Index {
+	if len(l.entries) != 0 && stableIndex >= l.entries[0].Index {
 		l.entries = l.entries[l.stabled-l.entries[0].Index+1:]
 	}
 	l.stabled = max(l.stabled, stableIndex)
 }
+
 func (l *RaftLog) Slice(lo, hi uint64) ([]pb.Entry, error) {
 	if lo > hi {
-		log.Panicf("Invaild slice [%d:%d]", lo, hi)
+		log.Panicf("[slice]Invaild slice [%d:%d]", lo, hi)
 	}
-	lastIndex := l.LastIndex()
-	if lastIndex < lo || hi > lastIndex+1 {
-		log.Panicf("lo or hi can`t be bigger than lastIndex.lo=%d.hi=%d,lastIndex=%d", lo, hi, lastIndex)
+	if lo > l.LastIndex() || hi > l.LastIndex()+1 {
+		log.Panicf("[slice]lo %d bigger than lastIndex %d or hi %d bigger than lastIndex puls one %d", lo, l.LastIndex(), hi, l.LastIndex()+1)
 	}
-	if lo == hi {
-		return nil, nil
+	if hi < l.FirstIndex {
+		return nil, ErrUnavailable
 	}
-	sLastIndex := l.stabled
-	if sLastIndex >= hi {
-		return l.storage.Entries(lo, hi)
+	if lo < l.FirstIndex {
+		lo = l.FirstIndex
 	}
-	if sLastIndex < lo {
-		if len(l.entries) != 0 {
-			return l.entries[lo-l.entries[0].Index : hi-l.entries[0].Index], nil
-		}
-		return nil, nil
+	if len(l.entries) > 0 {
+		return l.entries[l.toSliceIndex(lo):l.toSliceIndex(hi)], nil
 	}
-	entries, err := l.storage.Entries(lo, sLastIndex+1)
-	if err != nil {
-		return nil, err
-	}
-	if len(l.entries) != 0 {
-		if sLastIndex >= l.entries[0].Index {
-			entries = append(entries, l.entries[sLastIndex-l.entries[0].Index+1:hi-l.entries[0].Index]...)
-		} else {
-			entries = append(entries, l.entries[:hi-l.entries[0].Index]...)
-		}
-	}
-	return entries, nil
+	return nil, nil
 }
 
 func (l *RaftLog) Append(entries []*pb.Entry) {
 	if len(entries) == 0 {
 		return
 	}
-	if entries[0].Index <= l.stabled {
-		preStable, err := l.storage.Entries(entries[0].Index, l.stabled+1)
-		if err != nil {
-			log.Panicf(err.Error())
+	for i, ent := range entries {
+		if ent.Index < l.FirstIndex {
+			continue
 		}
-		var i int
-		for i = 0; i < len(preStable) && i < len(entries); i++ {
-			if preStable[i].Term != entries[i].Term {
-				l.stabled = preStable[i].Index - 1
-				break
+		if ent.Index <= l.LastIndex() {
+			term, err := l.Term(ent.Index)
+			if err != nil {
+				panic(err)
+			}
+			if term != ent.Term {
+				idx := l.toSliceIndex(ent.Index)
+				l.entries[idx] = *ent
+				l.entries = l.entries[:idx+1]
+				l.stabled = min(l.stabled, ent.Index-1)
+			}
+		} else {
+			n := len(entries)
+			for j := i; j < n; j++ {
+				l.entries = append(l.entries, *entries[j])
 			}
 		}
-		entries = entries[i:]
 	}
-	if len(entries) == 0 {
-		return
+}
+
+func (l *RaftLog) toSliceIndex(index uint64) int {
+	idx := int(index - l.FirstIndex)
+	if idx < 0 {
+		panic("toSliceIndex: index < 0")
 	}
-	if len(l.entries) != 0 && l.entries[len(l.entries)-1].Index >= entries[0].Index {
-		l.entries = l.entries[:entries[0].Index-l.entries[0].Index]
-	}
-	for _, entry := range entries {
-		l.entries = append(l.entries, *entry)
-	}
+	return idx
 }

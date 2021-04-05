@@ -26,12 +26,14 @@ type router struct {
 
 func newRouter(storeSender chan<- message.Msg) *router {
 	pm := &router{
+		//size the max number of messages
 		peerSender:  make(chan message.Msg, 40960),
 		storeSender: storeSender,
 	}
 	return pm
 }
 
+// get the state of the specified regionID
 func (pr *router) get(regionID uint64) *peerState {
 	v, ok := pr.peers.Load(regionID)
 	if ok {
@@ -40,6 +42,7 @@ func (pr *router) get(regionID uint64) *peerState {
 	return nil
 }
 
+// store <regionId,peerState> in sync.Map
 func (pr *router) register(peer *peer) {
 	id := peer.regionId
 	newPeer := &peerState{
@@ -48,6 +51,7 @@ func (pr *router) register(peer *peer) {
 	pr.peers.Store(id, newPeer)
 }
 
+//  turn peerState to close,and delete peerState of specified in sync.map
 func (pr *router) close(regionID uint64) {
 	v, ok := pr.peers.Load(regionID)
 	if ok {
@@ -57,6 +61,7 @@ func (pr *router) close(regionID uint64) {
 	}
 }
 
+// send message to specified region
 func (pr *router) send(regionID uint64, msg message.Msg) error {
 	msg.RegionID = regionID
 	p := pr.get(regionID)
@@ -67,6 +72,7 @@ func (pr *router) send(regionID uint64, msg message.Msg) error {
 	return nil
 }
 
+// send to store channel
 func (pr *router) sendStore(msg message.Msg) {
 	pr.storeSender <- msg
 }
@@ -81,6 +87,7 @@ func NewRaftstoreRouter(router *router) *RaftstoreRouter {
 	return &RaftstoreRouter{router: router}
 }
 
+// send message to specified region
 func (r *RaftstoreRouter) Send(regionID uint64, msg message.Msg) error {
 	return r.router.send(regionID, msg)
 }
@@ -94,6 +101,7 @@ func (r *RaftstoreRouter) SendRaftMessage(msg *raft_serverpb.RaftMessage) error 
 
 }
 
+// send command to specified peer
 func (r *RaftstoreRouter) SendRaftCommand(req *raft_cmdpb.RaftCmdRequest, cb *message.Callback) error {
 	cmd := &message.MsgRaftCmd{
 		Request:  req,

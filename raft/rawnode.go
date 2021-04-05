@@ -137,7 +137,9 @@ func (rn *RawNode) Step(m pb.Message) error {
 	if IsLocalMsg(m.MsgType) {
 		return ErrStepLocalMsg
 	}
-	if pr := rn.Raft.Prs[m.From]; pr != nil || !IsResponseMsg(m.MsgType) {
+	t := m.MsgType
+
+	if pr := rn.Raft.Prs[m.From]; pr != nil || !IsResponseMsg(t) {
 		return rn.Raft.Step(m)
 	}
 	return ErrStepPeerNotFound
@@ -154,15 +156,15 @@ func (rn *RawNode) Ready() Ready {
 		HardState:        hardState,
 		SoftState:        softState,
 	}
-	rn.Raft.msgs = rn.Raft.msgs[:0]
+	rn.Raft.msgs = make([]pb.Message, 0)
 	return ready
 }
 
 // HasReady called when RawNode user need to check if any Ready pending.
 func (rn *RawNode) HasReady() bool {
 	// Your Code Here (2A).
-	hardState, softState := rn.FetchRaftState()
-	if !IsEmptyHardState(hardState) || softState != nil {
+	hardState, _ := rn.FetchRaftState()
+	if !IsEmptyHardState(hardState) {
 		return true
 	}
 	if len(rn.Raft.msgs) > 0 || len(rn.Raft.RaftLog.unstableEntries()) > 0 || len(rn.Raft.RaftLog.nextEnts()) > 0 {
@@ -175,6 +177,9 @@ func (rn *RawNode) HasReady() bool {
 // last Ready results.
 func (rn *RawNode) Advance(rd Ready) {
 	// Your Code Here (2A).
+	if !IsEmptyHardState(rd.HardState) {
+		rn.preHardState = rd.HardState
+	}
 	rn.Raft.Advance(rd)
 }
 
@@ -201,6 +206,12 @@ func (rn *RawNode) FetchRaftState() (hardState pb.HardState, softState *SoftStat
 		hardState = pb.HardState{}
 	} else {
 		hardState = nowHardState
+	}
+	if nowSoftState != nil && rn.preSoftState == nil {
+		softState = nowSoftState
+		return
+	} else {
+		softState = nil
 	}
 	if nowSoftState.Lead == rn.preSoftState.Lead && nowSoftState.RaftState == rn.preSoftState.RaftState {
 		softState = nil

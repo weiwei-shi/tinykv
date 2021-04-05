@@ -19,6 +19,7 @@ import (
 	"math/rand"
 	"sort"
 
+	"github.com/pingcap-incubator/tinykv/log"
 	pb "github.com/pingcap-incubator/tinykv/proto/pkg/eraftpb"
 )
 
@@ -190,7 +191,6 @@ func newRaft(c *Config) *Raft {
 		heartbeatTimeout: c.HeartbeatTick,
 		electionElapsed:  c.ElectionTick,
 		electionTimeout:  c.ElectionTick,
-		Prs:              make(map[uint64]*Progress, len(c.peers)),
 	}
 	raft.becomeFollower(0, None)
 	state, confState, _ := raft.RaftLog.storage.InitialState()
@@ -198,6 +198,10 @@ func newRaft(c *Config) *Raft {
 		raft.Peers = c.peers
 	} else {
 		raft.Peers = confState.Nodes
+	}
+	raft.Prs = make(map[uint64]*Progress, len(raft.Peers))
+	for _, i := range raft.Peers {
+		raft.Prs[i] = &Progress{}
 	}
 	raft.Term, raft.Vote, raft.RaftLog.committed = state.Term, state.Vote, state.Commit
 	return raft
@@ -209,10 +213,14 @@ func (r *Raft) sendAppend(to uint64) bool {
 	// Your Code Here (2A).
 	next_index := r.Prs[to].Next
 	log_term, _ := r.RaftLog.Term(next_index - 1)
-	first_index := r.RaftLog.entries[0].Index
-	var entries []*pb.Entry
-	for index := int(next_index - first_index); index < len(r.RaftLog.entries); index++ {
-		entries = append(entries, &r.RaftLog.entries[index])
+	last_index := r.RaftLog.LastIndex()
+	entries := make([]*pb.Entry, 0)
+	if next_index <= last_index {
+		next_ents, _ := r.RaftLog.Slice(next_index, last_index+1)
+		for _, entry := range next_ents {
+			temp := entry
+			entries = append(entries, &temp)
+		}
 	}
 	message := pb.Message{
 		From:    r.id,
@@ -231,6 +239,7 @@ func (r *Raft) sendAppend(to uint64) bool {
 // sendHeartbeat sends a heartbeat RPC to the given peer.
 func (r *Raft) sendHeartbeat(to uint64) {
 	// Your Code Here (2A).
+	// log.Infof("%v send heart beat msg to %v", r.id, to)
 	var match uint64
 	match = 0
 	if len(r.Prs) != 0 {
@@ -311,6 +320,7 @@ func (r *Raft) becomeLeader() {
 	// Your Code Here (2A).
 	// NOTE: Leader should propose a noop entry on its term
 	//open heart beat
+	// log.Infof("%v become leader,old leader is %v", r.id, r.Lead)
 	r.restHeartbeatTime()
 	r.tickFunc = r.heartbeatTickFunc
 	//close  election time
@@ -356,6 +366,7 @@ func (r *Raft) Step(m pb.Message) error {
 			r.becomeCandidate()
 			r.sendVoteMessage()
 		case pb.MessageType_MsgPropose:
+			// log.Infof("%v not leader", r.id)
 			break
 		case pb.MessageType_MsgRequestVote:
 			r.msgs = append(r.msgs, r.responseVote(m.From, m.Term, m.Index, m.LogTerm))
@@ -369,6 +380,8 @@ func (r *Raft) Step(m pb.Message) error {
 			r.handleHeartbeat(m)
 		case pb.MessageType_MsgHeartbeatResponse:
 			break
+		case pb.MessageType_MsgSnapshot:
+			r.handleSnapshot(m)
 		}
 	case StateCandidate:
 		switch m.MsgType {
@@ -376,6 +389,7 @@ func (r *Raft) Step(m pb.Message) error {
 			r.becomeCandidate()
 			r.sendVoteMessage()
 		case pb.MessageType_MsgPropose:
+			// log.Infof("%v not leader", r.id)
 			break
 		case pb.MessageType_MsgRequestVote:
 			r.msgs = append(r.msgs, r.responseVote(m.From, m.Term, m.Index, m.LogTerm))
@@ -389,6 +403,8 @@ func (r *Raft) Step(m pb.Message) error {
 			r.handleHeartbeat(m)
 		case pb.MessageType_MsgHeartbeatResponse:
 			break
+		case pb.MessageType_MsgSnapshot:
+			r.handleSnapshot(m)
 		}
 	case StateLeader:
 		switch m.MsgType {
@@ -420,22 +436,24 @@ func (r *Raft) Step(m pb.Message) error {
 			r.handleHeartbeat(m)
 		case pb.MessageType_MsgHeartbeatResponse:
 			r.handleHeartbeatResponse(m)
+		case pb.MessageType_MsgSnapshot:
+			r.handleSnapshot(m)
 		}
-
 	}
 	return nil
 }
 
 func (r *Raft) handlePropose(m pb.Message) {
-	for _, entry := range m.Entries {
-		entry.Index = r.RaftLog.LastIndex() + 1
+	lastIndex := r.RaftLog.LastIndex()
+	for i, entry := range m.Entries {
+		entry.Index = lastIndex + uint64(i) + 1
 		entry.Term = r.Term
 		r.RaftLog.entries = append(r.RaftLog.entries, *entry)
 	}
 	for _, id := range r.Peers {
 		if id == r.id {
 			r.Prs[id].Match = r.RaftLog.LastIndex()
-			r.Prs[id].Next = r.RaftLog.LastIndex() + 1
+			r.Prs[id].Next = r.Prs[id].Match + 1
 			if len(r.Peers) == 1 {
 				r.RaftLog.committed = r.Prs[id].Match
 			}
@@ -463,21 +481,28 @@ func (r *Raft) handleAppendEntries(m pb.Message) {
 		return
 	}
 	pre_index_term, err := r.RaftLog.Term(m.Index)
-	if m.Index < r.RaftLog.committed && pre_index_term == m.LogTerm {
+	if err == nil && m.Index < r.RaftLog.committed && pre_index_term == m.LogTerm {
 		message.Reject = false
 		r.msgs = append(r.msgs, message)
 		return
 	}
-	if err != nil || pre_index_term != m.LogTerm || m.Index < r.RaftLog.committed {
-		for _, entry := range r.RaftLog.entries {
+	if err != nil || pre_index_term != m.LogTerm {
+		for _, entry := range r.RaftLog.uncommitEnts() {
 			temp := pb.Entry{Term: entry.Term, Index: entry.Index}
 			message.Entries = append(message.Entries, &temp)
 		}
+		message.Index = r.RaftLog.committed
 		r.msgs = append(r.msgs, message)
 		return
 	}
+	// log.Infof("[handleAppendEntries]%d receive Append entries m_log_trem %d,pre_index %d,pre_index_term %d", r.id, m.LogTerm, m.Index, pre_index_term)
 	r.RaftLog.Append(m.Entries)
-	r.RaftLog.committed = min(m.Commit, m.Index+uint64(len(m.Entries)))
+	if m.Commit > r.RaftLog.committed {
+		r.RaftLog.committed = min(m.Commit, r.RaftLog.LastIndex())
+	}
+	if r.RaftLog.committed < r.RaftLog.applied {
+		log.Panicf("[handleAppendEntries]%d committed index %d smaller than applied index %d", r.id, r.RaftLog.committed, r.RaftLog.applied)
+	}
 	message.Reject = false
 	message.Index = r.RaftLog.LastIndex()
 	r.msgs = append(r.msgs, message)
@@ -485,7 +510,7 @@ func (r *Raft) handleAppendEntries(m pb.Message) {
 }
 func (r *Raft) handleAppendEntriesResponse(m pb.Message) error {
 	//old message
-	if m.Term < r.Term || m.Index < r.Prs[m.From].Next-1 {
+	if m.Term < r.Term {
 		return nil
 	}
 	if m.Reject {
@@ -499,7 +524,7 @@ func (r *Raft) handleAppendEntriesResponse(m pb.Message) error {
 		if index > -1 {
 			r.Prs[m.From].Next = m.Entries[index].Index + 1
 		} else {
-			r.Prs[m.From].Next = 1
+			r.Prs[m.From].Next = m.Index + 1
 		}
 		r.sendAppend(m.From)
 		return nil
@@ -526,6 +551,9 @@ func (r *Raft) handleAppendEntriesResponse(m pb.Message) error {
 			}
 		}
 	}
+	if r.RaftLog.committed < r.RaftLog.applied {
+		log.Panicf("[handleAppendEntries]%d committed index %d smaller than applied index %d", r.id, r.RaftLog.committed, r.RaftLog.applied)
+	}
 	return nil
 }
 
@@ -533,9 +561,9 @@ func (r *Raft) handleAppendEntriesResponse(m pb.Message) error {
 func (r *Raft) handleHeartbeat(m pb.Message) {
 	// Your Code Here (2A).
 	if m.Term >= r.Term {
-		r.RaftLog.committed = min(r.RaftLog.LastIndex(), m.Commit)
-	}
-	if m.Term > r.Term {
+		// log.Infof("%v receive %v heart beat msg", r.id, m.From)
+		commit := min(r.RaftLog.LastIndex(), m.Commit)
+		r.RaftLog.committed = max(r.RaftLog.committed, commit)
 		r.becomeFollower(m.Term, m.From)
 		return
 	}
@@ -549,6 +577,9 @@ func (r *Raft) handleHeartbeat(m pb.Message) {
 		}
 		r.msgs = append(r.msgs, message)
 		return
+	}
+	if r.RaftLog.committed < r.RaftLog.applied {
+		log.Panicf("[handleAppendEntries]%d committed index %d smaller than applied index %d", r.id, r.RaftLog.committed, r.RaftLog.applied)
 	}
 }
 func (r *Raft) handleHeartbeatResponse(m pb.Message) {

@@ -51,6 +51,7 @@ func NewCluster(count int, schedulerClient *MockSchedulerClient, simulator Simul
 	}
 }
 
+// 创建了几个cluster的store
 func (c *Cluster) Start() {
 	ctx := context.TODO()
 	clusterID := c.schedulerClient.GetClusterID(ctx)
@@ -131,6 +132,7 @@ func (c *Cluster) Start() {
 		if err != nil {
 			panic(err)
 		}
+		// 删掉了启动状态
 		raftstore.ClearPrepareBootstrapState(engine)
 	}
 
@@ -220,6 +222,14 @@ func (c *Cluster) CallCommandOnLeader(request *raft_cmdpb.RaftCmdRequest, timeou
 		resp, txn := c.CallCommand(request, 1*time.Second)
 		if resp == nil {
 			log.Debugf("can't call command %s on leader %d of region %d", request.String(), leader.GetId(), regionID)
+			requests := request.Requests
+			if len(requests) != 0 {
+				request := requests[0]
+				if request.CmdType == raft_cmdpb.CmdType_Put {
+					log.Infof("leader %v cf %v,client new put %v,%v\n", leader, request.Put.Cf, string(request.Put.Key), string(request.Put.Value))
+				}
+			}
+			log.Infof("can't call command %s on leader %d of region %d", request.String(), leader.GetId(), regionID)
 			newLeader := c.LeaderOfRegion(regionID)
 			if leader == newLeader {
 				region, _, err := c.schedulerClient.GetRegionByID(context.TODO(), regionID)
@@ -229,10 +239,19 @@ func (c *Cluster) CallCommandOnLeader(request *raft_cmdpb.RaftCmdRequest, timeou
 				peers := region.GetPeers()
 				leader = peers[rand.Int()%len(peers)]
 				log.Debugf("leader info maybe wrong, use random leader %d of region %d", leader.GetId(), regionID)
+				log.Infof("leader info maybe wrong, use random leader %d of region %d", leader.GetId(), regionID)
 			} else {
 				leader = newLeader
 				log.Debugf("use new leader %d of region %d", leader.GetId(), regionID)
+				log.Infof("use new leader %d of region %d", leader.GetId(), regionID)
 			}
+			if len(requests) != 0 {
+				request := requests[0]
+				if request.CmdType == raft_cmdpb.CmdType_Put {
+					log.Infof("leader %v cf %v,client new put %v,%v\n", leader, request.Put.Cf, string(request.Put.Key), string(request.Put.Value))
+				}
+			}
+
 			continue
 		}
 		if resp.Header.Error != nil {
