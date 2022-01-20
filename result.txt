@@ -1,0 +1,160 @@
+=== RUN   TestSplitConfChangeSnapshotUnreliableRecoverConcurrentPartition3B
+2021/05/10 10:09:56.520328 node.go:193: [0;37m[info] start raft store node, storeID: 1[0m
+2021/05/10 10:09:56.520752 peer.go:41: [0;37m[info] region id:1 region_epoch:<conf_ver:1 version:1 > peers:<id:4 store_id:4 > peers:<id:5 store_id:5 > peers:<id:1 store_id:1 > peers:<id:2 store_id:2 > peers:<id:3 store_id:3 >  create peer with ID 1[0m
+2021/05/10 10:09:56.520863 raftstore.go:174: [0;37m[info] start store 1, region_count 1, tombstone_count 0, takes 265.824µs[0m
+2021/05/10 10:09:56.521688 node.go:193: [0;37m[info] start raft store node, storeID: 2[0m
+2021/05/10 10:09:56.521843 peer.go:41: [0;37m[info] region id:1 region_epoch:<conf_ver:1 version:1 > peers:<id:4 store_id:4 > peers:<id:5 store_id:5 > peers:<id:1 store_id:1 > peers:<id:2 store_id:2 > peers:<id:3 store_id:3 >  create peer with ID 2[0m
+2021/05/10 10:09:56.521918 raftstore.go:174: [0;37m[info] start store 2, region_count 1, tombstone_count 0, takes 128.226µs[0m
+2021/05/10 10:09:56.522651 node.go:193: [0;37m[info] start raft store node, storeID: 3[0m
+2021/05/10 10:09:56.522801 peer.go:41: [0;37m[info] region id:1 region_epoch:<conf_ver:1 version:1 > peers:<id:4 store_id:4 > peers:<id:5 store_id:5 > peers:<id:1 store_id:1 > peers:<id:2 store_id:2 > peers:<id:3 store_id:3 >  create peer with ID 3[0m
+2021/05/10 10:09:56.522866 raftstore.go:174: [0;37m[info] start store 3, region_count 1, tombstone_count 0, takes 114.368µs[0m
+2021/05/10 10:09:56.523595 node.go:193: [0;37m[info] start raft store node, storeID: 4[0m
+2021/05/10 10:09:56.523730 peer.go:41: [0;37m[info] region id:1 region_epoch:<conf_ver:1 version:1 > peers:<id:4 store_id:4 > peers:<id:5 store_id:5 > peers:<id:1 store_id:1 > peers:<id:2 store_id:2 > peers:<id:3 store_id:3 >  create peer with ID 4[0m
+2021/05/10 10:09:56.523794 raftstore.go:174: [0;37m[info] start store 4, region_count 1, tombstone_count 0, takes 110.05µs[0m
+2021/05/10 10:09:56.524441 node.go:193: [0;37m[info] start raft store node, storeID: 5[0m
+2021/05/10 10:09:56.524594 peer.go:41: [0;37m[info] region id:1 region_epoch:<conf_ver:1 version:1 > peers:<id:4 store_id:4 > peers:<id:5 store_id:5 > peers:<id:1 store_id:1 > peers:<id:2 store_id:2 > peers:<id:3 store_id:3 >  create peer with ID 5[0m
+2021/05/10 10:09:56.524656 raftstore.go:174: [0;37m[info] start store 5, region_count 1, tombstone_count 0, takes 130.45µs[0m
+2021/05/10 10:09:57.128943 raft.go:345: [0;37m[info] [becomeLeader]3 become leader[0m
+2021/05/10 10:09:57.223322 scheduler.go:303: [0;37m[info] new region 1 has been add[0m
+2021/05/10 10:09:57.825291 test_test.go:118: [0;37m[info] partition: [1 2 4 5], [3][0m
+2021/05/10 10:09:57.858170 peer_msg_handler.go:388: [0;37m[info] [region 1] 3 on split with [49 32 48 48 48 48 48 48 48 52][0m
+2021/05/10 10:09:57.858372 scheduler_task.go:102: [0;37m[info] [onAskSplit]region epoch is conf_ver:1 version:1 ,peers 5[0m
+2021/05/10 10:09:57.925932 peer_msg_handler.go:388: [0;37m[info] [region 1] 3 on split with [49 32 48 48 48 48 48 48 48 52][0m
+2021/05/10 10:09:57.925992 scheduler_task.go:102: [0;37m[info] [onAskSplit]region epoch is conf_ver:1 version:1 ,peers 5[0m
+2021/05/10 10:09:58.026212 peer_msg_handler.go:388: [0;37m[info] [region 1] 3 on split with [49 32 48 48 48 48 48 48 48 52][0m
+2021/05/10 10:09:58.026348 scheduler_task.go:102: [0;37m[info] [onAskSplit]region epoch is conf_ver:1 version:1 ,peers 5[0m
+2021/05/10 10:09:58.126085 peer_msg_handler.go:388: [0;37m[info] [region 1] 3 on split with [49 32 48 48 48 48 48 48 48 52][0m
+2021/05/10 10:09:58.126266 scheduler_task.go:102: [0;37m[info] [onAskSplit]region epoch is conf_ver:1 version:1 ,peers 5[0m
+2021/05/10 10:09:58.225975 peer_msg_handler.go:388: [0;37m[info] [region 1] 3 on split with [49 32 48 48 48 48 48 48 48 52][0m
+2021/05/10 10:09:58.226087 scheduler_task.go:102: [0;37m[info] [onAskSplit]region epoch is conf_ver:1 version:1 ,peers 5[0m
+2021/05/10 10:09:58.327559 peer_msg_handler.go:388: [0;37m[info] [region 1] 3 on split with [49 32 48 48 48 48 48 48 48 52][0m
+2021/05/10 10:09:58.327742 scheduler_task.go:102: [0;37m[info] [onAskSplit]region epoch is conf_ver:1 version:1 ,peers 5[0m
+2021/05/10 10:09:58.334613 raft.go:345: [0;37m[info] [becomeLeader]5 become leader[0m
+2021/05/10 10:09:58.426714 peer_msg_handler.go:388: [0;37m[info] [region 1] 3 on split with [49 32 48 48 48 48 48 48 48 52][0m
+2021/05/10 10:09:58.426893 scheduler_task.go:102: [0;37m[info] [onAskSplit]region epoch is conf_ver:1 version:1 ,peers 5[0m
+2021/05/10 10:09:58.429042 peer_msg_handler.go:388: [0;37m[info] [region 1] 5 on split with [49 32 48 48 48 48 48 48 48 52][0m
+2021/05/10 10:09:58.429224 scheduler_task.go:102: [0;37m[info] [onAskSplit]region epoch is conf_ver:1 version:1 ,peers 5[0m
+2021/05/10 10:09:58.446075 peer_msg_handler.go:338: [0;37m[info] [confChange]region 1 peer 5 region epoch is conf_ver:2 version:1 ,delete peer 2[0m
+2021/05/10 10:09:58.450913 peer_msg_handler.go:663: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2021/05/10 10:09:58.450954 peer_msg_handler.go:338: [0;37m[info] [confChange]region 1 peer 2 region epoch is conf_ver:2 version:1 ,delete peer 2[0m
+2021/05/10 10:09:58.451000 peer_msg_handler.go:751: [0;37m[info] [region 1] 2 starts destroy[0m
+2021/05/10 10:09:58.451011 peer.go:203: [0;37m[info] [region 1] 2 begin to destroy[0m
+2021/05/10 10:09:58.451119 peer_storage.go:299: [0;37m[info] [region 1] clear peer 1 meta key 1 apply key 1 raft key and 45 raft logs, takes 92.372µs[0m
+2021/05/10 10:09:58.453453 peer_msg_handler.go:338: [0;37m[info] [confChange]region 1 peer 4 region epoch is conf_ver:2 version:1 ,delete peer 2[0m
+2021/05/10 10:09:58.453465 peer_msg_handler.go:338: [0;37m[info] [confChange]region 1 peer 1 region epoch is conf_ver:2 version:1 ,delete peer 2[0m
+2021/05/10 10:09:58.458858 test_test.go:118: [0;37m[info] partition: [2 4], [1 3 5][0m
+2021/05/10 10:09:58.460829 peer_msg_handler.go:663: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2021/05/10 10:09:58.460875 peer_msg_handler.go:663: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2021/05/10 10:09:58.466195 peer.go:223: [0;37m[info] region 1 peer [region 1] 2 destory[0m
+2021/05/10 10:09:58.466280 peer.go:232: [0;37m[info] [region 1] 2 destroy itself, takes 15.26446ms[0m
+2021/05/10 10:09:58.471166 region_task.go:137: [0;37m[info] succeed in deleting data in range. [regionId: 1, startKey: , endKey: ][0m
+2021/05/10 10:09:58.526028 peer_msg_handler.go:388: [0;37m[info] [region 1] 3 on split with [49 32 48 48 48 48 48 48 48 52][0m
+2021/05/10 10:09:58.526133 log.go:116: [0;31m[error] [epoch is stale]
+[0m
+2021/05/10 10:09:58.528383 peer_msg_handler.go:388: [0;37m[info] [region 1] 5 on split with [49 32 48 48 48 48 48 48 48 52][0m
+2021/05/10 10:09:58.528487 scheduler_task.go:102: [0;37m[info] [onAskSplit]region epoch is conf_ver:2 version:1 ,peers 4[0m
+2021/05/10 10:09:58.537931 peer_msg_handler.go:338: [0;37m[info] [confChange]region 1 peer 3 region epoch is conf_ver:2 version:1 ,delete peer 2[0m
+2021/05/10 10:09:58.549992 peer_msg_handler.go:338: [0;37m[info] [confChange]region 1 peer 5 region epoch is conf_ver:3 version:1 ,delete peer 1[0m
+2021/05/10 10:09:58.552922 peer_msg_handler.go:338: [0;37m[info] [confChange]region 1 peer 1 region epoch is conf_ver:3 version:1 ,delete peer 1[0m
+2021/05/10 10:09:58.552971 peer_msg_handler.go:751: [0;37m[info] [region 1] 1 starts destroy[0m
+2021/05/10 10:09:58.552982 peer.go:203: [0;37m[info] [region 1] 1 begin to destroy[0m
+2021/05/10 10:09:58.553063 peer_storage.go:299: [0;37m[info] [region 1] clear peer 1 meta key 1 apply key 1 raft key and 47 raft logs, takes 67.078µs[0m
+2021/05/10 10:09:58.555278 peer_msg_handler.go:338: [0;37m[info] [confChange]region 1 peer 3 region epoch is conf_ver:3 version:1 ,delete peer 1[0m
+2021/05/10 10:09:58.555358 peer_msg_handler.go:663: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:3 version:1  ignore it[0m
+2021/05/10 10:09:58.565660 peer.go:223: [0;37m[info] region 1 peer [region 1] 1 destory[0m
+2021/05/10 10:09:58.565698 peer.go:232: [0;37m[info] [region 1] 1 destroy itself, takes 12.712135ms[0m
+2021/05/10 10:09:58.570593 region_task.go:137: [0;37m[info] succeed in deleting data in range. [regionId: 1, startKey: , endKey: ][0m
+2021/05/10 10:09:58.627581 peer_msg_handler.go:388: [0;37m[info] [region 1] 5 on split with [49 32 48 48 48 48 48 48 48 52][0m
+2021/05/10 10:09:58.627630 scheduler_task.go:102: [0;37m[info] [onAskSplit]region epoch is conf_ver:3 version:1 ,peers 3[0m
+2021/05/10 10:09:58.641118 peer_msg_handler.go:206: [0;37m[info] [split]peer 5 region start key [] end key [] split key [49 32 48 48 48 48 48 48 48 52][0m
+2021/05/10 10:09:58.641175 peer_msg_handler.go:207: [0;37m[info] [split]region 1 is spliting to 1,59,regionEpoch conf_ver:3 version:1  reqeust regionEpoch conf_ver:3 version:1  peers 3[0m
+2021/05/10 10:09:58.641236 peer.go:41: [0;37m[info] region id:59 start_key:"1 00000004" region_epoch:<conf_ver:3 version:2 > peers:<id:60 store_id:4 > peers:<id:61 store_id:5 > peers:<id:62 store_id:3 >  create peer with ID 61[0m
+2021/05/10 10:09:58.648187 scheduler.go:331: [0;37m[info] old region 1 has been remove[0m
+2021/05/10 10:09:58.648220 scheduler.go:303: [0;37m[info] new region 1 has been add[0m
+2021/05/10 10:09:58.730129 peer_msg_handler.go:206: [0;37m[info] [split]peer 3 region start key [] end key [] split key [49 32 48 48 48 48 48 48 48 52][0m
+2021/05/10 10:09:58.730185 peer_msg_handler.go:207: [0;37m[info] [split]region 1 is spliting to 1,59,regionEpoch conf_ver:3 version:1  reqeust regionEpoch conf_ver:3 version:1  peers 3[0m
+2021/05/10 10:09:58.730237 peer.go:41: [0;37m[info] region id:59 start_key:"1 00000004" region_epoch:<conf_ver:3 version:2 > peers:<id:60 store_id:4 > peers:<id:61 store_id:5 > peers:<id:62 store_id:3 >  create peer with ID 62[0m
+2021/05/10 10:09:58.835680 peer_msg_handler.go:338: [0;37m[info] [confChange]region 1 peer 5 region epoch is conf_ver:4 version:2 ,delete peer 5[0m
+2021/05/10 10:09:58.835735 peer_msg_handler.go:751: [0;37m[info] [region 1] 5 starts destroy[0m
+2021/05/10 10:09:58.835745 peer.go:203: [0;37m[info] [region 1] 5 begin to destroy[0m
+2021/05/10 10:09:58.835791 peer_storage.go:299: [0;37m[info] [region 1] clear peer 1 meta key 1 apply key 1 raft key and 49 raft logs, takes 33.217µs[0m
+2021/05/10 10:09:58.838438 peer_msg_handler.go:338: [0;37m[info] [confChange]region 1 peer 3 region epoch is conf_ver:4 version:2 ,delete peer 5[0m
+2021/05/10 10:09:58.841297 peer.go:223: [0;37m[info] region 1 peer [region 1] 5 destory[0m
+2021/05/10 10:09:58.841365 peer.go:232: [0;37m[info] [region 1] 5 destroy itself, takes 5.614847ms[0m
+2021/05/10 10:09:58.846203 region_task.go:137: [0;37m[info] succeed in deleting data in range. [regionId: 1, startKey: , endKey: 31203030303030303034][0m
+2021/05/10 10:09:59.100949 test_test.go:118: [0;37m[info] partition: [1 3 5], [2 4][0m
+2021/05/10 10:09:59.608026 test_test.go:118: [0;37m[info] partition: [3 5], [1 2 4][0m
+2021/05/10 10:09:59.876807 store_worker.go:139: [0;37m[info] tombstone peer receives a stale message. region_id:1, from_region_epoch:conf_ver:2 version:1 ,from peer 4 current_region_epoch:conf_ver:3 version:1 , msg_type:MsgRequestVote[0m
+2021/05/10 10:09:59.876847 peer_msg_handler.go:663: [0;37m[info] [region 1] raft message MsgRequestVote is stale, current conf_ver:3 version:1  ignore it[0m
+2021/05/10 10:10:00.123075 test_test.go:118: [0;37m[info] partition: [1 3 5], [2 4][0m
+2021/05/10 10:10:00.659124 test_test.go:118: [0;37m[info] partition: [2 3 4], [1 5][0m
+2021/05/10 10:10:01.335169 test_test.go:118: [0;37m[info] partition: [1 4], [2 3 5][0m
+2021/05/10 10:10:01.476654 store_worker.go:139: [0;37m[info] tombstone peer receives a stale message. region_id:1, from_region_epoch:conf_ver:2 version:1 ,from peer 4 current_region_epoch:conf_ver:3 version:1 , msg_type:MsgRequestVote[0m
+2021/05/10 10:10:01.476695 peer_msg_handler.go:663: [0;37m[info] [region 1] raft message MsgRequestVote is stale, current conf_ver:3 version:1  ignore it[0m
+2021/05/10 10:10:02.010247 test_test.go:118: [0;37m[info] partition: [1 2], [3 4 5][0m
+2021/05/10 10:10:02.178127 store_worker.go:139: [0;37m[info] tombstone peer receives a stale message. region_id:1, from_region_epoch:conf_ver:2 version:1 ,from peer 4 current_region_epoch:conf_ver:4 version:2 , msg_type:MsgRequestVote[0m
+2021/05/10 10:10:02.178175 peer_msg_handler.go:663: [0;37m[info] [region 1] raft message MsgRequestVote is stale, current conf_ver:4 version:2  ignore it[0m
+2021/05/10 10:10:02.575325 test_test.go:118: [0;37m[info] partition: [1 3], [2 4 5][0m
+2021/05/10 10:10:02.679548 store_worker.go:215: [0;37m[info] msg region_id:59 from_peer:<id:61 store_id:5 > to_peer:<id:60 store_id:4 > message:<msg_type:MsgRequestVote to:60 from:61 term:11 log_term:5 index:5 commit:5 > region_epoch:<conf_ver:3 version:2 > start_key:"1 00000004"  is overlapped with exist region id:1 region_epoch:<conf_ver:2 version:1 > peers:<id:4 store_id:4 > peers:<id:5 store_id:5 > peers:<id:1 store_id:1 > peers:<id:3 store_id:3 > [0m
+2021/05/10 10:10:02.679595 store_worker.go:225: [0;37m[info] [maybeCreatePeer]create new peer region id 59 store id 4 peer id 60[0m
+2021/05/10 10:10:02.679605 peer.go:51: [0;37m[info] [region 59] replicates peer with ID 60[0m
+2021/05/10 10:10:02.679627 peer_msg_handler.go:646: [0;37m[info] [region 1] 4 is stale as received a larger peer id:60 store_id:4 , destroying[0m
+2021/05/10 10:10:02.679650 peer_msg_handler.go:751: [0;37m[info] [region 1] 4 starts destroy[0m
+2021/05/10 10:10:02.682160 peer.go:203: [0;37m[info] [region 1] 4 begin to destroy[0m
+2021/05/10 10:10:02.682209 peer_storage.go:299: [0;37m[info] [region 1] clear peer 1 meta key 1 apply key 1 raft key and 45 raft logs, takes 27.11µs[0m
+2021/05/10 10:10:02.690149 peer.go:223: [0;37m[info] region 1 peer [region 1] 4 destory[0m
+2021/05/10 10:10:02.690191 peer.go:232: [0;37m[info] [region 1] 4 destroy itself, takes 8.028917ms[0m
+2021/05/10 10:10:02.692757 raft.go:345: [0;37m[info] [becomeLeader]61 become leader[0m
+2021/05/10 10:10:02.694506 region_task.go:137: [0;37m[info] succeed in deleting data in range. [regionId: 1, startKey: , endKey: ][0m
+2021/05/10 10:10:02.699341 peer_storage.go:182: [0;37m[info] [region 59] 61 requesting snapshot[0m
+2021/05/10 10:10:02.700277 snap.go:549: [0;37m[info] region 59 scan snapshot /tmp/test-raftstore042504696/snap/gen_59_5_5_(default|write|lock).sst, key count 13, size 325[0m
+2021/05/10 10:10:02.724870 scheduler.go:303: [0;37m[info] new region 59 has been add[0m
+2021/05/10 10:10:02.929889 raft.go:258: [0;37m[info] [sendSnapshot]61 send snapshot to 60[0m
+2021/05/10 10:10:02.936760 raft.go:640: [0;37m[info] [handleSnapshot]60 Receive 61 snapshot[0m
+2021/05/10 10:10:02.936840 region_task.go:93: [0;37m[info] begin apply snap data. [regionId: 59][0m
+2021/05/10 10:10:02.936904 region_task.go:137: [0;37m[info] succeed in deleting data in range. [regionId: 59, startKey: 31203030303030303034, endKey: ][0m
+2021/05/10 10:10:02.964015 snap.go:700: [0;37m[info] apply snapshot ingested 1 tables[0m
+2021/05/10 10:10:02.964065 region_task.go:117: [0;37m[info] applying new data. [regionId: 59, timeTakes: 26.971695ms][0m
+2021/05/10 10:10:03.724274 store_worker.go:225: [0;37m[info] [maybeCreatePeer]create new peer region id 1 store id 4 peer id 4[0m
+2021/05/10 10:10:03.724327 peer.go:51: [0;37m[info] [region 1] replicates peer with ID 4[0m
+2021/05/10 10:10:03.736895 raft.go:345: [0;37m[info] [becomeLeader]3 become leader[0m
+2021/05/10 10:10:03.749435 peer_storage.go:182: [0;37m[info] [region 1] 3 requesting snapshot[0m
+2021/05/10 10:10:03.750481 snap.go:549: [0;37m[info] region 1 scan snapshot /tmp/test-raftstore042504696/snap/gen_1_7_54_(default|write|lock).sst, key count 11, size 275[0m
+2021/05/10 10:10:03.779980 raft.go:258: [0;37m[info] [sendSnapshot]3 send snapshot to 4[0m
+2021/05/10 10:10:03.791144 raft.go:640: [0;37m[info] [handleSnapshot]4 Receive 3 snapshot[0m
+2021/05/10 10:10:03.791230 region_task.go:93: [0;37m[info] begin apply snap data. [regionId: 1][0m
+2021/05/10 10:10:03.791342 region_task.go:137: [0;37m[info] succeed in deleting data in range. [regionId: 1, startKey: , endKey: 31203030303030303034][0m
+2021/05/10 10:10:03.814857 snap.go:700: [0;37m[info] apply snapshot ingested 1 tables[0m
+2021/05/10 10:10:03.814906 region_task.go:117: [0;37m[info] applying new data. [regionId: 1, timeTakes: 23.431677ms][0m
+2021/05/10 10:10:03.858760 peer_msg_handler.go:319: [0;37m[info] [confChange]region 1 peer 3 region epoch is conf_ver:5 version:2 ,add peer 63[0m
+2021/05/10 10:10:03.861772 peer_msg_handler.go:319: [0;37m[info] [confChange]region 1 peer 4 region epoch is conf_ver:5 version:2 ,add peer 63[0m
+2021/05/10 10:10:03.864824 store_worker.go:225: [0;37m[info] [maybeCreatePeer]create new peer region id 1 store id 2 peer id 63[0m
+2021/05/10 10:10:03.864859 peer.go:51: [0;37m[info] [region 1] replicates peer with ID 63[0m
+2021/05/10 10:10:03.870607 peer_storage.go:182: [0;37m[info] [region 1] 3 requesting snapshot[0m
+2021/05/10 10:10:03.871723 snap.go:549: [0;37m[info] region 1 scan snapshot /tmp/test-raftstore042504696/snap/gen_1_15_58_(default|write|lock).sst, key count 12, size 300[0m
+2021/05/10 10:10:03.928970 raft.go:258: [0;37m[info] [sendSnapshot]3 send snapshot to 63[0m
+2021/05/10 10:10:03.938345 raft.go:640: [0;37m[info] [handleSnapshot]63 Receive 3 snapshot[0m
+2021/05/10 10:10:03.938438 region_task.go:93: [0;37m[info] begin apply snap data. [regionId: 1][0m
+2021/05/10 10:10:03.938484 region_task.go:137: [0;37m[info] succeed in deleting data in range. [regionId: 1, startKey: , endKey: 31203030303030303034][0m
+2021/05/10 10:10:03.984139 snap.go:700: [0;37m[info] apply snapshot ingested 1 tables[0m
+2021/05/10 10:10:03.984178 region_task.go:117: [0;37m[info] applying new data. [regionId: 1, timeTakes: 45.513096ms][0m
+2021/05/10 10:10:49.693626 cluster.go:199: [0;37m[info] request key [49 32 48 48 48 48 48 48 48 48][0m
+2021/05/10 10:10:49.693661 cluster.go:199: [0;37m[info] request key [48 32 48 48 48 48 48 48 48 55][0m
+    test_test.go:44: failure
+panic: request timeout
+
+goroutine 78 [running]:
+github.com/pingcap-incubator/tinykv/kv/test_raftstore.(*Cluster).Request(0xc00028b220, 0xc17d050500, 0xa, 0x10, 0xc000011830, 0x1, 0x1, 0x12a05f200, 0x8, 0x7)
+	/root/vscode/Go/tinykv/kv/test_raftstore/cluster.go:200 +0x4d1
+github.com/pingcap-incubator/tinykv/kv/test_raftstore.(*Cluster).MustPutCF(0xc00028b220, 0xcfeec5, 0x7, 0xc17d050500, 0xa, 0x10, 0xc17d0504f8, 0x7, 0x8)
+	/root/vscode/Go/tinykv/kv/test_raftstore/cluster.go:301 +0x169
+github.com/pingcap-incubator/tinykv/kv/test_raftstore.(*Cluster).MustPut(...)
+	/root/vscode/Go/tinykv/kv/test_raftstore/cluster.go:296
+github.com/pingcap-incubator/tinykv/kv/test_raftstore.GenericTest.func1(0x0, 0xc0002e2300)
+	/root/vscode/Go/tinykv/kv/test_raftstore/test_test.go:222 +0x410
+github.com/pingcap-incubator/tinykv/kv/test_raftstore.runClient(0xc0002e2300, 0x0, 0xc0043b2180, 0xc0043b4810)
+	/root/vscode/Go/tinykv/kv/test_raftstore/test_test.go:27 +0x7a
+created by github.com/pingcap-incubator/tinykv/kv/test_raftstore.SpawnClientsAndWait
+	/root/vscode/Go/tinykv/kv/test_raftstore/test_test.go:37 +0xb2
+FAIL	github.com/pingcap-incubator/tinykv/kv/test_raftstore	53.790s
+FAIL

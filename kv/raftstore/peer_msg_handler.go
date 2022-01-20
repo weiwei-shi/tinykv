@@ -6,13 +6,10 @@ import (
 
 	"github.com/Connor1996/badger/y"
 	"github.com/pingcap-incubator/tinykv/kv/raftstore/message"
-	"github.com/pingcap-incubator/tinykv/kv/raftstore/meta"
 	"github.com/pingcap-incubator/tinykv/kv/raftstore/runner"
 	"github.com/pingcap-incubator/tinykv/kv/raftstore/snap"
 	"github.com/pingcap-incubator/tinykv/kv/raftstore/util"
-	"github.com/pingcap-incubator/tinykv/kv/util/engine_util"
 	"github.com/pingcap-incubator/tinykv/log"
-	"github.com/pingcap-incubator/tinykv/proto/pkg/eraftpb"
 	"github.com/pingcap-incubator/tinykv/proto/pkg/metapb"
 	"github.com/pingcap-incubator/tinykv/proto/pkg/raft_cmdpb"
 	rspb "github.com/pingcap-incubator/tinykv/proto/pkg/raft_serverpb"
@@ -46,123 +43,8 @@ func (d *peerMsgHandler) HandleRaftReady() {
 		return
 	}
 	// Your Code Here (2B).
-	node := d.peer.RaftGroup
-	if !node.HasReady() {
-		return
-	}
-	ready := node.Ready()
-	if _, err := d.peerStorage.SaveReadyState(&ready); err != nil {
-		panic(err)
-	}
-	if len(ready.Messages) != 0 {
-		d.Send(d.ctx.trans, ready.Messages)
-	}
-	if len(ready.CommittedEntries) > 0 {
-		wb := new(engine_util.WriteBatch)
-		for _, entry := range ready.CommittedEntries {
-			d.process(&entry, wb)
-			if d.stopped {
-				return
-			}
-		}
-		d.peerStorage.applyState.AppliedIndex = ready.CommittedEntries[len(ready.CommittedEntries)-1].Index
-		wb.SetMeta(meta.ApplyStateKey(d.regionId), d.peerStorage.applyState)
-		wb.WriteToDB(d.peerStorage.Engines.Kv)
-	}
-	d.RaftGroup.Advance(ready)
 }
 
-func (d *peerMsgHandler) process(entry *eraftpb.Entry, wb *engine_util.WriteBatch) {
-	if entry.EntryType == eraftpb.EntryType_EntryConfChange {
-		return
-	}
-	msg := new(raft_cmdpb.RaftCmdRequest)
-	if err := msg.Unmarshal(entry.Data); err != nil {
-		panic(err)
-	}
-	if len(msg.Requests) > 0 {
-		d.processRequest(entry, msg, wb)
-	} else if msg.AdminRequest != nil {
-		d.processAdminRequest(entry, msg, wb)
-	}
-}
-func (d *peerMsgHandler) processRequest(entry *eraftpb.Entry, msg *raft_cmdpb.RaftCmdRequest, wb *engine_util.WriteBatch) {
-	var responses []*raft_cmdpb.Response
-	for _, request := range msg.Requests {
-		switch request.CmdType {
-		case raft_cmdpb.CmdType_Delete:
-			wb.DeleteCF(request.Delete.Cf, request.Delete.Key)
-			responses = append(responses, &raft_cmdpb.Response{
-				CmdType: raft_cmdpb.CmdType_Delete,
-				Delete:  new(raft_cmdpb.DeleteResponse),
-			})
-		case raft_cmdpb.CmdType_Put:
-			// log.Infof("leader %v peer %v cf %v,client new put %v,%v\n", d.LeaderId(), d.PeerId(), request.Put.Cf, string(request.Put.Key), string(request.Put.Value))
-			wb.SetCF(request.Put.Cf, request.Put.Key, request.Put.Value)
-			responses = append(responses, &raft_cmdpb.Response{
-				CmdType: raft_cmdpb.CmdType_Put,
-				Put:     new(raft_cmdpb.PutResponse),
-			})
-		case raft_cmdpb.CmdType_Get:
-			// 向前推进，读取到最新写入的数据
-			d.peerStorage.applyState.AppliedIndex = entry.Index
-			wb.SetMeta(meta.ApplyStateKey(d.regionId), d.peerStorage.applyState)
-			wb.WriteToDB(d.peerStorage.Engines.Kv)
-			wb.Reset()
-			value, err := engine_util.GetCF(d.peerStorage.Engines.Kv, request.Get.Cf, request.Get.Key)
-			if err != nil {
-				value = nil
-			}
-			responses = append(responses, &raft_cmdpb.Response{
-				CmdType: raft_cmdpb.CmdType_Get,
-				Get:     &raft_cmdpb.GetResponse{Value: value},
-			})
-		case raft_cmdpb.CmdType_Snap:
-			if msg.Header.RegionEpoch.Version != d.Region().RegionEpoch.Version {
-				r := ErrResp(&util.ErrEpochNotMatch{})
-				d.handlePorcess(r, entry, func(p *proposal) { p.cb.Done(r) })
-				return
-			}
-			d.peerStorage.applyState.AppliedIndex = entry.Index
-			wb.SetMeta(meta.ApplyStateKey(d.regionId), d.peerStorage.applyState)
-			wb.WriteToDB(d.peerStorage.Engines.Kv)
-			wb.Reset()
-			responses = append([]*raft_cmdpb.Response{{CmdType: raft_cmdpb.CmdType_Snap, Snap: &raft_cmdpb.SnapResponse{Region: d.Region()}}})
-			r := new(raft_cmdpb.RaftCmdResponse)
-			r.Header = &raft_cmdpb.RaftResponseHeader{}
-			r.Responses = responses
-			d.handlePorcess(r, entry, func(p *proposal) {
-				p.cb.Txn = d.peerStorage.Engines.Kv.NewTransaction(false)
-				p.cb.Done(r)
-			})
-			return
-		case raft_cmdpb.CmdType_Invalid:
-		}
-	}
-	resp := raft_cmdpb.RaftCmdResponse{
-		Header:    &raft_cmdpb.RaftResponseHeader{},
-		Responses: responses,
-	}
-	d.handlePorcess(&resp, entry, func(p *proposal) { p.cb.Done(&resp) })
-}
-func (d *peerMsgHandler) processAdminRequest(entry *eraftpb.Entry, msg *raft_cmdpb.RaftCmdRequest, wb *engine_util.WriteBatch) {
-
-}
-func (d *peerMsgHandler) handlePorcess(resp *raft_cmdpb.RaftCmdResponse, entry *eraftpb.Entry, proposalFunc func(*proposal)) {
-	if len(d.proposals) > 0 {
-		proposal := d.proposals[0]
-		if proposal.index == entry.Index {
-			if proposal.term != entry.Term {
-				NotifyStaleReq(entry.Term, proposal.cb)
-			} else {
-				proposalFunc(proposal)
-			}
-		}
-		d.proposals = d.proposals[1:]
-	}
-}
-
-// 处理消息
 func (d *peerMsgHandler) HandleMsg(msg message.Msg) {
 	switch msg.Type {
 	case message.MsgTypeRaftMessage:
@@ -189,7 +71,6 @@ func (d *peerMsgHandler) HandleMsg(msg message.Msg) {
 	}
 }
 
-// 预处理
 func (d *peerMsgHandler) preProposeRaftCommand(req *raft_cmdpb.RaftCmdRequest) error {
 	// Check store_id, make sure that the msg is dispatched to the right place.
 	if err := util.CheckStoreID(req, d.storeID()); err != nil {
@@ -226,7 +107,6 @@ func (d *peerMsgHandler) preProposeRaftCommand(req *raft_cmdpb.RaftCmdRequest) e
 	return err
 }
 
-//
 func (d *peerMsgHandler) proposeRaftCommand(msg *raft_cmdpb.RaftCmdRequest, cb *message.Callback) {
 	err := d.preProposeRaftCommand(msg)
 	if err != nil {
@@ -234,24 +114,6 @@ func (d *peerMsgHandler) proposeRaftCommand(msg *raft_cmdpb.RaftCmdRequest, cb *
 		return
 	}
 	// Your Code Here (2B).
-	data, err := msg.Marshal()
-	if err != nil {
-		cb.Done(ErrResp(err))
-	}
-	proposal := proposal{
-		cb:    cb,
-		index: d.nextProposalIndex(),
-		term:  d.Term(),
-	}
-	// requests := msg.Requests
-	// if len(requests) != 0 {
-	// 	request := requests[0]
-	// 	if request.CmdType == raft_cmdpb.CmdType_Put {
-	// 		log.Infof("leader %v peer %v cf %v,client new put %v,%v\n", d.LeaderId(), d.PeerId(), request.Put.Cf, string(request.Put.Key), string(request.Put.Value))
-	// 	}
-	// }
-	d.proposals = append(d.proposals, &proposal)
-	d.RaftGroup.Propose(data)
 }
 
 func (d *peerMsgHandler) onTick() {
@@ -288,7 +150,7 @@ func (d *peerMsgHandler) onRaftBaseTick() {
 	d.ticker.schedule(PeerTickRaft)
 }
 
-func (d *peerMsgHandler) ScheduleCompactLog(firstIndex uint64, truncatedIndex uint64) {
+func (d *peerMsgHandler) ScheduleCompactLog(truncatedIndex uint64) {
 	raftLogGCTask := &runner.RaftLogGCTask{
 		RaftEngine: d.ctx.engine.Raft,
 		RegionID:   d.regionId,
@@ -422,8 +284,8 @@ func handleStaleMsg(trans Transport, msg *rspb.RaftMessage, curEpoch *metapb.Reg
 	}
 	gcMsg := &rspb.RaftMessage{
 		RegionId:    regionID,
-		FromPeer:    fromPeer,
-		ToPeer:      toPeer,
+		FromPeer:    toPeer,
+		ToPeer:      fromPeer,
 		RegionEpoch: curEpoch,
 		IsTombstone: true,
 	}

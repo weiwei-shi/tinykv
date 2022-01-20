@@ -70,15 +70,12 @@ type Ready struct {
 type RawNode struct {
 	Raft *Raft
 	// Your Data Here (2A).
-	preHardState pb.HardState
-	preSoftState *SoftState
 }
 
 // NewRawNode returns a new RawNode given configuration and a list of raft peers.
 func NewRawNode(config *Config) (*RawNode, error) {
 	// Your Code Here (2A).
-	raft := newRaft(config)
-	return &RawNode{Raft: raft, preHardState: raft.GetHardState(), preSoftState: raft.GetSoftState()}, nil
+	return nil, nil
 }
 
 // Tick advances the internal logical clock by a single tick.
@@ -137,9 +134,7 @@ func (rn *RawNode) Step(m pb.Message) error {
 	if IsLocalMsg(m.MsgType) {
 		return ErrStepLocalMsg
 	}
-	t := m.MsgType
-
-	if pr := rn.Raft.Prs[m.From]; pr != nil || !IsResponseMsg(t) {
+	if pr := rn.Raft.Prs[m.From]; pr != nil || !IsResponseMsg(m.MsgType) {
 		return rn.Raft.Step(m)
 	}
 	return ErrStepPeerNotFound
@@ -148,28 +143,12 @@ func (rn *RawNode) Step(m pb.Message) error {
 // Ready returns the current point-in-time state of this RawNode.
 func (rn *RawNode) Ready() Ready {
 	// Your Code Here (2A).
-	hardState, softState := rn.FetchRaftState()
-	ready := Ready{
-		Entries:          rn.Raft.RaftLog.unstableEntries(),
-		CommittedEntries: rn.Raft.RaftLog.nextEnts(),
-		Messages:         rn.Raft.msgs,
-		HardState:        hardState,
-		SoftState:        softState,
-	}
-	rn.Raft.msgs = make([]pb.Message, 0)
-	return ready
+	return Ready{}
 }
 
 // HasReady called when RawNode user need to check if any Ready pending.
 func (rn *RawNode) HasReady() bool {
 	// Your Code Here (2A).
-	hardState, _ := rn.FetchRaftState()
-	if !IsEmptyHardState(hardState) {
-		return true
-	}
-	if len(rn.Raft.msgs) > 0 || len(rn.Raft.RaftLog.unstableEntries()) > 0 || len(rn.Raft.RaftLog.nextEnts()) > 0 {
-		return true
-	}
 	return false
 }
 
@@ -177,13 +156,9 @@ func (rn *RawNode) HasReady() bool {
 // last Ready results.
 func (rn *RawNode) Advance(rd Ready) {
 	// Your Code Here (2A).
-	if !IsEmptyHardState(rd.HardState) {
-		rn.preHardState = rd.HardState
-	}
-	rn.Raft.Advance(rd)
 }
 
-// GetProgress return the the Progress of this node and its peers, if this
+// GetProgress return the Progress of this node and its peers, if this
 // node is leader.
 func (rn *RawNode) GetProgress() map[uint64]Progress {
 	prs := make(map[uint64]Progress)
@@ -198,25 +173,4 @@ func (rn *RawNode) GetProgress() map[uint64]Progress {
 // TransferLeader tries to transfer leadership to the given transferee.
 func (rn *RawNode) TransferLeader(transferee uint64) {
 	_ = rn.Raft.Step(pb.Message{MsgType: pb.MessageType_MsgTransferLeader, From: transferee})
-}
-func (rn *RawNode) FetchRaftState() (hardState pb.HardState, softState *SoftState) {
-	nowHardState := rn.Raft.GetHardState()
-	nowSoftState := rn.Raft.GetSoftState()
-	if isHardStateEqual(nowHardState, rn.preHardState) {
-		hardState = pb.HardState{}
-	} else {
-		hardState = nowHardState
-	}
-	if nowSoftState != nil && rn.preSoftState == nil {
-		softState = nowSoftState
-		return
-	} else {
-		softState = nil
-	}
-	if nowSoftState.Lead == rn.preSoftState.Lead && nowSoftState.RaftState == rn.preSoftState.RaftState {
-		softState = nil
-	} else {
-		softState = nowSoftState
-	}
-	return
 }

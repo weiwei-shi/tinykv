@@ -19,7 +19,6 @@ type raftWorker struct {
 	closeCh <-chan struct{}
 }
 
-// peerSender in router will be raftCh in worker
 func newRaftWorker(ctx *GlobalContext, pm *router) *raftWorker {
 	return &raftWorker{
 		raftCh: pm.peerSender,
@@ -31,7 +30,6 @@ func newRaftWorker(ctx *GlobalContext, pm *router) *raftWorker {
 // run runs raft commands.
 // On each loop, raft commands are batched by channel buffer.
 // After commands are handled, we collect apply messages by peers, make a applyBatch, send it to apply channel.
-// get command and send to peerMsgHandler
 func (rw *raftWorker) run(closeCh <-chan struct{}, wg *sync.WaitGroup) {
 	defer wg.Done()
 	var msgs []message.Msg
@@ -61,7 +59,6 @@ func (rw *raftWorker) run(closeCh <-chan struct{}, wg *sync.WaitGroup) {
 	}
 }
 
-// return peer state and set state for specified regionID in peerState
 func (rw *raftWorker) getPeerState(peersMap map[uint64]*peerState, regionID uint64) *peerState {
 	peer, ok := peersMap[regionID]
 	if !ok {

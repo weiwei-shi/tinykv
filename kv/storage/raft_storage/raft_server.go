@@ -46,7 +46,6 @@ func (re *RegionError) Error() string {
 	return re.RequestErr.String()
 }
 
-// check if resp has error or reqCount!=len(resp.Responses)
 func (rs *RaftStorage) checkResponse(resp *raft_cmdpb.RaftCmdResponse, reqCount int) error {
 	if resp.Header.Error != nil {
 		return &RegionError{RequestErr: resp.Header.Error}
@@ -146,9 +145,6 @@ func (rs *RaftStorage) Reader(ctx *kvrpcpb.Context) (storage.StorageReader, erro
 	}
 	if cb.Txn == nil {
 		panic("can not found region snap")
-	}
-	if len(resp.Responses) != 1 {
-		panic("wrong response count for snap cmd")
 	}
 	return NewRegionReader(cb.Txn, *resp.Responses[0].GetSnap().Region), nil
 }

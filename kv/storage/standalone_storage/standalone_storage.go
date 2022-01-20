@@ -14,20 +14,20 @@ import (
 // communicate with other nodes and all data is stored locally.
 type StandAloneStorage struct {
 	// Your Data Here (1).
-	engines *engine_util.Engines
-	config  *config.Config
+	engine *engine_util.Engines
+	config *config.Config
 }
 
 func NewStandAloneStorage(conf *config.Config) *StandAloneStorage {
 	// Your Code Here (1).
-	dbPath := conf.DBPath
-	kvPath := path.Join(dbPath, "kv")
-	raftPath := path.Join(dbPath, "raft")
-	kvDB := engine_util.CreateDB(kvPath, false)
-	raftDB := engine_util.CreateDB(raftPath, true)
+	kvPath := path.Join(conf.DBPath, "kv")          //定义存储kv的路径
+	raftPath := path.Join(conf.DBPath, "raft")      //定义存储raft的路径
+	kvEngine := engine_util.CreateDB(kvPath, false) //在该路径创建新的存储引擎BargerDB
+	raftEngine := engine_util.CreateDB(raftPath, true)
+
 	return &StandAloneStorage{
-		config:  conf,
-		engines: engine_util.NewEngines(kvDB, raftDB, kvPath, raftPath),
+		engine: engine_util.NewEngines(kvEngine, raftEngine, kvPath, raftPath),
+		config: conf,
 	}
 }
 
@@ -38,54 +38,56 @@ func (s *StandAloneStorage) Start() error {
 
 func (s *StandAloneStorage) Stop() error {
 	// Your Code Here (1).
-	return s.engines.Close()
+	return s.engine.Close()
 }
 
 func (s *StandAloneStorage) Reader(ctx *kvrpcpb.Context) (storage.StorageReader, error) {
 	// Your Code Here (1).
-	return NewStandAloneReader(s.engines.Kv.NewTransaction(false)), nil
+	return NewStandAloneReader(s.engine.Kv.NewTransaction(false))
 }
 
 func (s *StandAloneStorage) Write(ctx *kvrpcpb.Context, batch []storage.Modify) error {
 	// Your Code Here (1).
 	for _, b := range batch {
-		switch b.Data.(type) {
+		switch b.Data.(type) { //需要判断数据的类型是插入还是删除
 		case storage.Put:
 			put := b.Data.(storage.Put)
-			if err := engine_util.PutCF(s.engines.Kv, put.Cf, put.Key, put.Value); err != nil {
+			err := engine_util.PutCF(s.engine.Kv, put.Cf, put.Key, put.Value)
+			if err != nil {
 				return err
 			}
 		case storage.Delete:
 			delete := b.Data.(storage.Delete)
-			if err := engine_util.DeleteCF(s.engines.Kv, delete.Cf, delete.Key); err != nil {
+			err := engine_util.DeleteCF(s.engine.Kv, delete.Cf, delete.Key)
+			if err != nil {
 				return err
 			}
 		}
 	}
 	return nil
 }
-func NewStandAloneReader(txn *badger.Txn) *StandAloneReader {
-	return &StandAloneReader{
-		txn: txn,
-	}
+
+//以下部分需要自己实现，storage.go中有相关api
+type StandAloneReader struct {
+	kvTxn *badger.Txn
 }
 
-type StandAloneReader struct {
-	txn *badger.Txn
+func NewStandAloneReader(kvTxn *badger.Txn) (*StandAloneReader, error) {
+	return &StandAloneReader{kvTxn: kvTxn}, nil
 }
 
 func (s *StandAloneReader) GetCF(cf string, key []byte) ([]byte, error) {
-	if value, err := engine_util.GetCFFromTxn(s.txn, cf, key); err == badger.ErrKeyNotFound {
+	value, err := engine_util.GetCFFromTxn(s.kvTxn, cf, key)
+	if err == badger.ErrKeyNotFound {
 		return nil, nil
-	} else if err != nil {
-		return nil, err
-	} else {
-		return value, nil
 	}
+	return value, err
 }
+
 func (s *StandAloneReader) IterCF(cf string) engine_util.DBIterator {
-	return engine_util.NewCFIterator(cf, s.txn)
+	return engine_util.NewCFIterator(cf, s.kvTxn)
 }
+
 func (s *StandAloneReader) Close() {
-	s.txn.Discard()
+	s.kvTxn.Discard()
 }
