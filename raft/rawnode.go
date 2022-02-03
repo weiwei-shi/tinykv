@@ -48,7 +48,7 @@ type Ready struct {
 	pb.HardState
 
 	// Entries specifies entries to be saved to stable storage BEFORE
-	// Messages are sent.
+	// Messages are sent. // 在发送消息之前需要保存到稳定存储的表项(未持久化的)
 	Entries []pb.Entry
 
 	// Snapshot specifies the snapshot to be saved to stable storage.
@@ -70,12 +70,36 @@ type Ready struct {
 type RawNode struct {
 	Raft *Raft
 	// Your Data Here (2A).
+	lastSoftState SoftState
+	lastHardState pb.HardState
 }
 
 // NewRawNode returns a new RawNode given configuration and a list of raft peers.
 func NewRawNode(config *Config) (*RawNode, error) {
 	// Your Code Here (2A).
-	return nil, nil
+	rn := &RawNode{
+		Raft: newRaft(config),
+	}
+	rn.lastHardState = rn.GetHardState()
+	rn.lastSoftState = rn.GetSoftState()
+	return rn, nil
+}
+
+// 2A自定义函数，得到rn的HardState
+func (rn *RawNode) GetHardState() pb.HardState {
+	return pb.HardState{
+		Term:   rn.Raft.Term,
+		Vote:   rn.Raft.Vote,
+		Commit: rn.Raft.RaftLog.committed,
+	}
+}
+
+// 2A自定义函数，得到rn的SoftState
+func (rn *RawNode) GetSoftState() SoftState {
+	return SoftState{
+		Lead:      rn.Raft.Lead,
+		RaftState: rn.Raft.State,
+	}
 }
 
 // Tick advances the internal logical clock by a single tick.
@@ -140,22 +164,71 @@ func (rn *RawNode) Step(m pb.Message) error {
 	return ErrStepPeerNotFound
 }
 
-// Ready returns the current point-in-time state of this RawNode.
+// Ready returns the current point-in-time state of this RawNode. // 返回RawNode的当前时间点状态
 func (rn *RawNode) Ready() Ready {
 	// Your Code Here (2A).
-	return Ready{}
+	rd := Ready{
+		SoftState:        nil,
+		Entries:          rn.Raft.RaftLog.unstableEntries(),
+		CommittedEntries: rn.Raft.RaftLog.nextEnts(),
+		Messages:         rn.Raft.msgs,
+	}
+	if !isHardStateEqual(rn.lastHardState, rn.GetHardState()) {
+		rd.HardState = rn.GetHardState()
+	}
+	if !IsEmptySnap(rn.Raft.RaftLog.pendingSnapshot) {
+		rd.Snapshot = *rn.Raft.RaftLog.pendingSnapshot
+		rn.Raft.RaftLog.pendingSnapshot = nil
+	}
+	softState := rn.GetSoftState()
+	if !isSoftStateEqual(rn.lastSoftState, softState) {
+		rd.SoftState = &softState
+	}
+	rn.Raft.msgs = []pb.Message{} // 清空消息
+	return rd
 }
 
-// HasReady called when RawNode user need to check if any Ready pending.
+// HasReady called when RawNode user need to check if any Ready pending. // 当RawNode用户需要检查是否有Ready挂起时，调用HasReady
 func (rn *RawNode) HasReady() bool {
 	// Your Code Here (2A).
+	if len(rn.Raft.RaftLog.unstableEntries()) > 0 {
+		return true
+	}
+	if len(rn.Raft.RaftLog.nextEnts()) > 0 {
+		return true
+	}
+	if len(rn.Raft.msgs) > 0 {
+		return true
+	}
+	if !IsEmptyHardState(rn.GetHardState()) && !isHardStateEqual(rn.lastHardState, rn.GetHardState()) {
+		return true
+	}
+	if !isSoftStateEqual(rn.lastSoftState, rn.GetSoftState()) {
+		return true
+	}
+	if !IsEmptySnap(rn.Raft.RaftLog.pendingSnapshot) {
+		return true
+	}
 	return false
 }
 
 // Advance notifies the RawNode that the application has applied and saved progress in the
-// last Ready results.
+// last Ready results. // 通知RawNode应用程序已经应用并保存了最后一个Ready结果的进度
 func (rn *RawNode) Advance(rd Ready) {
 	// Your Code Here (2A).
+	if !IsEmptyHardState(rd.HardState) {
+		rn.lastHardState = rd.HardState
+	}
+	if rd.SoftState != nil {
+		rn.lastSoftState = *rd.SoftState
+	}
+	if len(rd.Entries) > 0 {
+		rn.Raft.RaftLog.stabled = rd.Entries[len(rd.Entries)-1].GetIndex()
+	}
+	if len(rd.CommittedEntries) > 0 {
+		rn.Raft.RaftLog.applied = rd.CommittedEntries[len(rd.CommittedEntries)-1].GetIndex()
+	}
+	rn.Raft.RaftLog.maybeCompact()
 }
 
 // GetProgress return the Progress of this node and its peers, if this

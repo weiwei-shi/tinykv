@@ -127,3 +127,8 @@ func IsResponseMsg(msgt pb.MessageType) bool {
 func isHardStateEqual(a, b pb.HardState) bool {
 	return a.Term == b.Term && a.Vote == b.Vote && a.Commit == b.Commit
 }
+
+// 2A自定义函数，查看SoftState是否相等
+func isSoftStateEqual(a, b SoftState) bool {
+	return a.Lead == b.Lead && a.RaftState == b.RaftState
+}

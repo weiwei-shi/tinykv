@@ -52,30 +52,42 @@ type MessageType int32
 const (
 	// 'MessageType_MsgHup' is a local message used for election. If an election timeout happened,
 	// the node should pass 'MessageType_MsgHup' to its Step method and start a new election.
+	// 如果选举超时，节点发送该信号到step方法告诉自己需要开始新的选举
 	MessageType_MsgHup MessageType = 0
 	// 'MessageType_MsgBeat' is a local message that signals the leader to send a heartbeat
 	// of the 'MessageType_MsgHeartbeat' type to its followers.
+	// 领导者告诉自己需要发送'MessageType_MsgHeartbeat'类型的心跳给他的跟随者们
 	MessageType_MsgBeat MessageType = 1
 	// 'MessageType_MsgPropose' is a local message that proposes to append data to the leader's log entries.
+	// 是添加数据到领导者的日志条目的信号
 	MessageType_MsgPropose MessageType = 2
 	// 'MessageType_MsgAppend' contains log entries to replicate.
+	// 包含要复制的日志条目信息
 	MessageType_MsgAppend MessageType = 3
 	// 'MessageType_MsgAppendResponse' is response to log replication request('MessageType_MsgAppend').
+	// 响应日志复制请求的信号
 	MessageType_MsgAppendResponse MessageType = 4
 	// 'MessageType_MsgRequestVote' requests votes for election.
+	// 请求选举投票的信号
 	MessageType_MsgRequestVote MessageType = 5
 	// 'MessageType_MsgRequestVoteResponse' contains responses from voting request.
+	// 包含来自投票请求的响应信号
 	MessageType_MsgRequestVoteResponse MessageType = 6
 	// 'MessageType_MsgSnapshot' requests to install a snapshot message.
+	// 请求开始快照的信号
 	MessageType_MsgSnapshot MessageType = 7
 	// 'MessageType_MsgHeartbeat' sends heartbeat from leader to its followers.
+	// 从领导者发送心跳到他的追随者们的信号
 	MessageType_MsgHeartbeat MessageType = 8
 	// 'MessageType_MsgHeartbeatResponse' is a response to 'MessageType_MsgHeartbeat'.
+	// 响应心跳的信号
 	MessageType_MsgHeartbeatResponse MessageType = 9
 	// 'MessageType_MsgTransferLeader' requests the leader to transfer its leadership.
+	// 请求领导者转移其领导身份（即否认领导者的身份）
 	MessageType_MsgTransferLeader MessageType = 11
 	// 'MessageType_MsgTimeoutNow' send from the leader to the leadership transfer target, to let
 	// the transfer target timeout immediately and start a new election.
+	// 从领导者发送到领导身份的转移目标，让转移目标立即超时并开始新的选举
 	MessageType_MsgTimeoutNow MessageType = 12
 )
 
