@@ -103,6 +103,7 @@ func (rn *RawNode) GetSoftState() SoftState {
 }
 
 // Tick advances the internal logical clock by a single tick.
+// Tick将内部逻辑时钟向前推进一个Tick
 func (rn *RawNode) Tick() {
 	rn.Raft.tick()
 }
@@ -123,7 +124,7 @@ func (rn *RawNode) Propose(data []byte) error {
 		Entries: []*pb.Entry{&ent}})
 }
 
-// ProposeConfChange proposes a config change.
+// ProposeConfChange proposes a config change. 提出成员变更
 func (rn *RawNode) ProposeConfChange(cc pb.ConfChange) error {
 	data, err := cc.Marshal()
 	if err != nil {
@@ -136,7 +137,7 @@ func (rn *RawNode) ProposeConfChange(cc pb.ConfChange) error {
 	})
 }
 
-// ApplyConfChange applies a config change to the local node.
+// ApplyConfChange applies a config change to the local node. 将成员变更应用到本地节点
 func (rn *RawNode) ApplyConfChange(cc pb.ConfChange) *pb.ConfState {
 	if cc.NodeId == None {
 		return &pb.ConfState{Nodes: nodes(rn.Raft)}
@@ -152,7 +153,7 @@ func (rn *RawNode) ApplyConfChange(cc pb.ConfChange) *pb.ConfState {
 	return &pb.ConfState{Nodes: nodes(rn.Raft)}
 }
 
-// Step advances the state machine using the given message.
+// Step advances the state machine using the given message. 使用给定的messag发展状态机
 func (rn *RawNode) Step(m pb.Message) error {
 	// ignore unexpected local messages receiving over network
 	if IsLocalMsg(m.MsgType) {
@@ -176,13 +177,15 @@ func (rn *RawNode) Ready() Ready {
 	if !isHardStateEqual(rn.lastHardState, rn.GetHardState()) {
 		rd.HardState = rn.GetHardState()
 	}
+	softState := rn.GetSoftState()
+	if !(softState.Lead == rn.lastSoftState.Lead && softState.RaftState == rn.lastSoftState.RaftState) {
+		rd.SoftState = &softState
+		rn.lastSoftState = softState
+	}
+	// 2C添加
 	if !IsEmptySnap(rn.Raft.RaftLog.pendingSnapshot) {
 		rd.Snapshot = *rn.Raft.RaftLog.pendingSnapshot
 		rn.Raft.RaftLog.pendingSnapshot = nil
-	}
-	softState := rn.GetSoftState()
-	if !isSoftStateEqual(rn.lastSoftState, softState) {
-		rd.SoftState = &softState
 	}
 	rn.Raft.msgs = []pb.Message{} // 清空消息
 	return rd
@@ -203,7 +206,7 @@ func (rn *RawNode) HasReady() bool {
 	if !IsEmptyHardState(rn.GetHardState()) && !isHardStateEqual(rn.lastHardState, rn.GetHardState()) {
 		return true
 	}
-	if !isSoftStateEqual(rn.lastSoftState, rn.GetSoftState()) {
+	if !(rn.GetSoftState().Lead == rn.lastSoftState.Lead && rn.GetSoftState().RaftState == rn.lastSoftState.RaftState) {
 		return true
 	}
 	if !IsEmptySnap(rn.Raft.RaftLog.pendingSnapshot) {
@@ -223,10 +226,10 @@ func (rn *RawNode) Advance(rd Ready) {
 		rn.lastSoftState = *rd.SoftState
 	}
 	if len(rd.Entries) > 0 {
-		rn.Raft.RaftLog.stabled = rd.Entries[len(rd.Entries)-1].GetIndex()
+		rn.Raft.RaftLog.stabled = rd.Entries[len(rd.Entries)-1].Index
 	}
 	if len(rd.CommittedEntries) > 0 {
-		rn.Raft.RaftLog.applied = rd.CommittedEntries[len(rd.CommittedEntries)-1].GetIndex()
+		rn.Raft.RaftLog.applied = rd.CommittedEntries[len(rd.CommittedEntries)-1].Index
 	}
 	rn.Raft.RaftLog.maybeCompact()
 }

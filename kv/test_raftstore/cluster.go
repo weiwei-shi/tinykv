@@ -56,10 +56,11 @@ func NewCluster(count int, schedulerClient *MockSchedulerClient, simulator Simul
 func (c *Cluster) Start() {
 	ctx := context.TODO()
 	clusterID := c.schedulerClient.GetClusterID(ctx)
-
+	// 创建了几个store
 	for storeID := uint64(1); storeID <= uint64(c.count); storeID++ {
 		dbPath, err := ioutil.TempDir("", c.baseDir)
 		if err != nil {
+			log.Infof("12 here!")
 			panic(err)
 		}
 		c.cfg.DBPath = dbPath
@@ -71,14 +72,17 @@ func (c *Cluster) Start() {
 
 		err = os.MkdirAll(kvPath, os.ModePerm)
 		if err != nil {
+			log.Infof("13 here!")
 			panic(err)
 		}
 		err = os.MkdirAll(raftPath, os.ModePerm)
 		if err != nil {
+			log.Infof("14 here!")
 			panic(err)
 		}
 		err = os.MkdirAll(snapPath, os.ModePerm)
 		if err != nil {
+			log.Infof("15 here!")
 			panic(err)
 		}
 
@@ -104,11 +108,13 @@ func (c *Cluster) Start() {
 		firstRegion.Peers = append(firstRegion.Peers, peer)
 		err := raftstore.BootstrapStore(engine, clusterID, storeID)
 		if err != nil {
+			log.Infof("16 here!")
 			panic(err)
 		}
 	}
 
 	for _, engine := range c.engines {
+		// 这里会将region的信息写入磁盘，后期会读取
 		raftstore.PrepareBootstrapCluster(engine, firstRegion)
 	}
 
@@ -118,6 +124,7 @@ func (c *Cluster) Start() {
 	}
 	resp, err := c.schedulerClient.Bootstrap(context.TODO(), store)
 	if err != nil {
+		log.Infof("17 here!")
 		panic(err)
 	}
 	if resp.Header != nil && resp.Header.Error != nil {
@@ -131,11 +138,13 @@ func (c *Cluster) Start() {
 		}
 		err := c.schedulerClient.PutStore(context.TODO(), store)
 		if err != nil {
+			log.Infof("18 here!")
 			panic(err)
 		}
+		// 清除了准备启动的状态
 		raftstore.ClearPrepareBootstrapState(engine)
 	}
-
+	// 启动了五个node/raft_storage
 	for storeID := range c.engines {
 		c.StartServer(storeID)
 	}
@@ -169,6 +178,7 @@ func (c *Cluster) StartServer(storeID uint64) {
 	engine := c.engines[storeID]
 	err := c.simulator.RunStore(c.cfg, engine, context.TODO())
 	if err != nil {
+		log.Infof("19 here!")
 		panic(err)
 	}
 }
@@ -176,6 +186,7 @@ func (c *Cluster) StartServer(storeID uint64) {
 func (c *Cluster) AllocPeer(storeID uint64) *metapb.Peer {
 	id, err := c.schedulerClient.AllocID(context.TODO())
 	if err != nil {
+		log.Infof("20 here!")
 		panic(err)
 	}
 	return NewPeer(storeID, id)
@@ -284,6 +295,7 @@ func (c *Cluster) GetRandomRegion() *metapb.Region {
 func (c *Cluster) GetStoreIdsOfRegion(regionID uint64) []uint64 {
 	region, _, err := c.schedulerClient.GetRegionByID(context.TODO(), regionID)
 	if err != nil {
+		log.Infof("21 here!")
 		panic(err)
 	}
 	peers := region.GetPeers()
@@ -379,6 +391,7 @@ func (c *Cluster) Scan(start, end []byte) [][]byte {
 			}
 			value, err := iter.Item().ValueCopy(nil)
 			if err != nil {
+				log.Infof("22 here!")
 				panic(err)
 			}
 			values = append(values, value)
@@ -397,6 +410,7 @@ func (c *Cluster) Scan(start, end []byte) [][]byte {
 func (c *Cluster) TransferLeader(regionID uint64, leader *metapb.Peer) {
 	region, _, err := c.schedulerClient.GetRegionByID(context.TODO(), regionID)
 	if err != nil {
+		log.Infof("23 here!")
 		panic(err)
 	}
 	epoch := region.RegionEpoch
@@ -436,6 +450,7 @@ func (c *Cluster) MustHavePeer(regionID uint64, peer *metapb.Peer) {
 	for i := 0; i < 500; i++ {
 		region, _, err := c.schedulerClient.GetRegionByID(context.TODO(), regionID)
 		if err != nil {
+			log.Infof("24 here!")
 			panic(err)
 		}
 		if region != nil {
@@ -454,6 +469,7 @@ func (c *Cluster) MustNonePeer(regionID uint64, peer *metapb.Peer) {
 	for i := 0; i < 500; i++ {
 		region, _, err := c.schedulerClient.GetRegionByID(context.TODO(), regionID)
 		if err != nil {
+			log.Infof("25 here!")
 			panic(err)
 		}
 		if region != nil {

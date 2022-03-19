@@ -5,6 +5,7 @@ import (
 
 	"github.com/pingcap-incubator/tinykv/kv/storage"
 	"github.com/pingcap-incubator/tinykv/kv/util/codec"
+	"github.com/pingcap-incubator/tinykv/log"
 	"github.com/pingcap-incubator/tinykv/proto/pkg/kvrpcpb"
 	"github.com/pingcap-incubator/tinykv/scheduler/pkg/tsoutil"
 )
@@ -105,6 +106,7 @@ func EncodeKey(key []byte, ts uint64) []byte {
 func DecodeUserKey(key []byte) []byte {
 	_, userKey, err := codec.DecodeBytes(key)
 	if err != nil {
+		log.Infof("27 here!")
 		panic(err)
 	}
 	return userKey
@@ -114,6 +116,7 @@ func DecodeUserKey(key []byte) []byte {
 func decodeTimestamp(key []byte) uint64 {
 	left, _, err := codec.DecodeBytes(key)
 	if err != nil {
+		log.Infof("28 here!")
 		panic(err)
 	}
 	return ^binary.BigEndian.Uint64(left)

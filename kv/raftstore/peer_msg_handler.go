@@ -2,19 +2,26 @@ package raftstore
 
 import (
 	"fmt"
+	"reflect"
 	"time"
 
 	"github.com/Connor1996/badger/y"
 	"github.com/pingcap-incubator/tinykv/kv/raftstore/message"
+	"github.com/pingcap-incubator/tinykv/kv/raftstore/meta"
 	"github.com/pingcap-incubator/tinykv/kv/raftstore/runner"
 	"github.com/pingcap-incubator/tinykv/kv/raftstore/snap"
 	"github.com/pingcap-incubator/tinykv/kv/raftstore/util"
+	"github.com/pingcap-incubator/tinykv/kv/util/engine_util"
 	"github.com/pingcap-incubator/tinykv/log"
+	"github.com/pingcap-incubator/tinykv/proto/pkg/eraftpb"
 	"github.com/pingcap-incubator/tinykv/proto/pkg/metapb"
 	"github.com/pingcap-incubator/tinykv/proto/pkg/raft_cmdpb"
 	rspb "github.com/pingcap-incubator/tinykv/proto/pkg/raft_serverpb"
 	"github.com/pingcap-incubator/tinykv/scheduler/pkg/btree"
 	"github.com/pingcap/errors"
+
+	// 2B自添加
+	pb "github.com/pingcap-incubator/tinykv/proto/pkg/eraftpb"
 )
 
 type PeerTick int
@@ -38,39 +45,247 @@ func newPeerMsgHandler(peer *peer, ctx *GlobalContext) *peerMsgHandler {
 	}
 }
 
+// 功能1：处理 RawNode 产生的 Ready
 func (d *peerMsgHandler) HandleRaftReady() {
 	if d.stopped {
 		return
 	}
 	// Your Code Here (2B).
+	if !d.peer.RaftGroup.HasReady() {
+		return
+	}
+	// 获得需要尚未保存到磁盘的entry，尚未发送的msg和尚未applied的entry
+	rd := d.RaftGroup.Ready()
+	// 保存entry到磁盘中
+	apply, err := d.peerStorage.SaveReadyState(&rd)
+	if err != nil {
+		panic(err)
+	}
+	// 2C添加, 如果 Ready 中存在 snapshot，则应用它
+	if apply != nil {
+		if reflect.DeepEqual(apply.PrevRegion, d.Region()) {
+			d.peerStorage.region = apply.Region
+			// 加锁，防止冲突
+			d.ctx.storeMeta.Lock()
+			// 更新region信息
+			d.ctx.storeMeta.regions[d.regionId] = d.Region()
+			d.ctx.storeMeta.regionRanges.Delete(&regionItem{region: apply.PrevRegion})
+			d.ctx.storeMeta.regionRanges.ReplaceOrInsert(&regionItem{region: d.Region()})
+			d.ctx.storeMeta.Unlock()
+		}
+	}
+	// 发送消息
+	if len(rd.Messages) != 0 {
+		d.Send(d.ctx.trans, rd.Messages)
+	}
+	// apply消息
+	if len(rd.CommittedEntries) > 0 {
+		for _, e := range rd.CommittedEntries {
+			kvWB := new(engine_util.WriteBatch)
+			d.applyAndResponseEntry(kvWB, e)
+			if d.stopped {
+				return // 可能被 destroy 了
+			}
+			// 更新
+			d.peerStorage.applyState.AppliedIndex = e.Index
+			kvWB.SetMeta(meta.ApplyStateKey(d.regionId), d.peerStorage.applyState)
+			kvWB.WriteToDB(d.peerStorage.Engines.Kv)
+		}
+	}
+	d.RaftGroup.Advance(rd)
 }
 
+// 2B自定义函数，应用并回复消息
+func (d *peerMsgHandler) applyAndResponseEntry(kvWB *engine_util.WriteBatch, entry pb.Entry) {
+	// 3A修改这里
+	if entry.EntryType == pb.EntryType_EntryConfChange {
+		//d.applyConfChangeEntry(kvWB, entry)
+		return
+	}
+	msg := raft_cmdpb.RaftCmdRequest{}
+	err := msg.Unmarshal(entry.GetData())
+	if err != nil {
+		panic("poorpool: unmarshal error")
+	}
+	// 2B只考虑非admin消息, 2C添加admin消息
+	if msg.AdminRequest != nil {
+		d.applyAdminRequest(kvWB, entry, msg)
+	} else if len(msg.Requests) > 0 {
+		d.applyRequest(kvWB, entry, msg)
+	}
+}
+
+// 2B自定义函数，应用非admin消息
+func (d *peerMsgHandler) applyRequest(kvWB *engine_util.WriteBatch, entry pb.Entry, msg raft_cmdpb.RaftCmdRequest) {
+	req := msg.Requests[0]
+	err := d.checkRequestIfKeyInRegion(req)
+	if err != nil {
+		d.handleProposal(&entry, func(p *proposal) {
+			p.cb.Done(ErrResp(err))
+		})
+		return
+	}
+	// 写操作对修改进行保存
+	switch req.CmdType {
+	case raft_cmdpb.CmdType_Get:
+	case raft_cmdpb.CmdType_Put:
+		putRequest := req.Put
+		kvWB.SetCF(putRequest.Cf, putRequest.Key, putRequest.Value)
+	case raft_cmdpb.CmdType_Delete:
+		deleteRequest := req.Delete
+		kvWB.DeleteCF(deleteRequest.Cf, deleteRequest.Key)
+	case raft_cmdpb.CmdType_Snap:
+	}
+	// callback
+	d.handleProposal(&entry, func(p *proposal) {
+		resp := &raft_cmdpb.RaftCmdResponse{Header: &raft_cmdpb.RaftResponseHeader{}}
+		switch req.CmdType {
+		case raft_cmdpb.CmdType_Get:
+			// 向前推进，使之读取到最新写入的数据
+			d.peerStorage.applyState.AppliedIndex = entry.Index
+			kvWB.SetMeta(meta.ApplyStateKey(d.regionId), d.peerStorage.applyState)
+			kvWB.WriteToDB(d.peerStorage.Engines.Kv)
+			kvWB.Reset()
+			// 读取需要将读到的值保存在回复消息中
+			getRequest := req.Get
+			value, _ := engine_util.GetCF(d.peerStorage.Engines.Kv, getRequest.Cf, getRequest.Key)
+			resp.Responses = []*raft_cmdpb.Response{
+				{CmdType: raft_cmdpb.CmdType_Get, Get: &raft_cmdpb.GetResponse{Value: value}},
+			}
+			p.cb.Done(resp) // 将消息发送给指令发送者
+		case raft_cmdpb.CmdType_Put:
+			resp.Responses = []*raft_cmdpb.Response{
+				{CmdType: raft_cmdpb.CmdType_Put, Put: &raft_cmdpb.PutResponse{}},
+			}
+			p.cb.Done(resp) // 将消息发送给指令发送者
+		case raft_cmdpb.CmdType_Delete:
+			resp.Responses = []*raft_cmdpb.Response{
+				{CmdType: raft_cmdpb.CmdType_Delete, Delete: &raft_cmdpb.DeleteResponse{}},
+			}
+			p.cb.Done(resp) // 将消息发送给指令发送者
+		case raft_cmdpb.CmdType_Snap:
+			if msg.Header.RegionEpoch.Version != d.Region().RegionEpoch.Version {
+				p.cb.Done(ErrResp(&util.ErrEpochNotMatch{}))
+				return
+			}
+			resp.Responses = []*raft_cmdpb.Response{
+				{CmdType: raft_cmdpb.CmdType_Snap, Snap: &raft_cmdpb.SnapResponse{Region: d.Region()}},
+			}
+			//  Snap需要将返回一个 txn
+			p.cb.Txn = d.peerStorage.Engines.Kv.NewTransaction(false)
+			p.cb.Done(resp) // 将消息发送给指令发送者
+		}
+	})
+}
+
+// 2B自定义函数，检查Get/Put/Delete消息是否key在region范围内
+func (d *peerMsgHandler) checkRequestIfKeyInRegion(req *raft_cmdpb.Request) error {
+	var key []byte
+	switch req.CmdType {
+	case raft_cmdpb.CmdType_Get:
+		key = req.Get.Key
+	case raft_cmdpb.CmdType_Put:
+		key = req.Put.Key
+	case raft_cmdpb.CmdType_Delete:
+		key = req.Delete.Key
+	default:
+		return nil
+	}
+	return util.CheckKeyInRegion(key, d.Region())
+}
+
+// 2B自定义函数，处理proposal
+func (d *peerMsgHandler) handleProposal(entry *eraftpb.Entry, handle func(*proposal)) {
+	for len(d.proposals) > 0 {
+		proposal := d.proposals[0]
+		//1.过期的entry，已经被其他执行了
+		if entry.Term < proposal.term {
+			return
+		}
+		//2.更高任期的entry, 本条proposal作废
+		if entry.Term > proposal.term {
+			proposal.cb.Done(ErrRespStaleCommand(proposal.term))
+			d.proposals = d.proposals[1:]
+			continue
+		}
+		//3.entry的index小，不回复
+		if entry.Term == proposal.term && entry.Index < proposal.index {
+			return
+		}
+		//4.entry的index大，回复发送至错误的领导人
+		if entry.Term == proposal.term && entry.Index > proposal.index {
+			proposal.cb.Done(ErrRespStaleCommand(proposal.term))
+			d.proposals = d.proposals[1:]
+			continue
+		}
+		//5.entry的index等于proposal.index
+		if entry.Index == proposal.index && entry.Term == proposal.term {
+			handle(proposal)
+			d.proposals = d.proposals[1:]
+			// if response.Header == nil {
+			// 	response.Header = &raft_cmdpb.RaftResponseHeader{}
+			// }
+			// // proposal.cb.Txn = txn
+			// proposal.cb.Done(response)
+		}
+	}
+}
+
+// 2C自定义函数，应用admin消息
+func (d *peerMsgHandler) applyAdminRequest(kvWB *engine_util.WriteBatch, entry pb.Entry, msg raft_cmdpb.RaftCmdRequest) {
+	switch msg.AdminRequest.CmdType {
+	case raft_cmdpb.AdminCmdType_ChangePeer:
+	case raft_cmdpb.AdminCmdType_InvalidAdmin:
+	// 3B实现
+	case raft_cmdpb.AdminCmdType_Split:
+	case raft_cmdpb.AdminCmdType_TransferLeader:
+	// 2C实现
+	case raft_cmdpb.AdminCmdType_CompactLog:
+		compact := msg.AdminRequest.CompactLog
+		if compact.CompactIndex >= d.peerStorage.truncatedIndex() {
+			// 更新truncated State
+			d.peerStorage.applyState.TruncatedState.Index = compact.CompactIndex
+			d.peerStorage.applyState.TruncatedState.Term = compact.CompactTerm
+			kvWB.SetMeta(meta.ApplyStateKey(d.regionId), d.peerStorage.applyState)
+			d.ScheduleCompactLog(compact.CompactIndex)
+		}
+
+	}
+}
+
+// 3B自定义函数
+func (d *peerMsgHandler) applyConfChangeEntry(kvWB *engine_util.WriteBatch, entry pb.Entry) {
+	return
+}
+
+// 功能2：处理消息
 func (d *peerMsgHandler) HandleMsg(msg message.Msg) {
 	switch msg.Type {
-	case message.MsgTypeRaftMessage:
+	case message.MsgTypeRaftMessage: // 在 Raft peers之间传输的消息
 		raftMsg := msg.Data.(*rspb.RaftMessage)
 		if err := d.onRaftMsg(raftMsg); err != nil {
 			log.Errorf("%s handle raft message error %v", d.Tag, err)
 		}
-	case message.MsgTypeRaftCmd:
+	case message.MsgTypeRaftCmd: // 包装来自客户端的请求
 		raftCMD := msg.Data.(*message.MsgRaftCmd)
 		d.proposeRaftCommand(raftCMD.Request, raftCMD.Callback)
-	case message.MsgTypeTick:
+	case message.MsgTypeTick: // 驱动 Raft 的消息
 		d.onTick()
-	case message.MsgTypeSplitRegion:
+	case message.MsgTypeSplitRegion: // 分割region的消息（3B）
 		split := msg.Data.(*message.MsgSplitRegion)
 		log.Infof("%s on split with %v", d.Tag, split.SplitKey)
 		d.onPrepareSplitRegion(split.RegionEpoch, split.SplitKey, split.Callback)
-	case message.MsgTypeRegionApproximateSize:
+	case message.MsgTypeRegionApproximateSize: // 更新region大致的大小
 		d.onApproximateRegionSize(msg.Data.(uint64))
-	case message.MsgTypeGcSnap:
+	case message.MsgTypeGcSnap: // 清理已经安装完的 snapshot
 		gcSnap := msg.Data.(*message.MsgGCSnap)
 		d.onGCSnap(gcSnap.Snaps)
-	case message.MsgTypeStart:
+	case message.MsgTypeStart: // 启动peer的定时器的消息（3B）
 		d.startTicker()
 	}
 }
 
+// 预处理
 func (d *peerMsgHandler) preProposeRaftCommand(req *raft_cmdpb.RaftCmdRequest) error {
 	// Check store_id, make sure that the msg is dispatched to the right place.
 	if err := util.CheckStoreID(req, d.storeID()); err != nil {
@@ -78,6 +293,7 @@ func (d *peerMsgHandler) preProposeRaftCommand(req *raft_cmdpb.RaftCmdRequest) e
 	}
 
 	// Check whether the store has the right peer to handle the request.
+	// 检查存储是否有正确的peer来处理请求
 	regionID := d.regionId
 	leaderID := d.LeaderId()
 	if !d.IsLeader() {
@@ -88,7 +304,7 @@ func (d *peerMsgHandler) preProposeRaftCommand(req *raft_cmdpb.RaftCmdRequest) e
 	if err := util.CheckPeerID(req, d.PeerId()); err != nil {
 		return err
 	}
-	// Check whether the term is stale.
+	// Check whether the term is stale.检查任期是否过时
 	if err := util.CheckTerm(req, d.Term()); err != nil {
 		return err
 	}
@@ -107,6 +323,7 @@ func (d *peerMsgHandler) preProposeRaftCommand(req *raft_cmdpb.RaftCmdRequest) e
 	return err
 }
 
+// 接收客户端请求
 func (d *peerMsgHandler) proposeRaftCommand(msg *raft_cmdpb.RaftCmdRequest, cb *message.Callback) {
 	err := d.preProposeRaftCommand(msg)
 	if err != nil {
@@ -114,6 +331,63 @@ func (d *peerMsgHandler) proposeRaftCommand(msg *raft_cmdpb.RaftCmdRequest, cb *
 		return
 	}
 	// Your Code Here (2B).
+	// 2B只考虑非admin消息,2C添加admin消息
+	if msg.AdminRequest != nil {
+		d.proposeAdminRequest(msg, cb)
+	} else {
+		d.proposeRequest(msg, cb)
+	}
+}
+
+// 2B自定义函数，propose msg 的普通 request 的第一个，别的不 propose
+func (d *peerMsgHandler) proposeRequest(msg *raft_cmdpb.RaftCmdRequest, cb *message.Callback) {
+	req := msg.GetRequests()[0]
+	err := d.checkRequestIfKeyInRegion(req)
+	if err != nil {
+		cb.Done(ErrResp(err))
+		return
+	}
+	data, err := msg.Marshal() // 将msg转变为byte[]
+	if err != nil {
+		panic("poorpool: marshal error")
+	}
+	// 保存proposal
+	d.proposals = append(d.proposals, &proposal{
+		index: d.nextProposalIndex(),
+		term:  d.Term(),
+		cb:    cb,
+	})
+	// 调用Propose函数处理消息（MsgType_MsgPropose）
+	d.RaftGroup.Propose(data)
+}
+
+// 2C自定义函数，propose msg 的admin request 的第一个，别的不 propose
+func (d *peerMsgHandler) proposeAdminRequest(msg *raft_cmdpb.RaftCmdRequest, cb *message.Callback) {
+	//adminReq := msg.AdminRequest
+	switch msg.AdminRequest.CmdType {
+	// 3A实现
+	case raft_cmdpb.AdminCmdType_ChangePeer:
+	case raft_cmdpb.AdminCmdType_InvalidAdmin:
+	// 3B实现
+	case raft_cmdpb.AdminCmdType_Split:
+	// 3A实现
+	case raft_cmdpb.AdminCmdType_TransferLeader:
+		// resp := new(raft_cmdpb.RaftCmdResponse)
+		// resp.Header = new(raft_cmdpb.RaftResponseHeader)
+		// resp.AdminResponse = &raft_cmdpb.AdminResponse{
+		// 	CmdType:        raft_cmdpb.AdminCmdType_TransferLeader,
+		// 	TransferLeader: &raft_cmdpb.TransferLeaderResponse{},
+		// }
+		// cb.Done(resp)
+		// d.RaftGroup.TransferLeader(adminReq.TransferLeader.Peer.Id)
+	// 2C实现
+	case raft_cmdpb.AdminCmdType_CompactLog:
+		data, err := msg.Marshal()
+		if err != nil {
+			panic("poorpool: marshal error")
+		}
+		d.RaftGroup.Propose(data)
+	}
 }
 
 func (d *peerMsgHandler) onTick() {
@@ -150,6 +424,7 @@ func (d *peerMsgHandler) onRaftBaseTick() {
 	d.ticker.schedule(PeerTickRaft)
 }
 
+// 安排压缩日志
 func (d *peerMsgHandler) ScheduleCompactLog(truncatedIndex uint64) {
 	raftLogGCTask := &runner.RaftLogGCTask{
 		RaftEngine: d.ctx.engine.Raft,
@@ -172,6 +447,7 @@ func (d *peerMsgHandler) onRaftMsg(msg *rspb.RaftMessage) error {
 	}
 	if msg.GetIsTombstone() {
 		// we receive a message tells us to remove self.
+		// 消息的接收方应该不存在，所以接收方应该删除自己
 		d.handleGCPeerMsg(msg)
 		return nil
 	}
@@ -206,6 +482,7 @@ func (d *peerMsgHandler) onRaftMsg(msg *rspb.RaftMessage) error {
 }
 
 // return false means the message is invalid, and can be ignored.
+// 查看raft消息是否有效
 func (d *peerMsgHandler) validateRaftMessage(msg *rspb.RaftMessage) bool {
 	regionID := msg.GetRegionId()
 	from := msg.GetFromPeer()
@@ -224,7 +501,7 @@ func (d *peerMsgHandler) validateRaftMessage(msg *rspb.RaftMessage) bool {
 }
 
 /// Checks if the message is sent to the correct peer.
-///
+/// 检查消息是否发送到正确的peer
 /// Returns true means that the message can be dropped silently.
 func (d *peerMsgHandler) checkMessage(msg *rspb.RaftMessage) bool {
 	fromEpoch := msg.GetRegionEpoch()
@@ -252,6 +529,7 @@ func (d *peerMsgHandler) checkMessage(msg *rspb.RaftMessage) bool {
 	region := d.Region()
 	if util.IsEpochStale(fromEpoch, region.RegionEpoch) && util.FindPeer(region, fromStoreID) == nil {
 		// The message is stale and not in current region.
+		// 该消息过时且不在当前region
 		handleStaleMsg(d.ctx.trans, msg, region.RegionEpoch, isVoteMsg)
 		return true
 	}
@@ -270,6 +548,7 @@ func (d *peerMsgHandler) checkMessage(msg *rspb.RaftMessage) bool {
 	return false
 }
 
+// 处理过时的消息
 func handleStaleMsg(trans Transport, msg *rspb.RaftMessage, curEpoch *metapb.RegionEpoch,
 	needGC bool) {
 	regionID := msg.RegionId
@@ -294,6 +573,7 @@ func handleStaleMsg(trans Transport, msg *rspb.RaftMessage, curEpoch *metapb.Reg
 	}
 }
 
+// 处理垃圾消息
 func (d *peerMsgHandler) handleGCPeerMsg(msg *rspb.RaftMessage) {
 	fromEpoch := msg.RegionEpoch
 	if !util.IsEpochStale(d.Region().RegionEpoch, fromEpoch) {
@@ -311,6 +591,7 @@ func (d *peerMsgHandler) handleGCPeerMsg(msg *rspb.RaftMessage) {
 
 // Returns `None` if the `msg` doesn't contain a snapshot or it contains a snapshot which
 // doesn't conflict with any other snapshots or regions. Otherwise a `snap.SnapKey` is returned.
+// 如果' msg '不包含快照，或者它包含的快照不与任何其他快照或region冲突，则返回' None '
 func (d *peerMsgHandler) checkSnapshot(msg *rspb.RaftMessage) (*snap.SnapKey, error) {
 	if msg.Message.Snapshot == nil {
 		return nil, nil
@@ -365,6 +646,7 @@ func (d *peerMsgHandler) checkSnapshot(msg *rspb.RaftMessage) (*snap.SnapKey, er
 	return nil, nil
 }
 
+// 销毁peer
 func (d *peerMsgHandler) destroyPeer() {
 	log.Infof("%s starts destroy", d.Tag)
 	regionID := d.regionId
@@ -391,6 +673,7 @@ func (d *peerMsgHandler) destroyPeer() {
 	delete(meta.regions, regionID)
 }
 
+// 找到兄弟region
 func (d *peerMsgHandler) findSiblingRegion() (result *metapb.Region) {
 	meta := d.ctx.storeMeta
 	meta.RLock()
@@ -403,6 +686,7 @@ func (d *peerMsgHandler) findSiblingRegion() (result *metapb.Region) {
 	return
 }
 
+// 定时调用判断现在的firstIdx小于appliedIdx就进行compactLog
 func (d *peerMsgHandler) onRaftGCLogTick() {
 	d.ticker.schedule(PeerTickRaftLogGC)
 	if !d.IsLeader() {
@@ -428,19 +712,23 @@ func (d *peerMsgHandler) onRaftGCLogTick() {
 	term, err := d.RaftGroup.Raft.RaftLog.Term(compactIdx)
 	if err != nil {
 		log.Fatalf("appliedIdx: %d, firstIdx: %d, compactIdx: %d", appliedIdx, firstIdx, compactIdx)
+		log.Infof("1 here!")
 		panic(err)
 	}
 
 	// Create a compact log request and notify directly.
+	// 创建一个压缩的日志请求并直接通知
 	regionID := d.regionId
 	request := newCompactLogRequest(regionID, d.Meta, compactIdx, term)
 	d.proposeRaftCommand(request, nil)
 }
 
+// 定时会调用判断自己是否需要分割
 func (d *peerMsgHandler) onSplitRegionCheckTick() {
 	d.ticker.schedule(PeerTickSplitRegionCheck)
 	// To avoid frequent scan, we only add new scan tasks if all previous tasks
 	// have finished.
+	// 为了避免频繁的扫描，只在所有之前的任务都完成的情况下添加新的扫描任务
 	if len(d.ctx.splitCheckTaskSender) > 0 {
 		return
 	}
@@ -457,12 +745,15 @@ func (d *peerMsgHandler) onSplitRegionCheckTick() {
 	d.SizeDiffHint = 0
 }
 
+// 分割region的方法
 func (d *peerMsgHandler) onPrepareSplitRegion(regionEpoch *metapb.RegionEpoch, splitKey []byte, cb *message.Callback) {
+	// 判断分割范围是否有效
 	if err := d.validateSplitRegion(regionEpoch, splitKey); err != nil {
 		cb.Done(ErrResp(err))
 		return
 	}
 	region := d.Region()
+	// 向 SchedulerTask发送一个请求分割的消息
 	d.ctx.schedulerTaskSender <- &runner.SchedulerAskSplitTask{
 		Region:   region,
 		SplitKey: splitKey,
@@ -471,6 +762,7 @@ func (d *peerMsgHandler) onPrepareSplitRegion(regionEpoch *metapb.RegionEpoch, s
 	}
 }
 
+// 验证是否可以分割region
 func (d *peerMsgHandler) validateSplitRegion(epoch *metapb.RegionEpoch, splitKey []byte) error {
 	if len(splitKey) == 0 {
 		err := errors.Errorf("%s split key should not be empty", d.Tag)
@@ -551,6 +843,7 @@ func (d *peerMsgHandler) onGCSnap(snaps []snap.SnapKeyWithSending) {
 	}
 }
 
+// 创建管理请求
 func newAdminRequest(regionID uint64, peer *metapb.Peer) *raft_cmdpb.RaftCmdRequest {
 	return &raft_cmdpb.RaftCmdRequest{
 		Header: &raft_cmdpb.RaftRequestHeader{
@@ -560,6 +853,7 @@ func newAdminRequest(regionID uint64, peer *metapb.Peer) *raft_cmdpb.RaftCmdRequ
 	}
 }
 
+// 创建压缩日志请求
 func newCompactLogRequest(regionID uint64, peer *metapb.Peer, compactIndex, compactTerm uint64) *raft_cmdpb.RaftCmdRequest {
 	req := newAdminRequest(regionID, peer)
 	req.AdminRequest = &raft_cmdpb.AdminRequest{

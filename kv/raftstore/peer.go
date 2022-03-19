@@ -82,6 +82,7 @@ type peer struct {
 	Tag string
 
 	// Record the callback of the proposals
+	// 记录proposal的回调
 	// (Used in 2B)
 	proposals []*proposal
 
@@ -99,6 +100,7 @@ type peer struct {
 	PeersStartPendingTime map[uint64]time.Time
 	// Mark the peer as stopped, set when peer is destroyed
 	// (Used in 3B conf change)
+	// 当peer被销毁时标注为true
 	stopped bool
 
 	// An inaccurate difference in region size since last reset.
@@ -159,14 +161,17 @@ func NewPeer(storeId uint64, cfg *config.Config, engines *engine_util.Engines, r
 	return p, nil
 }
 
+// 将peer插入peer缓存中
 func (p *peer) insertPeerCache(peer *metapb.Peer) {
 	p.peerCache[peer.GetId()] = peer
 }
 
+// 从缓存中移除peerID对应的peer
 func (p *peer) removePeerCache(peerID uint64) {
 	delete(p.peerCache, peerID)
 }
 
+// 从缓存中找到peer
 func (p *peer) getPeerFromCache(peerID uint64) *metapb.Peer {
 	if peer, ok := p.peerCache[peerID]; ok {
 		return peer
@@ -185,6 +190,7 @@ func (p *peer) nextProposalIndex() uint64 {
 }
 
 /// Tries to destroy itself. Returns a job (if needed) to do more cleaning tasks.
+// 尝试销毁自己
 func (p *peer) MaybeDestroy() bool {
 	if p.stopped {
 		log.Infof("%v is being destroyed, skip", p.Tag)
@@ -264,6 +270,7 @@ func (p *peer) IsLeader() bool {
 	return p.RaftGroup.Raft.State == raft.StateLeader
 }
 
+// 发送消息
 func (p *peer) Send(trans Transport, msgs []eraftpb.Message) {
 	for _, msg := range msgs {
 		err := p.sendRaftMessage(msg, trans)
@@ -274,6 +281,7 @@ func (p *peer) Send(trans Transport, msgs []eraftpb.Message) {
 }
 
 /// Collects all pending peers and update `peers_start_pending_time`.
+// 收集所有挂起的peer并更新' peers_start_pending_time '
 func (p *peer) CollectPendingPeers() []*metapb.Peer {
 	pendingPeers := make([]*metapb.Peer, 0, len(p.Region().GetPeers()))
 	truncatedIdx := p.peerStorage.truncatedIndex()
@@ -303,6 +311,7 @@ func (p *peer) clearPeersStartPendingTime() {
 
 /// Returns `true` if any new peer catches up with the leader in replicating logs.
 /// And updates `PeersStartPendingTime` if needed.
+// 如果任何新的peer在复制日志时赶上了leader，则返回' true '。并更新' peerstartpendingtime '如果需要
 func (p *peer) AnyNewPeerCatchUp(peerId uint64) bool {
 	if len(p.PeersStartPendingTime) == 0 {
 		return false

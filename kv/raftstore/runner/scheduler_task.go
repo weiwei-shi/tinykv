@@ -50,11 +50,11 @@ func NewSchedulerTaskHandler(storeID uint64, SchedulerClient scheduler_client.Cl
 
 func (r *SchedulerTaskHandler) Handle(t worker.Task) {
 	switch t.(type) {
-	case *SchedulerAskSplitTask:
+	case *SchedulerAskSplitTask: // 接受来自region的split请求
 		r.onAskSplit(t.(*SchedulerAskSplitTask))
-	case *SchedulerRegionHeartbeatTask:
+	case *SchedulerRegionHeartbeatTask: // 接收来自region(peer leader)的心跳
 		r.onHeartbeat(t.(*SchedulerRegionHeartbeatTask))
-	case *SchedulerStoreHeartbeatTask:
+	case *SchedulerStoreHeartbeatTask: // 接收来自store的心跳
 		r.onStoreHeartbeat(t.(*SchedulerStoreHeartbeatTask))
 	default:
 		log.Errorf("unsupported worker.Task: %+v", t)

@@ -59,6 +59,7 @@ func CheckKeyInRegionInclusive(key []byte, region *metapb.Region) error {
 }
 
 /// check whether epoch is staler than check_epoch.
+// 检查epoch是否比check_epoch更陈旧
 func IsEpochStale(epoch *metapb.RegionEpoch, checkEpoch *metapb.RegionEpoch) bool {
 	return epoch.Version < checkEpoch.Version || epoch.ConfVer < checkEpoch.ConfVer
 }
@@ -76,6 +77,7 @@ func IsFirstVoteMessage(msg *eraftpb.Message) bool {
 	return IsVoteMessage(msg) && msg.Term == meta.RaftInitLogTerm+1
 }
 
+// 检查region的epoch，避免key不在region的错误
 func CheckRegionEpoch(req *raft_cmdpb.RaftCmdRequest, region *metapb.Region, includeRegion bool) error {
 	checkVer, checkConfVer := false, false
 	if req.AdminRequest == nil {
@@ -107,7 +109,7 @@ func CheckRegionEpoch(req *raft_cmdpb.RaftCmdRequest, region *metapb.Region, inc
 	currentEpoch := region.RegionEpoch
 
 	// We must check epochs strictly to avoid key not in region error.
-	//
+	// 我们必须严格检查epoch，以避免key不在区域的错误
 	// A 3 nodes TiKV cluster with merge enabled, after commit merge, TiKV A
 	// tells TiDB with an epoch not match error contains the latest target Region
 	// info, TiDB updates its region cache and sends requests to TiKV B,
@@ -131,6 +133,7 @@ func CheckRegionEpoch(req *raft_cmdpb.RaftCmdRequest, region *metapb.Region, inc
 	return nil
 }
 
+// 在region中找到storeID对应的peer
 func FindPeer(region *metapb.Region, storeID uint64) *metapb.Peer {
 	for _, peer := range region.Peers {
 		if peer.StoreId == storeID {

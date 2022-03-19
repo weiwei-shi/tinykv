@@ -3,6 +3,7 @@ package engine_util
 import (
 	"github.com/Connor1996/badger"
 	"github.com/golang/protobuf/proto"
+	"github.com/pingcap-incubator/tinykv/log"
 	"github.com/pingcap/errors"
 )
 
@@ -97,6 +98,7 @@ func (wb *WriteBatch) WriteToDB(db *badger.DB) error {
 func (wb *WriteBatch) MustWriteToDB(db *badger.DB) {
 	err := wb.WriteToDB(db)
 	if err != nil {
+		log.Infof("29 here!")
 		panic(err)
 	}
 }

@@ -149,6 +149,7 @@ func (d *storeWorker) checkMsg(msg *rspb.RaftMessage) (bool, error) {
 	return false, nil
 }
 
+// 当一个Raft消息发送给一个不存在的peer时会调用此方法
 func (d *storeWorker) onRaftMessage(msg *rspb.RaftMessage) error {
 	regionID := msg.RegionId
 	if err := d.ctx.router.send(regionID, message.Msg{Type: message.MsgTypeRaftMessage, Data: msg}); err == nil {
@@ -251,6 +252,7 @@ func (d *storeWorker) onSchedulerStoreHeartbeatTick() {
 
 func (d *storeWorker) handleSnapMgrGC() error {
 	mgr := d.ctx.snapMgr
+	// 取出所有的SnapKeys，按照Region Term Index排序
 	snapKeys, err := mgr.ListIdleSnap()
 	if err != nil {
 		return err
@@ -262,10 +264,12 @@ func (d *storeWorker) handleSnapMgrGC() error {
 	var keys []snap.SnapKeyWithSending
 	for _, pair := range snapKeys {
 		key := pair.SnapKey
+		// 如果RegionID没有发生变化则取出该值
 		if lastRegionID == key.RegionID {
 			keys = append(keys, pair)
 			continue
 		}
+		// 如果上一个region的数据取完了，则调用scheduleGCSnap
 		if len(keys) > 0 {
 			err = d.scheduleGCSnap(lastRegionID, keys)
 			if err != nil {
@@ -312,5 +316,6 @@ func (d *storeWorker) onSnapMgrGC() {
 	if err := d.handleSnapMgrGC(); err != nil {
 		log.Errorf("handle snap GC failed store_id %d, err %s", d.storeState.id, err)
 	}
+	// 重置了自己的tick时间
 	d.ticker.scheduleStore(StoreTickSnapGC)
 }

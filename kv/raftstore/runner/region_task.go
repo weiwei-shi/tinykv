@@ -57,15 +57,15 @@ func NewRegionTaskHandler(engines *engine_util.Engines, mgr *snap.SnapManager) *
 
 func (r *regionTaskHandler) Handle(t worker.Task) {
 	switch t.(type) {
-	case *RegionTaskGen:
+	case *RegionTaskGen: // 接收产生Snap的请求
 		task := t.(*RegionTaskGen)
 		// It is safe for now to handle generating and applying snapshot concurrently,
 		// but it may not when merge is implemented.
 		r.ctx.handleGen(task.RegionId, task.Notifier)
-	case *RegionTaskApply:
+	case *RegionTaskApply: // 应用Snap消息
 		task := t.(*RegionTaskApply)
 		r.ctx.handleApply(task.RegionId, task.Notifier, task.StartKey, task.EndKey, task.SnapMeta)
-	case *RegionTaskDestroy:
+	case *RegionTaskDestroy: // 删除region中Range的key
 		task := t.(*RegionTaskDestroy)
 		r.ctx.cleanUpRange(task.RegionId, task.StartKey, task.EndKey)
 	}
@@ -178,6 +178,7 @@ func doSnapshot(engines *engine_util.Engines, mgr *snap.SnapManager, regionId ui
 	regionState := new(rspb.RegionLocalState)
 	err = engine_util.GetMetaFromTxn(txn, meta.RegionStateKey(regionId), regionState)
 	if err != nil {
+		log.Infof("5 here!")
 		panic(err)
 	}
 	if regionState.GetState() != rspb.PeerState_Normal {

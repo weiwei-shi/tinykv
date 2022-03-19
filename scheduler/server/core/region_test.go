@@ -20,6 +20,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/pingcap-incubator/tinykv/log"
 	"github.com/pingcap-incubator/tinykv/proto/pkg/metapb"
 	"github.com/pingcap-incubator/tinykv/scheduler/pkg/mock/mockid"
 	"github.com/pingcap-incubator/tinykv/scheduler/server/id"
@@ -148,6 +149,7 @@ func randomBytes(n int) []byte {
 	bytes := make([]byte, n)
 	_, err := rand.Read(bytes)
 	if err != nil {
+		log.Infof("34 here!")
 		panic(err)
 	}
 	return bytes

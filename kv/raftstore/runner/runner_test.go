@@ -14,6 +14,7 @@ import (
 	"github.com/pingcap-incubator/tinykv/kv/util/codec"
 	"github.com/pingcap-incubator/tinykv/kv/util/engine_util"
 	"github.com/pingcap-incubator/tinykv/kv/util/worker"
+	"github.com/pingcap-incubator/tinykv/log"
 	"github.com/pingcap-incubator/tinykv/proto/pkg/eraftpb"
 	"github.com/pingcap-incubator/tinykv/proto/pkg/metapb"
 	"github.com/pingcap-incubator/tinykv/proto/pkg/raft_cmdpb"
@@ -214,6 +215,7 @@ func raftLogMustExist(t *testing.T, db *badger.DB, regionId, startIdx, endIdx ui
 
 func cleanUpTestEngineData(engines *engine_util.Engines) {
 	if err := engines.Destroy(); err != nil {
+		log.Infof("6 here!")
 		panic(err)
 	}
 }

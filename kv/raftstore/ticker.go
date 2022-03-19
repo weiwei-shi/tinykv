@@ -49,6 +49,7 @@ func (t *ticker) tickClock() {
 }
 
 // schedule arrange the next run for the PeerTick.
+// 安排PeerTick的下一次运行
 func (t *ticker) schedule(tp PeerTick) {
 	sched := &t.schedules[int(tp)]
 	if sched.interval <= 0 {
@@ -59,6 +60,7 @@ func (t *ticker) schedule(tp PeerTick) {
 }
 
 // isOnTick checks if the PeerTick should run.
+// isOnTick检查PeerTick是否应该运行
 func (t *ticker) isOnTick(tp PeerTick) bool {
 	sched := &t.schedules[int(tp)]
 	return sched.runAt == t.tick

@@ -38,8 +38,10 @@ func (r *regionItem) Less(other btree.Item) bool {
 type storeMeta struct {
 	sync.RWMutex
 	/// region end key -> region ID
+	// 用于快速定位某一个 key 在哪个 region 中
 	regionRanges *btree.BTree
 	/// region_id -> region
+	// region id 映射 region 结构体
 	regions map[uint64]*metapb.Region
 	/// `MsgRequestVote` messages from newly split Regions shouldn't be dropped if there is no
 	/// such Region in this store now. So the messages are recorded temporarily and will be handled later.
@@ -59,6 +61,7 @@ func (m *storeMeta) setRegion(region *metapb.Region, peer *peer) {
 }
 
 // getOverlaps gets the regions which are overlapped with the specified region range.
+// getooverlap获取与指定区域范围重叠的区域
 func (m *storeMeta) getOverlapRegions(region *metapb.Region) []*metapb.Region {
 	item := &regionItem{region: region}
 	var result *regionItem
@@ -171,8 +174,7 @@ func (bs *Raftstore) loadPeers() ([]*peer, error) {
 	kvWB.MustWriteToDB(ctx.engine.Kv)
 	raftWB.MustWriteToDB(ctx.engine.Raft)
 
-	log.Infof("start store %d, region_count %d, tombstone_count %d, takes %v",
-		storeID, totalCount, tombStoneCount, time.Since(t))
+	log.Infof("start store %d, region_count %d, tombstone_count %d, takes %v", storeID, totalCount, tombStoneCount, time.Since(t))
 	return regionPeers, nil
 }
 
@@ -185,9 +187,11 @@ func (bs *Raftstore) clearStaleMeta(kvWB, raftWB *engine_util.WriteBatch, origin
 	}
 	err = ClearMeta(bs.ctx.engine, kvWB, raftWB, region.Id, raftState.LastIndex)
 	if err != nil {
+		log.Infof("3 here!")
 		panic(err)
 	}
 	if err := kvWB.SetMeta(meta.RegionStateKey(region.Id), originState); err != nil {
+		log.Infof("4 here!")
 		panic(err)
 	}
 }
@@ -227,6 +231,7 @@ func (bs *Raftstore) start(
 		return err
 	}
 	wg := new(sync.WaitGroup)
+	// 新建多个worker
 	bs.workers = &workers{
 		splitCheckWorker: worker.NewWorker("split-check", wg),
 		regionWorker:     worker.NewWorker("snapshot-worker", wg),
@@ -234,6 +239,7 @@ func (bs *Raftstore) start(
 		schedulerWorker:  worker.NewWorker("scheduler-worker", wg),
 		wg:               wg,
 	}
+	// 将worker的Sender方法存入到 ctx 之中
 	bs.ctx = &GlobalContext{
 		cfg:                  cfg,
 		engine:               engines,
@@ -257,10 +263,12 @@ func (bs *Raftstore) start(
 	for _, peer := range regionPeers {
 		bs.router.register(peer)
 	}
+	// 启动六个worker
 	bs.startWorkers(regionPeers)
 	return nil
 }
 
+// 启动多个region peer，一个region内只有一个peer
 func (bs *Raftstore) startWorkers(peers []*peer) {
 	ctx := bs.ctx
 	workers := bs.workers
@@ -277,6 +285,7 @@ func (bs *Raftstore) startWorkers(peers []*peer) {
 	}
 	engines := ctx.engine
 	cfg := ctx.cfg
+	// 创建六个worker方法
 	workers.splitCheckWorker.Start(runner.NewSplitCheckHandler(engines.Kv, NewRaftstoreRouter(router), cfg))
 	workers.regionWorker.Start(runner.NewRegionTaskHandler(engines, ctx.snapMgr))
 	workers.raftLogGCWorker.Start(runner.NewRaftLogGCTaskHandler())

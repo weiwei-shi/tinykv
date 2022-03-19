@@ -23,6 +23,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/pingcap-incubator/tinykv/log"
 	pb "github.com/pingcap-incubator/tinykv/proto/pkg/eraftpb"
 )
 
@@ -55,6 +56,7 @@ func IsEmptySnap(sp *pb.Snapshot) bool {
 
 func mustTerm(term uint64, err error) uint64 {
 	if err != nil {
+		log.Infof("30 here!")
 		panic(err)
 	}
 	return term
@@ -83,6 +85,7 @@ func diffu(a, b string) string {
 			// do nothing
 			return string(buf)
 		}
+		log.Infof("31 here!")
 		panic(err)
 	}
 	return string(buf)
@@ -91,10 +94,12 @@ func diffu(a, b string) string {
 func mustTemp(pre, body string) string {
 	f, err := ioutil.TempFile("", pre)
 	if err != nil {
+		log.Infof("32 here!")
 		panic(err)
 	}
 	_, err = io.Copy(f, strings.NewReader(body))
 	if err != nil {
+		log.Infof("33 here!")
 		panic(err)
 	}
 	f.Close()

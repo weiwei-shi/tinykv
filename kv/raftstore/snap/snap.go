@@ -588,11 +588,13 @@ func (s *Snap) Delete() {
 		if s.holdTmpFiles {
 			_, err := util.DeleteFileIfExists(cfFile.TmpPath)
 			if err != nil {
+				log.Infof("7 here!")
 				panic(err)
 			}
 		}
 		deleted, err := util.DeleteFileIfExists(cfFile.Path)
 		if err != nil {
+			log.Infof("8 here!")
 			panic(err)
 		}
 		if deleted {
@@ -601,11 +603,13 @@ func (s *Snap) Delete() {
 	}
 	_, err := util.DeleteFileIfExists(s.MetaFile.Path)
 	if err != nil {
+		log.Infof("9 here!")
 		panic(err)
 	}
 	if s.holdTmpFiles {
 		_, err := util.DeleteFileIfExists(s.MetaFile.TmpPath)
 		if err != nil {
+			log.Infof("10 here!")
 			panic(err)
 		}
 	}

@@ -27,7 +27,7 @@ func newRaftWorker(ctx *GlobalContext, pm *router) *raftWorker {
 	}
 }
 
-// run runs raft commands.
+// run runs raft commands. 运行raft命令
 // On each loop, raft commands are batched by channel buffer.
 // After commands are handled, we collect apply messages by peers, make a applyBatch, send it to apply channel.
 func (rw *raftWorker) run(closeCh <-chan struct{}, wg *sync.WaitGroup) {

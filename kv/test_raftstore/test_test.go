@@ -36,7 +36,7 @@ func SpawnClientsAndWait(t *testing.T, ch chan bool, ncli int, fn func(me int, t
 		ca[cli] = make(chan bool)
 		go runClient(t, cli, ca[cli], fn)
 	}
-	// log.Printf("SpawnClientsAndWait: waiting for clients")
+	// log.Infof("SpawnClientsAndWait: waiting for clients")
 	for cli := 0; cli < ncli; cli++ {
 		ok := <-ca[cli]
 		// log.Infof("SpawnClientsAndWait: client %d is done\n", cli)
@@ -136,12 +136,12 @@ func confchanger(t *testing.T, cluster *Cluster, ch chan bool, done *int32) {
 // operations to set of servers for some period of time.  After the period is
 // over, test checks that all sequential values are present and in order for a
 // particular key and perform Delete to clean up.
-// - If unreliable is set, RPCs may fail.
-// - If crash is set, the servers restart after the period is over.
-// - If partitions is set, the test repartitions the network concurrently between the servers.
-// - If maxraftlog is a positive number, the count of the persistent log for Raft shouldn't exceed 2*maxraftlog.
-// - If confchange is set, the cluster will schedule random conf change concurrently.
-// - If split is set, split region when size exceed 1024 bytes.
+// - If unreliable is set, RPCs may fail.如果设置了reliable，则rpc可能会失效
+// - If crash is set, the servers restart after the period is over.如果设置了crash，则表示超时后服务器重新启动
+// - If partitions is set, the test repartitions the network concurrently between the servers.设置了分区，测试将在服务器之间并发重分区网络
+// - If maxraftlog is a positive number, the count of the persistent log for Raft shouldn't exceed 2*maxraftlog.如果maxraftlog是正数，则Raft的持久日志计数不应该超过2*maxraftlog
+// - If confchange is set, the cluster will schedule random conf change concurrently.配置了confchange后，集群会并发调度随机的conf修改
+// - If split is set, split region when size exceed 1024 bytes.如果设置了split，则在size超过1024字节时分割区域
 func GenericTest(t *testing.T, part string, nclients int, unreliable bool, crash bool, partitions bool, maxraftlog int, confchange bool, split bool) {
 	title := "Test: "
 	if unreliable {
@@ -207,14 +207,14 @@ func GenericTest(t *testing.T, part string, nclients int, unreliable bool, crash
 				if (rand.Int() % 1000) < 500 {
 					key := strconv.Itoa(cli) + " " + fmt.Sprintf("%08d", j)
 					value := "x " + strconv.Itoa(cli) + " " + strconv.Itoa(j) + " y"
-					// log.Infof("%d: client new put %v,%v\n", cli, key, value)
+					//log.Infof("%d: client new put %v,%v\n", cli, key, value)
 					cluster.MustPut([]byte(key), []byte(value))
 					last = NextValue(last, value)
 					j++
 				} else {
 					start := strconv.Itoa(cli) + " " + fmt.Sprintf("%08d", 0)
 					end := strconv.Itoa(cli) + " " + fmt.Sprintf("%08d", j)
-					// log.Infof("%d: client new scan %v-%v\n", cli, start, end)
+					//log.Infof("%d: client new scan %v-%v\n", cli, start, end)
 					values := cluster.Scan([]byte(start), []byte(end))
 					v := string(bytes.Join(values, []byte("")))
 					if v != last {
@@ -304,6 +304,7 @@ func GenericTest(t *testing.T, part string, nclients int, unreliable bool, crash
 						continue
 					}
 					if err != nil {
+						log.Infof("2 here!")
 						panic(err)
 					}
 					truncatedIdx := state.TruncatedState.Index

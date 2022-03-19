@@ -218,6 +218,7 @@ func (m *MockSchedulerClient) getRegionByIDLocked(regionID uint64) (*metapb.Regi
 }
 
 func (m *MockSchedulerClient) AskSplit(ctx context.Context, region *metapb.Region) (*schedulerpb.AskSplitResponse, error) {
+	// 回复一个 AskSplitResponse消息给 peer
 	resp := new(schedulerpb.AskSplitResponse)
 	resp.Header = &schedulerpb.ResponseHeader{ClusterId: m.clusterID}
 	curRegion, _, err := m.GetRegionByID(ctx, region.GetId())
@@ -247,6 +248,7 @@ func (m *MockSchedulerClient) StoreHeartbeat(ctx context.Context, stats *schedul
 	return nil
 }
 
+// receive heart beat and change pending peers
 func (m *MockSchedulerClient) RegionHeartbeat(req *schedulerpb.RegionHeartbeatRequest) error {
 	if err := m.checkBootstrap(); err != nil {
 		return err
@@ -257,12 +259,12 @@ func (m *MockSchedulerClient) RegionHeartbeat(req *schedulerpb.RegionHeartbeatRe
 
 	regionID := req.Region.GetId()
 	for _, p := range req.Region.GetPeers() {
-		delete(m.pendingPeers, p.GetId())
+		delete(m.pendingPeers, p.GetId()) // 删除节点
 	}
 	for _, p := range req.GetPendingPeers() {
-		m.pendingPeers[p.GetId()] = p
+		m.pendingPeers[p.GetId()] = p // 增加节点
 	}
-	m.leaders[regionID] = req.Leader
+	m.leaders[regionID] = req.Leader // 更换leader
 
 	if err := m.handleHeartbeatVersion(req.Region); err != nil {
 		return err
@@ -278,6 +280,7 @@ func (m *MockSchedulerClient) RegionHeartbeat(req *schedulerpb.RegionHeartbeatRe
 		TargetPeer:  req.Leader,
 	}
 	if op := m.operators[regionID]; op != nil {
+		// 判断之前的操作是否完成
 		if m.tryFinished(op, req.Region, req.Leader) {
 			delete(m.operators, regionID)
 		} else {

@@ -58,6 +58,7 @@ type RaftMessage struct {
 	Message     *eraftpb.Message    `protobuf:"bytes,4,opt,name=message" json:"message,omitempty"`
 	RegionEpoch *metapb.RegionEpoch `protobuf:"bytes,5,opt,name=region_epoch,json=regionEpoch" json:"region_epoch,omitempty"`
 	// true means to_peer is a tombstone peer and it should remove itself.
+	// True意味着to_peer是一个墓碑对等体，它应该删除自己。
 	IsTombstone bool `protobuf:"varint,6,opt,name=is_tombstone,json=isTombstone,proto3" json:"is_tombstone,omitempty"`
 	// Region key range [start_key, end_key). (Used in 3B)
 	StartKey             []byte   `protobuf:"bytes,7,opt,name=start_key,json=startKey,proto3" json:"start_key,omitempty"`
@@ -224,8 +225,10 @@ func (m *RaftLocalState) GetLastTerm() uint64 {
 type RaftApplyState struct {
 	// Record the applied index of the state machine to make sure
 	// not apply any index twice after restart.
+	// 记录状态机应用的索引，以确保在重启后不应用任何索引两次。
 	AppliedIndex uint64 `protobuf:"varint,1,opt,name=applied_index,json=appliedIndex,proto3" json:"applied_index,omitempty"`
 	// Record the index and term of the last raft log that have been truncated. (Used in 2C)
+	// 记录上次被截断的raft日志的索引和项
 	TruncatedState       *RaftTruncatedState `protobuf:"bytes,2,opt,name=truncated_state,json=truncatedState" json:"truncated_state,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}            `json:"-"`
 	XXX_unrecognized     []byte              `json:"-"`

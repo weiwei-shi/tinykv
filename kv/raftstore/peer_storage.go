@@ -40,7 +40,7 @@ type PeerStorage struct {
 
 	// current snapshot state
 	snapState snap.SnapState
-	// regionSched used to schedule task to region worker
+	// regionSched used to schedule task to region worker 用来安排到region worker的任务
 	regionSched chan<- worker.Task
 	// generate snapshot tried count
 	snapTriedCnt int
@@ -305,9 +305,34 @@ func ClearMeta(engines *engine_util.Engines, kvWB, raftWB *engine_util.WriteBatc
 }
 
 // Append the given entries to the raft log and update ps.raftState also delete log entries that will
-// never be committed
+// never be committed // 将给定的条目附加到raft日志中，并更新ps.raftState同时删除永远不会提交的日志条目
 func (ps *PeerStorage) Append(entries []eraftpb.Entry, raftWB *engine_util.WriteBatch) error {
 	// Your Code Here (2B).
+	if len(entries) == 0 {
+		return nil
+	}
+	psFirst, _ := ps.FirstIndex()
+	psLast, _ := ps.LastIndex()
+	last := entries[len(entries)-1].Index
+	//first := entries[0].Index
+	if last < psFirst {
+		return nil
+	}
+	// 添加新的指定的entries条目
+	for _, v := range entries {
+		if v.GetIndex() >= psFirst {
+			raftWB.SetMeta(meta.RaftLogKey(ps.region.GetId(), v.GetIndex()), &v)
+		}
+	}
+	// 删除永远不会提交的日志条目
+	if psLast > last {
+		for i := last + 1; i <= psLast; i++ {
+			raftWB.DeleteMeta(meta.RaftLogKey(ps.region.Id, i))
+		}
+	}
+	// 更新raftState
+	ps.raftState.LastIndex = last
+	ps.raftState.LastTerm = entries[len(entries)-1].Term
 	return nil
 }
 
@@ -323,7 +348,43 @@ func (ps *PeerStorage) ApplySnapshot(snapshot *eraftpb.Snapshot, kvWB *engine_ut
 	// and send RegionTaskApply task to region worker through ps.regionSched, also remember call ps.clearMeta
 	// and ps.clearExtraData to delete stale data
 	// Your Code Here (2C).
-	return nil, nil
+	//清除原来的数据
+	if ps.isInitialized() {
+		ps.clearExtraData(snapData.Region)
+		ps.clearMeta(kvWB, raftWB)
+	}
+	// 更新ps的状态
+	ps.raftState.LastIndex = snapshot.Metadata.Index
+	ps.raftState.LastTerm = snapshot.Metadata.Term
+	ps.raftState.HardState.Commit = snapshot.Metadata.Index
+	ps.raftState.HardState.Term = snapshot.Metadata.Term
+	ps.raftState.HardState.Vote = 0
+	ps.applyState.AppliedIndex = snapshot.Metadata.Index
+	ps.applyState.TruncatedState.Index = snapshot.Metadata.Index
+	ps.applyState.TruncatedState.Term = snapshot.Metadata.Term
+	ps.snapState.StateType = snap.SnapState_Applying
+	kvWB.SetMeta(meta.ApplyStateKey(ps.region.Id), ps.applyState)
+	raftWB.SetMeta(meta.RaftStateKey(snapData.Region.Id), ps.raftState)
+	//log.Infof("[applyed state]Truncatedindex:%v; Appliedindex:%v", ps.applyState.TruncatedState.Index, ps.applyState.AppliedIndex)
+	// 发送 RegionTaskApply 到 regionSched 安装 snapshot
+	ch := make(chan bool, 1)
+	ps.regionSched <- &runner.RegionTaskApply{
+		//RegionId: ps.region.Id,
+		RegionId: snapData.Region.Id,
+		Notifier: ch,
+		SnapMeta: snapshot.Metadata,
+		StartKey: snapData.Region.StartKey,
+		EndKey:   snapData.Region.EndKey,
+	}
+	<-ch
+	result := &ApplySnapResult{
+		PrevRegion: ps.region,
+		Region:     snapData.Region,
+	}
+	ps.snapState.StateType = snap.SnapState_Relax
+	// 保存信息
+	meta.WriteRegionState(kvWB, snapData.Region, rspb.PeerState_Normal)
+	return result, nil
 }
 
 // Save memory states to disk.
@@ -331,7 +392,28 @@ func (ps *PeerStorage) ApplySnapshot(snapshot *eraftpb.Snapshot, kvWB *engine_ut
 func (ps *PeerStorage) SaveReadyState(ready *raft.Ready) (*ApplySnapResult, error) {
 	// Hint: you may call `Append()` and `ApplySnapshot()` in this function
 	// Your Code Here (2B/2C).
-	return nil, nil
+	raftWB := new(engine_util.WriteBatch)
+	var applySnapResult *ApplySnapResult
+	var err error = nil
+	// 2C添加,判断是否存在 Snapshot
+	if !raft.IsEmptySnap(&ready.Snapshot) {
+		kvWB := new(engine_util.WriteBatch)
+		applySnapResult, err = ps.ApplySnapshot(&ready.Snapshot, kvWB, raftWB)
+		if err != nil {
+			return applySnapResult, err
+		}
+		kvWB.WriteToDB(ps.Engines.Kv)
+	}
+	// 将需要持久化的 entries 保存到 raftDB
+	err = ps.Append(ready.Entries, raftWB)
+	// 持久化HardState
+	if !raft.IsEmptyHardState(ready.HardState) {
+		ps.raftState.HardState = &ready.HardState
+	}
+	// 更新 RaftLocalState
+	raftWB.SetMeta(meta.RaftStateKey(ps.region.Id), ps.raftState)
+	raftWB.WriteToDB(ps.Engines.Raft)
+	return applySnapResult, err
 }
 
 func (ps *PeerStorage) ClearData() {
