@@ -1,149 +1,1026 @@
-=== RUN   TestSnapshotUnreliableRecoverConcurrentPartition2C
-2022/03/18 09:59:11.693666 node.go:193: [0;37m[info] start raft store node, storeID: 1[0m
-2022/03/18 09:59:11.693963 peer.go:41: [0;37m[info] region id:1 region_epoch:<conf_ver:1 version:1 > peers:<id:3 store_id:3 > peers:<id:4 store_id:4 > peers:<id:5 store_id:5 > peers:<id:1 store_id:1 > peers:<id:2 store_id:2 >  create peer with ID 1[0m
-2022/03/18 09:59:11.694026 raftstore.go:177: [0;37m[info] start store 1, region_count 1, tombstone_count 0, takes 171.56µs[0m
-2022/03/18 09:59:11.694346 node.go:193: [0;37m[info] start raft store node, storeID: 2[0m
-2022/03/18 09:59:11.694426 peer.go:41: [0;37m[info] region id:1 region_epoch:<conf_ver:1 version:1 > peers:<id:3 store_id:3 > peers:<id:4 store_id:4 > peers:<id:5 store_id:5 > peers:<id:1 store_id:1 > peers:<id:2 store_id:2 >  create peer with ID 2[0m
-2022/03/18 09:59:11.694463 raftstore.go:177: [0;37m[info] start store 2, region_count 1, tombstone_count 0, takes 62.033µs[0m
-2022/03/18 09:59:11.694824 node.go:193: [0;37m[info] start raft store node, storeID: 3[0m
-2022/03/18 09:59:11.694920 peer.go:41: [0;37m[info] region id:1 region_epoch:<conf_ver:1 version:1 > peers:<id:3 store_id:3 > peers:<id:4 store_id:4 > peers:<id:5 store_id:5 > peers:<id:1 store_id:1 > peers:<id:2 store_id:2 >  create peer with ID 3[0m
-2022/03/18 09:59:11.694957 raftstore.go:177: [0;37m[info] start store 3, region_count 1, tombstone_count 0, takes 78.615µs[0m
-2022/03/18 09:59:11.695305 node.go:193: [0;37m[info] start raft store node, storeID: 4[0m
-2022/03/18 09:59:11.695383 peer.go:41: [0;37m[info] region id:1 region_epoch:<conf_ver:1 version:1 > peers:<id:3 store_id:3 > peers:<id:4 store_id:4 > peers:<id:5 store_id:5 > peers:<id:1 store_id:1 > peers:<id:2 store_id:2 >  create peer with ID 4[0m
-2022/03/18 09:59:11.695425 raftstore.go:177: [0;37m[info] start store 4, region_count 1, tombstone_count 0, takes 67.219µs[0m
-2022/03/18 09:59:11.695749 node.go:193: [0;37m[info] start raft store node, storeID: 5[0m
-2022/03/18 09:59:11.695819 peer.go:41: [0;37m[info] region id:1 region_epoch:<conf_ver:1 version:1 > peers:<id:3 store_id:3 > peers:<id:4 store_id:4 > peers:<id:5 store_id:5 > peers:<id:1 store_id:1 > peers:<id:2 store_id:2 >  create peer with ID 5[0m
-2022/03/18 09:59:11.695854 raftstore.go:177: [0;37m[info] start store 5, region_count 1, tombstone_count 0, takes 58.13µs[0m
-2022/03/18 09:59:12.195870 raft.go:342: [0;37m[info] [becomeCandidate]4 become candidate,term is 6[0m
-2022/03/18 09:59:12.200595 raft.go:571: [0;37m[info] ++1 【handleRequestVote】 become follower[0m
-2022/03/18 09:59:12.200629 raft.go:585: [0;37m[info] 1 vote to 4[0m
-2022/03/18 09:59:12.200677 raft.go:571: [0;37m[info] ++5 【handleRequestVote】 become follower[0m
-2022/03/18 09:59:12.200703 raft.go:585: [0;37m[info] 5 vote to 4[0m
-2022/03/18 09:59:12.200612 raft.go:571: [0;37m[info] ++3 【handleRequestVote】 become follower[0m
-2022/03/18 09:59:12.200622 raft.go:571: [0;37m[info] ++2 【handleRequestVote】 become follower[0m
-2022/03/18 09:59:12.200790 raft.go:585: [0;37m[info] 2 vote to 4[0m
-2022/03/18 09:59:12.200762 raft.go:585: [0;37m[info] 3 vote to 4[0m
-2022/03/18 09:59:12.205704 raft.go:349: [0;37m[info] [becomeLeader]4 become leader[0m
-2022/03/18 09:59:12.996201 test_test.go:104: [0;37m[info] partition: [1 2 3 4], [5][0m
-2022/03/18 09:59:13.592403 test_test.go:104: [0;37m[info] partition: [1 3 4], [2 5][0m
-2022/03/18 09:59:13.646120 raft.go:342: [0;37m[info] [becomeCandidate]5 become candidate,term is 7[0m
-2022/03/18 09:59:13.650672 raft.go:571: [0;37m[info] ++2 【handleRequestVote】 become follower[0m
-2022/03/18 09:59:13.728040 peer_storage.go:182: [0;37m[info] [region 1] 4 requesting snapshot[0m
-2022/03/18 09:59:13.728613 snap.go:549: [0;37m[info] region 1 scan snapshot /tmp/test-raftstore684509678/snap/gen_1_6_113_(default|write|lock).sst, key count 50, size 1252[0m
-2022/03/18 09:59:13.741147 raft.go:258: [0;37m[info] [sendSnapshot]4 send snapshot to 5[0m
-2022/03/18 09:59:13.741168 peer_storage.go:182: [0;37m[info] [region 1] 4 requesting snapshot[0m
-2022/03/18 09:59:13.741739 snap.go:549: [0;37m[info] region 1 scan snapshot /tmp/test-raftstore684509678/snap/gen_1_6_115_(default|write|lock).sst, key count 51, size 1277[0m
-2022/03/18 09:59:13.770663 raft.go:258: [0;37m[info] [sendSnapshot]4 send snapshot to 2[0m
-2022/03/18 09:59:14.215541 test_test.go:104: [0;37m[info] partition: [2 3], [1 4 5][0m
-2022/03/18 09:59:14.237362 raft.go:686: [0;37m[info] ++4 【handleAppendResponse】 become follower[0m
-2022/03/18 09:59:14.244735 raft.go:342: [0;37m[info] [becomeCandidate]2 become candidate,term is 8[0m
-2022/03/18 09:59:14.249570 raft.go:571: [0;37m[info] ++3 【handleRequestVote】 become follower[0m
-2022/03/18 09:59:14.496036 raft.go:342: [0;37m[info] [becomeCandidate]5 become candidate,term is 8[0m
-2022/03/18 09:59:14.498756 raft.go:571: [0;37m[info] ++4 【handleRequestVote】 become follower[0m
-2022/03/18 09:59:14.498774 raft.go:571: [0;37m[info] ++1 【handleRequestVote】 become follower[0m
-2022/03/18 09:59:14.865784 test_test.go:104: [0;37m[info] partition: [1 4], [2 3 5][0m
-2022/03/18 09:59:15.044799 raft.go:342: [0;37m[info] [becomeCandidate]2 become candidate,term is 9[0m
-2022/03/18 09:59:15.045317 raft.go:342: [0;37m[info] [becomeCandidate]3 become candidate,term is 9[0m
-2022/03/18 09:59:15.049592 raft.go:571: [0;37m[info] ++5 【handleRequestVote】 become follower[0m
-2022/03/18 09:59:15.049621 raft.go:585: [0;37m[info] 5 vote to 2[0m
-2022/03/18 09:59:15.095824 raft.go:342: [0;37m[info] [becomeCandidate]4 become candidate,term is 9[0m
-2022/03/18 09:59:15.098654 raft.go:571: [0;37m[info] ++1 【handleRequestVote】 become follower[0m
-2022/03/18 09:59:15.098687 raft.go:585: [0;37m[info] 1 vote to 4[0m
-2022/03/18 09:59:15.408955 test_test.go:104: [0;37m[info] partition: [1 3 4 5], [2][0m
-2022/03/18 09:59:15.644331 raft.go:342: [0;37m[info] [becomeCandidate]1 become candidate,term is 10[0m
-2022/03/18 09:59:15.649114 raft.go:571: [0;37m[info] ++3 【handleRequestVote】 become follower[0m
-2022/03/18 09:59:15.649133 raft.go:585: [0;37m[info] 3 vote to 1[0m
-2022/03/18 09:59:15.649116 raft.go:571: [0;37m[info] ++4 【handleRequestVote】 become follower[0m
-2022/03/18 09:59:15.649124 raft.go:571: [0;37m[info] ++5 【handleRequestVote】 become follower[0m
-2022/03/18 09:59:15.649277 raft.go:585: [0;37m[info] 5 vote to 1[0m
-2022/03/18 09:59:15.654093 raft.go:349: [0;37m[info] [becomeLeader]1 become leader[0m
-2022/03/18 09:59:15.667856 peer_storage.go:182: [0;37m[info] [region 1] 1 requesting snapshot[0m
-2022/03/18 09:59:15.668611 snap.go:549: [0;37m[info] region 1 scan snapshot /tmp/test-raftstore684509678/snap/gen_1_6_158_(default|write|lock).sst, key count 73, size 1848[0m
-2022/03/18 09:59:15.678466 raft.go:258: [0;37m[info] [sendSnapshot]1 send snapshot to 5[0m
-2022/03/18 09:59:15.694786 raft.go:342: [0;37m[info] [becomeCandidate]2 become candidate,term is 10[0m
-2022/03/18 09:59:15.739030 raft.go:791: [0;37m[info] ++5 【handleSnapshot】 become follower[0m
-2022/03/18 09:59:15.739069 peer_storage.go:351: [0;37m[info] [region 1] 5 begin to apply snapshot[0m
-2022/03/18 09:59:15.739192 peer_storage.go:298: [0;37m[info] [region 1] clear peer 1 meta key 1 apply key 1 raft key and 36 raft logs, takes 84.084µs[0m
-2022/03/18 09:59:15.739260 region_task.go:93: [0;37m[info] begin apply snap data. [regionId: 1][0m
-2022/03/18 09:59:15.748854 region_task.go:137: [0;37m[info] succeed in deleting data in range. [regionId: 1, startKey: , endKey: ][0m
-2022/03/18 09:59:15.802689 snap.go:704: [0;37m[info] apply snapshot ingested 1 tables[0m
-2022/03/18 09:59:15.802735 region_task.go:117: [0;37m[info] applying new data. [regionId: 1, timeTakes: 53.647102ms][0m
-2022/03/18 09:59:16.052170 test_test.go:104: [0;37m[info] partition: [1 2 3], [4 5][0m
-2022/03/18 09:59:16.062347 peer_storage.go:182: [0;37m[info] [region 1] 1 requesting snapshot[0m
-2022/03/18 09:59:16.062809 snap.go:549: [0;37m[info] region 1 scan snapshot /tmp/test-raftstore684509678/snap/gen_1_10_190_(default|write|lock).sst, key count 85, size 2160[0m
-2022/03/18 09:59:16.072744 raft.go:258: [0;37m[info] [sendSnapshot]1 send snapshot to 2[0m
-2022/03/18 09:59:16.072812 peer_storage.go:182: [0;37m[info] [region 1] 1 requesting snapshot[0m
-2022/03/18 09:59:16.089909 raft.go:791: [0;37m[info] ++2 【handleSnapshot】 become follower[0m
-2022/03/18 09:59:16.089942 peer_storage.go:351: [0;37m[info] [region 1] 2 begin to apply snapshot[0m
-2022/03/18 09:59:16.090032 peer_storage.go:298: [0;37m[info] [region 1] clear peer 1 meta key 1 apply key 1 raft key and 100 raft logs, takes 69.554µs[0m
-2022/03/18 09:59:16.090083 region_task.go:93: [0;37m[info] begin apply snap data. [regionId: 1][0m
-2022/03/18 09:59:16.097684 region_task.go:137: [0;37m[info] succeed in deleting data in range. [regionId: 1, startKey: , endKey: ][0m
-2022/03/18 09:59:16.151327 snap.go:704: [0;37m[info] apply snapshot ingested 1 tables[0m
-2022/03/18 09:59:16.151354 region_task.go:117: [0;37m[info] applying new data. [regionId: 1, timeTakes: 53.404721ms][0m
-2022/03/18 09:59:16.513692 peer_storage.go:236: [0;37m[info] [region 1] 1 snapshot is stale, generate again, snapIndex: 190, truncatedIndex: 214[0m
-2022/03/18 09:59:16.513720 peer_storage.go:182: [0;37m[info] [region 1] 1 requesting snapshot[0m
-2022/03/18 09:59:16.514650 snap.go:549: [0;37m[info] region 1 scan snapshot /tmp/test-raftstore684509678/snap/gen_1_10_221_(default|write|lock).sst, key count 95, size 2420[0m
-2022/03/18 09:59:16.530816 raft.go:258: [0;37m[info] [sendSnapshot]1 send snapshot to 4[0m
-2022/03/18 09:59:16.530830 peer_storage.go:182: [0;37m[info] [region 1] 1 requesting snapshot[0m
-2022/03/18 09:59:16.533869 snap.go:549: [0;37m[info] region 1 scan snapshot /tmp/test-raftstore684509678/snap/gen_1_10_222_(default|write|lock).sst, key count 96, size 2446[0m
-2022/03/18 09:59:16.567434 raft.go:258: [0;37m[info] [sendSnapshot]1 send snapshot to 5[0m
-2022/03/18 09:59:16.645987 raft.go:342: [0;37m[info] [becomeCandidate]5 become candidate,term is 11[0m
-2022/03/18 09:59:16.651040 raft.go:571: [0;37m[info] ++4 【handleRequestVote】 become follower[0m
-2022/03/18 09:59:16.651067 raft.go:585: [0;37m[info] 4 vote to 5[0m
-2022/03/18 09:59:16.721400 test_test.go:104: [0;37m[info] partition: [1 4], [2 3 5][0m
-2022/03/18 09:59:16.741675 raft.go:686: [0;37m[info] ++1 【handleAppendResponse】 become follower[0m
-2022/03/18 09:59:17.145835 raft.go:342: [0;37m[info] [becomeCandidate]4 become candidate,term is 12[0m
-2022/03/18 09:59:17.150603 raft.go:571: [0;37m[info] ++1 【handleRequestVote】 become follower[0m
-2022/03/18 09:59:17.301588 test_test.go:104: [0;37m[info] partition: [3], [1 2 4 5][0m
-2022/03/18 09:59:17.345342 raft.go:342: [0;37m[info] [becomeCandidate]3 become candidate,term is 11[0m
-2022/03/18 09:59:17.444787 raft.go:342: [0;37m[info] [becomeCandidate]2 become candidate,term is 11[0m
-2022/03/18 09:59:17.450265 raft.go:624: [0;37m[info] ++2 【handleRequestVoteResponse】 become follower[0m
-2022/03/18 09:59:17.596077 raft.go:342: [0;37m[info] [becomeCandidate]5 become candidate,term is 12[0m
-2022/03/18 09:59:17.606865 raft.go:639: [0;37m[info] 5 选举失败成为follower[0m
-2022/03/18 09:59:17.794298 raft.go:342: [0;37m[info] [becomeCandidate]1 become candidate,term is 13[0m
-2022/03/18 09:59:17.797007 raft.go:571: [0;37m[info] ++4 【handleRequestVote】 become follower[0m
-2022/03/18 09:59:17.797026 raft.go:585: [0;37m[info] 4 vote to 1[0m
-2022/03/18 09:59:17.797088 raft.go:571: [0;37m[info] ++5 【handleRequestVote】 become follower[0m
-2022/03/18 09:59:17.797104 raft.go:585: [0;37m[info] 5 vote to 1[0m
-2022/03/18 09:59:17.799771 raft.go:349: [0;37m[info] [becomeLeader]1 become leader[0m
-2022/03/18 09:59:17.807897 peer_storage.go:182: [0;37m[info] [region 1] 1 requesting snapshot[0m
-2022/03/18 09:59:17.808800 snap.go:549: [0;37m[info] region 1 scan snapshot /tmp/test-raftstore684509678/snap/gen_1_10_238_(default|write|lock).sst, key count 105, size 2680[0m
-2022/03/18 09:59:17.828814 test_test.go:104: [0;37m[info] partition: [5], [1 2 3 4][0m
-2022/03/18 09:59:17.895343 raft.go:342: [0;37m[info] [becomeCandidate]3 become candidate,term is 12[0m
-2022/03/18 09:59:17.925200 raft.go:258: [0;37m[info] [sendSnapshot]1 send snapshot to 5[0m
-2022/03/18 09:59:17.925253 peer_storage.go:182: [0;37m[info] [region 1] 1 requesting snapshot[0m
-2022/03/18 09:59:17.988476 raft.go:258: [0;37m[info] [sendSnapshot]1 send snapshot to 4[0m
-2022/03/18 09:59:18.005802 raft.go:791: [0;37m[info] ++4 【handleSnapshot】 become follower[0m
-2022/03/18 09:59:18.005849 peer_storage.go:351: [0;37m[info] [region 1] 4 begin to apply snapshot[0m
-2022/03/18 09:59:18.005950 peer_storage.go:298: [0;37m[info] [region 1] clear peer 1 meta key 1 apply key 1 raft key and 80 raft logs, takes 78.025µs[0m
-2022/03/18 09:59:18.005984 region_task.go:93: [0;37m[info] begin apply snap data. [regionId: 1][0m
-2022/03/18 09:59:18.016245 region_task.go:137: [0;37m[info] succeed in deleting data in range. [regionId: 1, startKey: , endKey: ][0m
-2022/03/18 09:59:18.074142 snap.go:704: [0;37m[info] apply snapshot ingested 1 tables[0m
-2022/03/18 09:59:18.074172 region_task.go:117: [0;37m[info] applying new data. [regionId: 1, timeTakes: 57.784391ms][0m
-2022/03/18 09:59:18.510081 peer_storage.go:182: [0;37m[info] [region 1] 1 requesting snapshot[0m
-2022/03/18 09:59:18.511013 snap.go:549: [0;37m[info] region 1 scan snapshot /tmp/test-raftstore684509678/snap/gen_1_13_252_(default|write|lock).sst, key count 110, size 2810[0m
-2022/03/18 09:59:18.609673 raft.go:258: [0;37m[info] [sendSnapshot]1 send snapshot to 5[0m
-2022/03/18 09:59:18.619243 raft.go:791: [0;37m[info] ++5 【handleSnapshot】 become follower[0m
-2022/03/18 09:59:18.619272 peer_storage.go:351: [0;37m[info] [region 1] 5 begin to apply snapshot[0m
-2022/03/18 09:59:18.619327 peer_storage.go:298: [0;37m[info] [region 1] clear peer 1 meta key 1 apply key 1 raft key and 32 raft logs, takes 35.085µs[0m
-2022/03/18 09:59:18.619351 region_task.go:93: [0;37m[info] begin apply snap data. [regionId: 1][0m
-2022/03/18 09:59:18.627410 region_task.go:137: [0;37m[info] succeed in deleting data in range. [regionId: 1, startKey: , endKey: ][0m
-2022/03/18 09:59:18.650447 snap.go:704: [0;37m[info] apply snapshot ingested 1 tables[0m
-2022/03/18 09:59:18.650476 region_task.go:117: [0;37m[info] applying new data. [regionId: 1, timeTakes: 22.953986ms][0m
-panic: request timeout
-
-goroutine 133 [running]:
-github.com/pingcap-incubator/tinykv/kv/test_raftstore.(*Cluster).Request(0xc0000e2ae0, 0xc19674f350, 0xa, 0x10, 0xc000183fd0, 0x1, 0x1, 0x12a05f200, 0x8, 0x8)
-	/home/tinykv/kv/test_raftstore/cluster.go:213 +0x41f
-github.com/pingcap-incubator/tinykv/kv/test_raftstore.(*Cluster).MustPutCF(0xc0000e2ae0, 0xd47aa1, 0x7, 0xc19674f350, 0xa, 0x10, 0xc19674f360, 0x8, 0x8)
-	/home/tinykv/kv/test_raftstore/cluster.go:315 +0x164
-github.com/pingcap-incubator/tinykv/kv/test_raftstore.(*Cluster).MustPut(...)
-	/home/tinykv/kv/test_raftstore/cluster.go:310
-github.com/pingcap-incubator/tinykv/kv/test_raftstore.GenericTest.func1(0x1, 0xc00023c100)
-	/home/tinykv/kv/test_raftstore/test_test.go:211 +0x3f6
-github.com/pingcap-incubator/tinykv/kv/test_raftstore.runClient(0xc00023c100, 0x1, 0xc17c9c4180, 0xc17c90d7d0)
-	/home/tinykv/kv/test_raftstore/test_test.go:27 +0x80
-created by github.com/pingcap-incubator/tinykv/kv/test_raftstore.SpawnClientsAndWait
-	/home/tinykv/kv/test_raftstore/test_test.go:37 +0xd5
-FAIL	github.com/pingcap-incubator/tinykv/kv/test_raftstore	58.217s
+=== RUN   TestConfChangeRecoverManyClients3B
+2022/03/23 20:15:24.720749 node.go:193: [0;37m[info] start raft store node, storeID: 1[0m
+2022/03/23 20:15:24.721333 peer.go:41: [0;37m[info] region id:1 region_epoch:<conf_ver:1 version:1 > peers:<id:1 store_id:1 > peers:<id:2 store_id:2 > peers:<id:3 store_id:3 > peers:<id:4 store_id:4 > peers:<id:5 store_id:5 >  create peer with ID 1[0m
+2022/03/23 20:15:24.721452 raftstore.go:177: [0;37m[info] start store 1, region_count 1, tombstone_count 0, takes 339.174µs[0m
+2022/03/23 20:15:24.722129 node.go:193: [0;37m[info] start raft store node, storeID: 2[0m
+2022/03/23 20:15:24.722301 peer.go:41: [0;37m[info] region id:1 region_epoch:<conf_ver:1 version:1 > peers:<id:1 store_id:1 > peers:<id:2 store_id:2 > peers:<id:3 store_id:3 > peers:<id:4 store_id:4 > peers:<id:5 store_id:5 >  create peer with ID 2[0m
+2022/03/23 20:15:24.722377 raftstore.go:177: [0;37m[info] start store 2, region_count 1, tombstone_count 0, takes 135.254µs[0m
+2022/03/23 20:15:24.723169 node.go:193: [0;37m[info] start raft store node, storeID: 3[0m
+2022/03/23 20:15:24.723333 peer.go:41: [0;37m[info] region id:1 region_epoch:<conf_ver:1 version:1 > peers:<id:1 store_id:1 > peers:<id:2 store_id:2 > peers:<id:3 store_id:3 > peers:<id:4 store_id:4 > peers:<id:5 store_id:5 >  create peer with ID 3[0m
+2022/03/23 20:15:24.723424 raftstore.go:177: [0;37m[info] start store 3, region_count 1, tombstone_count 0, takes 140.043µs[0m
+2022/03/23 20:15:24.724009 node.go:193: [0;37m[info] start raft store node, storeID: 4[0m
+2022/03/23 20:15:24.724155 peer.go:41: [0;37m[info] region id:1 region_epoch:<conf_ver:1 version:1 > peers:<id:1 store_id:1 > peers:<id:2 store_id:2 > peers:<id:3 store_id:3 > peers:<id:4 store_id:4 > peers:<id:5 store_id:5 >  create peer with ID 4[0m
+2022/03/23 20:15:24.724240 raftstore.go:177: [0;37m[info] start store 4, region_count 1, tombstone_count 0, takes 130.397µs[0m
+2022/03/23 20:15:24.724903 node.go:193: [0;37m[info] start raft store node, storeID: 5[0m
+2022/03/23 20:15:24.725045 peer.go:41: [0;37m[info] region id:1 region_epoch:<conf_ver:1 version:1 > peers:<id:1 store_id:1 > peers:<id:2 store_id:2 > peers:<id:3 store_id:3 > peers:<id:4 store_id:4 > peers:<id:5 store_id:5 >  create peer with ID 5[0m
+2022/03/23 20:15:24.725113 raftstore.go:177: [0;37m[info] start store 5, region_count 1, tombstone_count 0, takes 114.411µs[0m
+2022/03/23 20:15:25.334163 raft.go:349: [0;37m[info] [becomeLeader]1 become leader[0m
+2022/03/23 20:15:25.992522 peer_msg_handler.go:252: [0;37m[info] 1 processConfChange[0m
+2022/03/23 20:15:25.992627 peer_msg_handler.go:328: [0;37m[info] [confChange]region 1 region epoch is conf_ver:2 version:1 ,delete peer 5[0m
+2022/03/23 20:15:26.006107 peer_msg_handler.go:252: [0;37m[info] 2 processConfChange[0m
+2022/03/23 20:15:26.006189 peer_msg_handler.go:328: [0;37m[info] [confChange]region 1 region epoch is conf_ver:2 version:1 ,delete peer 5[0m
+2022/03/23 20:15:26.011433 peer_msg_handler.go:252: [0;37m[info] 4 processConfChange[0m
+2022/03/23 20:15:26.011518 peer_msg_handler.go:328: [0;37m[info] [confChange]region 1 region epoch is conf_ver:2 version:1 ,delete peer 5[0m
+2022/03/23 20:15:26.011592 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.011634 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.011656 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.011672 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.014069 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.014092 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.014102 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.014111 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.014120 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.014129 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.014156 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.014178 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.014197 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.014212 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.014230 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.014257 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.014276 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.014303 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.014322 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.014341 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.014354 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.014376 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.014392 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.014409 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.014420 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.014434 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.014460 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.014479 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.014493 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.014510 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.014527 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.014547 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.014564 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.014578 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.014595 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.014622 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.014637 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.014649 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.014667 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.014679 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.014694 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.014704 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.014721 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.014737 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.014749 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.014766 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.014783 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.014805 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.014820 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.014842 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.014862 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.014875 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.014893 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.014905 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.014923 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.014954 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.014970 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.015015 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.015025 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.015042 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.015055 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.015064 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.015073 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.015081 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.015090 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.015098 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.015107 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.015115 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.015123 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.015137 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.015145 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.015154 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.015167 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.015177 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.015189 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.015200 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.015209 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.015218 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.015226 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.015238 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.015252 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.015261 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.015270 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.015278 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.015287 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.015295 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.015304 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.015312 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.015328 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.015337 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.015349 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.015359 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgHeartbeatResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.015367 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.015375 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:1  ignore it[0m
+2022/03/23 20:15:26.048832 peer_msg_handler.go:252: [0;37m[info] 5 processConfChange[0m
+2022/03/23 20:15:26.048913 peer_msg_handler.go:302: [0;37m[info] [confChange]region 1 region epoch is conf_ver:1 version:1 ,delete peer 5[0m
+2022/03/23 20:15:26.048934 peer_msg_handler.go:770: [0;37m[info] [region 1] 5 starts destroy[0m
+2022/03/23 20:15:26.048944 peer.go:209: [0;37m[info] [region 1] 5 begin to destroy[0m
+2022/03/23 20:15:26.049010 peer_storage.go:298: [0;37m[info] [region 1] clear peer 1 meta key 1 apply key 1 raft key and 49 raft logs, takes 46.081µs[0m
+2022/03/23 20:15:26.051145 peer_msg_handler.go:252: [0;37m[info] 3 processConfChange[0m
+2022/03/23 20:15:26.051200 peer_msg_handler.go:328: [0;37m[info] [confChange]region 1 region epoch is conf_ver:2 version:1 ,delete peer 5[0m
+2022/03/23 20:15:26.060765 peer.go:237: [0;37m[info] [region 1] 5 destroy itself, takes 11.813324ms[0m
+2022/03/23 20:15:26.065682 region_task.go:137: [0;37m[info] succeed in deleting data in range. [regionId: 1, startKey: , endKey: ][0m
+2022/03/23 20:15:26.210836 peer_msg_handler.go:252: [0;37m[info] 1 processConfChange[0m
+2022/03/23 20:15:26.210874 peer_msg_handler.go:302: [0;37m[info] [confChange]region 1 region epoch is conf_ver:2 version:1 ,delete peer 1[0m
+2022/03/23 20:15:26.210886 peer_msg_handler.go:770: [0;37m[info] [region 1] 1 starts destroy[0m
+2022/03/23 20:15:26.210893 peer.go:209: [0;37m[info] [region 1] 1 begin to destroy[0m
+2022/03/23 20:15:26.210954 peer_storage.go:298: [0;37m[info] [region 1] clear peer 1 meta key 1 apply key 1 raft key and 96 raft logs, takes 48.504µs[0m
+2022/03/23 20:15:26.229522 peer.go:237: [0;37m[info] [region 1] 1 destroy itself, takes 18.619492ms[0m
+2022/03/23 20:15:26.229648 peer_msg_handler.go:252: [0;37m[info] 2 processConfChange[0m
+2022/03/23 20:15:26.229770 peer_msg_handler.go:328: [0;37m[info] [confChange]region 1 region epoch is conf_ver:3 version:1 ,delete peer 1[0m
+2022/03/23 20:15:26.229832 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.229905 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.229974 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.230026 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.230090 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.230144 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.230196 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.230248 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.230317 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.230371 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.230422 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.230480 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.230531 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.230589 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.230641 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.230702 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.230764 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.230824 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.230884 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.230936 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.231024 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.231084 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.231134 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.231209 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.231275 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.231326 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.231377 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.231428 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.231478 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.231538 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.231592 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.231642 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.231703 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.231755 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.231818 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.231883 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.231941 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.231997 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.232048 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.232083 peer_msg_handler.go:252: [0;37m[info] 4 processConfChange[0m
+2022/03/23 20:15:26.232099 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.232144 peer_msg_handler.go:328: [0;37m[info] [confChange]region 1 region epoch is conf_ver:3 version:1 ,delete peer 1[0m
+2022/03/23 20:15:26.232167 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.232218 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.232268 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.232316 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.232370 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.232431 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.232486 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.232557 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.232608 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.232657 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.232708 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.232766 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.232833 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.232886 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.232936 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.233000 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.233051 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.233100 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.233151 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.233213 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.233277 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.233336 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.233390 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.233439 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.233489 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.233539 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.233589 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.233639 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.233689 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.233739 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.233789 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.233850 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.233924 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.233977 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.234036 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.234094 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.234145 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.234201 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.234252 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.234318 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.234349 region_task.go:137: [0;37m[info] succeed in deleting data in range. [regionId: 1, startKey: , endKey: ][0m
+2022/03/23 20:15:26.234375 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.234435 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.234487 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.234539 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.234607 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.234669 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.234721 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.234772 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.234832 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.234881 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.234934 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.234999 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.235053 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.235113 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.235174 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.235225 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.235285 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.235336 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.235386 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.235437 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.235488 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.235553 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.235613 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.235663 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.235724 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.235776 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.235827 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.235886 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.235950 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.236027 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.236126 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.236193 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.236237 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.236269 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.236308 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.236337 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.236383 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.236414 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.236443 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.236472 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.236510 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.236540 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.236568 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.236597 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.236626 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.236667 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.236698 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.236727 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.236755 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.236784 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.236820 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.236849 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.236889 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.236928 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.236958 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.236992 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.237044 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.237075 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.237111 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.237141 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.237170 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.237205 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.237236 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.237275 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.237335 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.237379 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.237411 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.237439 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.237475 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.237507 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.237536 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.237564 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.237593 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.237629 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.237658 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.237687 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.237726 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.237764 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.237801 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.237831 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.237860 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.237893 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.237925 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.237962 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.237993 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.238029 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.238065 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.238095 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.238131 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.238174 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.238204 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.238233 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.238284 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.238319 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.238351 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.238387 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.238417 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.238446 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.238472 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.238501 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.238535 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.238581 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.238611 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.238641 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.238667 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.238695 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.238731 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.238765 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.238793 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.238831 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.238863 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.238897 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.238932 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.239036 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.239083 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.239116 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.239145 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.239173 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.239202 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.239231 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.239277 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.239307 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.239337 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.239365 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.239396 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.239436 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.239466 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.239513 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.239531 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.239544 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.239560 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.239586 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.239615 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.239634 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.239651 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.239668 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.239683 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.239702 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.239724 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.239747 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.239765 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.239791 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.239809 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.239827 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.242119 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.242168 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.242199 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.242226 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.242260 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.242288 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.242328 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.242356 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.242387 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.242422 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.242460 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.242497 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.242524 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.242555 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.242581 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.242606 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.242632 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.242657 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.242689 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.242714 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.242739 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.242764 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.242798 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.242829 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.242856 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.242893 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.242941 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.242969 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.243043 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.243070 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.243094 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.243119 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.243157 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.243196 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.243227 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.243252 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.243282 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.243309 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.243339 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.243374 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.243407 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.243452 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.243484 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.243510 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.243536 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.243561 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.243596 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.243623 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.243647 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.243680 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.243714 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.243753 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.243785 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.243815 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.243841 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.243866 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.243891 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.243915 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.243951 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.243978 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.244002 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.244035 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.244067 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.244093 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.244127 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.244169 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.244196 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.244229 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.244264 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.244290 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.244333 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.244376 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.244409 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.244452 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.244483 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.244509 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.244539 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.244565 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.244590 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.244635 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.244666 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.244700 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.244732 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.244763 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.244788 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.244812 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.244837 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.244861 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.244886 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.244917 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.244950 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.244985 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.245010 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.245035 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.245059 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.245096 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.245122 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.245152 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.245178 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.245203 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.245228 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.245252 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.245288 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.245316 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.245341 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.245371 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.245401 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.245438 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.245465 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.245503 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.245535 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.245560 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.245585 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.245610 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.245643 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.245668 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.245693 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.245717 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.245750 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.245786 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.245822 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.245848 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.245881 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.245913 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.245939 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.245964 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.245989 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.246018 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.246045 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.246071 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.246102 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.246133 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.246160 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.246185 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.246225 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.246257 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.246289 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.246327 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.246359 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.246385 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.246410 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.246451 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.246497 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.246536 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.246563 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.246588 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.246633 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.246660 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.246685 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.246727 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.246753 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.246783 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.246808 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.246839 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.246873 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.246899 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.246929 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.246955 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.246998 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.247037 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.247064 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.247098 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.247125 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.247156 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.247183 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.247220 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.247251 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.247276 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.247309 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.247345 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.247375 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.247401 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.247426 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.247447 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.247472 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.247513 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.247538 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.247563 store_worker.go:82: [0;31m[error] handle raft message failed storeID 1, tombstone peer [epoch: conf_ver:2 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:26.300217 peer_msg_handler.go:252: [0;37m[info] 3 processConfChange[0m
+2022/03/23 20:15:26.300286 peer_msg_handler.go:328: [0;37m[info] [confChange]region 1 region epoch is conf_ver:3 version:1 ,delete peer 1[0m
+2022/03/23 20:15:26.875911 raft.go:349: [0;37m[info] [becomeLeader]2 become leader[0m
+2022/03/23 20:15:26.888543 peer_msg_handler.go:252: [0;37m[info] 2 processConfChange[0m
+2022/03/23 20:15:26.892814 peer_msg_handler.go:252: [0;37m[info] 4 processConfChange[0m
+2022/03/23 20:15:26.944489 peer_msg_handler.go:252: [0;37m[info] 3 processConfChange[0m
+2022/03/23 20:15:27.213168 peer_msg_handler.go:252: [0;37m[info] 2 processConfChange[0m
+2022/03/23 20:15:27.213221 peer_msg_handler.go:302: [0;37m[info] [confChange]region 1 region epoch is conf_ver:3 version:1 ,delete peer 2[0m
+2022/03/23 20:15:27.213234 peer_msg_handler.go:770: [0;37m[info] [region 1] 2 starts destroy[0m
+2022/03/23 20:15:27.213240 peer.go:209: [0;37m[info] [region 1] 2 begin to destroy[0m
+2022/03/23 20:15:27.213302 peer_storage.go:298: [0;37m[info] [region 1] clear peer 1 meta key 1 apply key 1 raft key and 148 raft logs, takes 50.073µs[0m
+2022/03/23 20:15:27.228426 peer.go:237: [0;37m[info] [region 1] 2 destroy itself, takes 15.181567ms[0m
+2022/03/23 20:15:27.230774 peer_msg_handler.go:252: [0;37m[info] 4 processConfChange[0m
+2022/03/23 20:15:27.230884 peer_msg_handler.go:328: [0;37m[info] [confChange]region 1 region epoch is conf_ver:4 version:1 ,delete peer 2[0m
+2022/03/23 20:15:27.238932 region_task.go:137: [0;37m[info] succeed in deleting data in range. [regionId: 1, startKey: , endKey: ][0m
+2022/03/23 20:15:27.256496 peer_msg_handler.go:252: [0;37m[info] 3 processConfChange[0m
+2022/03/23 20:15:27.256545 peer_msg_handler.go:328: [0;37m[info] [confChange]region 1 region epoch is conf_ver:4 version:1 ,delete peer 2[0m
+2022/03/23 20:15:27.729488 raft.go:349: [0;37m[info] [becomeLeader]4 become leader[0m
+2022/03/23 20:15:28.100766 peer_msg_handler.go:252: [0;37m[info] 4 processConfChange[0m
+2022/03/23 20:15:28.100874 peer_msg_handler.go:297: [0;37m[info] [confChange]region 1 region epoch is conf_ver:5 version:1 ,add peer 6[0m
+2022/03/23 20:15:28.112396 peer_msg_handler.go:252: [0;37m[info] 3 processConfChange[0m
+2022/03/23 20:15:28.112462 peer_msg_handler.go:297: [0;37m[info] [confChange]region 1 region epoch is conf_ver:5 version:1 ,add peer 6[0m
+2022/03/23 20:15:28.114706 peer_storage.go:182: [0;37m[info] [region 1] 4 requesting snapshot[0m
+2022/03/23 20:15:28.115913 snap.go:549: [0;37m[info] region 1 scan snapshot /tmp/test-raftstore193868319/snap/gen_1_8_208_(default|write|lock).sst, key count 94, size 2442[0m
+2022/03/23 20:15:28.119331 peer.go:51: [0;37m[info] [region 1] replicates peer with ID 6[0m
+2022/03/23 20:15:28.127358 raft.go:258: [0;37m[info] [sendSnapshot]4 send snapshot to 6[0m
+2022/03/23 20:15:28.127470 peer_storage.go:182: [0;37m[info] [region 1] 4 requesting snapshot[0m
+2022/03/23 20:15:28.128409 snap.go:549: [0;37m[info] region 1 scan snapshot /tmp/test-raftstore193868319/snap/gen_1_8_210_(default|write|lock).sst, key count 95, size 2467[0m
+2022/03/23 20:15:28.143252 raft.go:258: [0;37m[info] [sendSnapshot]4 send snapshot to 6[0m
+2022/03/23 20:15:28.143474 peer_storage.go:341: [0;37m[info] [region 1] 6 begin to apply snapshot[0m
+2022/03/23 20:15:28.143546 region_task.go:93: [0;37m[info] begin apply snap data. [regionId: 1][0m
+2022/03/23 20:15:28.143609 region_task.go:137: [0;37m[info] succeed in deleting data in range. [regionId: 1, startKey: , endKey: ][0m
+2022/03/23 20:15:28.226881 snap.go:704: [0;37m[info] apply snapshot ingested 1 tables[0m
+2022/03/23 20:15:28.226942 region_task.go:117: [0;37m[info] applying new data. [regionId: 1, timeTakes: 83.132882ms][0m
+2022/03/23 20:15:28.373207 peer_msg_handler.go:252: [0;37m[info] 4 processConfChange[0m
+2022/03/23 20:15:28.373289 peer_msg_handler.go:297: [0;37m[info] [confChange]region 1 region epoch is conf_ver:6 version:1 ,add peer 7[0m
+2022/03/23 20:15:28.392553 peer_msg_handler.go:252: [0;37m[info] 3 processConfChange[0m
+2022/03/23 20:15:28.392598 peer_msg_handler.go:297: [0;37m[info] [confChange]region 1 region epoch is conf_ver:6 version:1 ,add peer 7[0m
+2022/03/23 20:15:28.395019 peer_msg_handler.go:252: [0;37m[info] 4 processConfChange[0m
+2022/03/23 20:15:28.402714 peer_storage.go:182: [0;37m[info] [region 1] 4 requesting snapshot[0m
+2022/03/23 20:15:28.403485 snap.go:549: [0;37m[info] region 1 scan snapshot /tmp/test-raftstore193868319/snap/gen_1_8_242_(default|write|lock).sst, key count 108, size 2804[0m
+2022/03/23 20:15:28.410168 peer_msg_handler.go:252: [0;37m[info] 3 processConfChange[0m
+2022/03/23 20:15:28.412905 peer.go:51: [0;37m[info] [region 1] replicates peer with ID 7[0m
+2022/03/23 20:15:28.438807 peer_msg_handler.go:252: [0;37m[info] 6 processConfChange[0m
+2022/03/23 20:15:28.438858 peer_msg_handler.go:297: [0;37m[info] [confChange]region 1 region epoch is conf_ver:6 version:1 ,add peer 7[0m
+2022/03/23 20:15:28.459227 peer_msg_handler.go:252: [0;37m[info] 6 processConfChange[0m
+2022/03/23 20:15:28.468629 raft.go:258: [0;37m[info] [sendSnapshot]4 send snapshot to 7[0m
+2022/03/23 20:15:28.468723 peer_storage.go:182: [0;37m[info] [region 1] 4 requesting snapshot[0m
+2022/03/23 20:15:28.469671 snap.go:549: [0;37m[info] region 1 scan snapshot /tmp/test-raftstore193868319/snap/gen_1_8_252_(default|write|lock).sst, key count 114, size 2956[0m
+2022/03/23 20:15:28.488541 peer_storage.go:341: [0;37m[info] [region 1] 7 begin to apply snapshot[0m
+2022/03/23 20:15:28.488600 raft.go:258: [0;37m[info] [sendSnapshot]4 send snapshot to 7[0m
+2022/03/23 20:15:28.488626 region_task.go:93: [0;37m[info] begin apply snap data. [regionId: 1][0m
+2022/03/23 20:15:28.488831 region_task.go:137: [0;37m[info] succeed in deleting data in range. [regionId: 1, startKey: , endKey: ][0m
+2022/03/23 20:15:28.549743 snap.go:704: [0;37m[info] apply snapshot ingested 1 tables[0m
+2022/03/23 20:15:28.549781 region_task.go:117: [0;37m[info] applying new data. [regionId: 1, timeTakes: 60.733261ms][0m
+2022/03/23 20:15:28.575197 peer_msg_handler.go:252: [0;37m[info] 4 processConfChange[0m
+2022/03/23 20:15:28.575293 peer_msg_handler.go:328: [0;37m[info] [confChange]region 1 region epoch is conf_ver:7 version:1 ,delete peer 3[0m
+2022/03/23 20:15:28.587191 peer_msg_handler.go:252: [0;37m[info] 6 processConfChange[0m
+2022/03/23 20:15:28.587265 peer_msg_handler.go:328: [0;37m[info] [confChange]region 1 region epoch is conf_ver:7 version:1 ,delete peer 3[0m
+2022/03/23 20:15:28.594657 peer_msg_handler.go:252: [0;37m[info] 3 processConfChange[0m
+2022/03/23 20:15:28.594741 peer_msg_handler.go:302: [0;37m[info] [confChange]region 1 region epoch is conf_ver:6 version:1 ,delete peer 3[0m
+2022/03/23 20:15:28.594772 peer_msg_handler.go:770: [0;37m[info] [region 1] 3 starts destroy[0m
+2022/03/23 20:15:28.594782 peer.go:209: [0;37m[info] [region 1] 3 begin to destroy[0m
+2022/03/23 20:15:28.594964 peer_storage.go:298: [0;37m[info] [region 1] clear peer 1 meta key 1 apply key 1 raft key and 279 raft logs, takes 163.823µs[0m
+2022/03/23 20:15:28.609683 peer.go:237: [0;37m[info] [region 1] 3 destroy itself, takes 14.8962ms[0m
+2022/03/23 20:15:28.624178 region_task.go:137: [0;37m[info] succeed in deleting data in range. [regionId: 1, startKey: , endKey: ][0m
+2022/03/23 20:15:28.638790 peer_msg_handler.go:252: [0;37m[info] 4 processConfChange[0m
+2022/03/23 20:15:28.642691 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.642716 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.642731 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.642740 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.642748 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.642760 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.642772 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.642782 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.642802 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.642811 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.642820 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.642828 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.642836 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.642844 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.642852 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.642860 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.642868 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.642877 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.642886 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.642901 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.642914 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.642924 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.642932 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.642940 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.642949 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.642957 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.642965 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.642986 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643008 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643018 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643026 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643035 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643042 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643053 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643087 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643103 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643115 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643124 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643137 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643146 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643155 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643168 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643179 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643190 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643204 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643212 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643220 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643233 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643241 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643248 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643256 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643263 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643270 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643278 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643285 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643293 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643300 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643307 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643314 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643322 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643330 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643338 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643346 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643354 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643368 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643377 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643386 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643407 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643416 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643424 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643437 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643446 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643454 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643466 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643476 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643484 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643492 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643503 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643511 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643519 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643527 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643535 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643550 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643563 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643571 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643580 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643594 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643602 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643610 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643624 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643635 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643643 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643651 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643659 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643674 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643682 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643693 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643703 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643717 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643726 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643734 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643742 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643756 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643767 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643780 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643788 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643800 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643808 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643818 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643829 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643839 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643847 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643860 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643870 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643878 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643886 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643894 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643901 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643909 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643917 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643932 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643947 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643955 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643963 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643970 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643983 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.643992 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644007 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644025 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644034 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644045 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644054 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644062 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644070 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644089 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644099 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644107 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644115 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644123 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644130 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644138 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644146 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644158 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644170 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644178 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644190 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644205 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644218 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644227 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644235 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644242 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644251 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644259 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644266 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644274 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644282 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644293 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644307 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644315 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644323 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644331 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644338 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644349 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644358 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644378 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644387 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644400 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644409 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644417 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644426 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644434 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644442 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644451 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644459 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644467 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644475 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644483 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644491 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644498 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644508 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644522 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644530 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644541 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644550 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644561 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644569 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644577 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644585 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644593 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644601 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644609 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644617 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644625 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644633 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644646 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644657 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644664 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644672 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644683 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644691 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644703 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644716 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644724 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644737 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644745 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644756 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644765 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644773 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644781 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644789 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644797 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644808 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644820 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644829 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644837 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644844 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644853 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644861 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644870 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644890 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644900 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644908 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644916 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644927 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644940 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644949 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644957 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644964 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644976 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.644989 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.645002 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.645010 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.645018 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.645026 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.645033 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.645041 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgHeartbeatResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.645053 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.645065 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.645073 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.645080 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.645088 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.645095 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.645108 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.645117 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.645125 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.645136 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:7 version:1  ignore it[0m
+2022/03/23 20:15:28.646121 peer_msg_handler.go:252: [0;37m[info] 6 processConfChange[0m
+2022/03/23 20:15:28.705181 peer_msg_handler.go:252: [0;37m[info] 7 processConfChange[0m
+2022/03/23 20:15:28.705264 peer_msg_handler.go:328: [0;37m[info] [confChange]region 1 region epoch is conf_ver:7 version:1 ,delete peer 3[0m
+2022/03/23 20:15:28.771803 peer_msg_handler.go:252: [0;37m[info] 7 processConfChange[0m
+2022/03/23 20:15:28.795544 peer_msg_handler.go:252: [0;37m[info] 4 processConfChange[0m
+2022/03/23 20:15:28.795571 peer_msg_handler.go:302: [0;37m[info] [confChange]region 1 region epoch is conf_ver:7 version:1 ,delete peer 4[0m
+2022/03/23 20:15:28.795582 peer_msg_handler.go:770: [0;37m[info] [region 1] 4 starts destroy[0m
+2022/03/23 20:15:28.795592 peer.go:209: [0;37m[info] [region 1] 4 begin to destroy[0m
+2022/03/23 20:15:28.795687 peer_storage.go:298: [0;37m[info] [region 1] clear peer 1 meta key 1 apply key 1 raft key and 311 raft logs, takes 87.333µs[0m
+2022/03/23 20:15:28.807261 peer_msg_handler.go:252: [0;37m[info] 6 processConfChange[0m
+2022/03/23 20:15:28.807301 peer_msg_handler.go:328: [0;37m[info] [confChange]region 1 region epoch is conf_ver:8 version:1 ,delete peer 4[0m
+2022/03/23 20:15:28.812231 peer_msg_handler.go:252: [0;37m[info] 6 processConfChange[0m
+2022/03/23 20:15:28.812304 peer.go:237: [0;37m[info] [region 1] 4 destroy itself, takes 16.704631ms[0m
+2022/03/23 20:15:28.822219 region_task.go:137: [0;37m[info] succeed in deleting data in range. [regionId: 1, startKey: , endKey: ][0m
+2022/03/23 20:15:28.848717 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.848772 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgHeartbeatResponse, ignore it[0m
+2022/03/23 20:15:28.848802 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.848835 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.848885 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.848931 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.848962 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.848991 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.849028 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.849058 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.849087 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.849115 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.849142 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.849171 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.849209 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.849254 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.849286 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.849314 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.849352 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.849389 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.849427 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.849472 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.849519 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.849550 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.849592 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.849621 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.849650 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.849683 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.849712 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.849746 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.849776 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.849805 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.849833 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.849868 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.849898 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.849926 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.849964 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.849994 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.850022 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.850048 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.850081 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.850112 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.850140 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.850191 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.850227 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.850257 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.850285 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.850317 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.850347 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.850375 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.850422 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.850453 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.850496 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.850534 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.850563 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.850592 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.850628 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.850658 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.850687 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.850725 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.850754 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.850792 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.850822 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.850857 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.850892 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.850922 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.850964 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.851046 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.851073 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.851095 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.851115 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.851133 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.851159 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.851180 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.851200 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.851223 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.851244 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.851264 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.851300 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.851322 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.851339 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.851359 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.851392 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.851414 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.851437 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.851464 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.851485 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.851505 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.851522 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.851542 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.851570 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.851599 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.851624 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.851645 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.851665 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.851683 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.851701 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.851718 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.851736 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.851753 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.851779 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.851801 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.851829 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.851851 store_worker.go:82: [0;31m[error] handle raft message failed storeID 4, tombstone peer [epoch: conf_ver:7 version:1 ] received an invalid message MsgAppendResponse, ignore it[0m
+2022/03/23 20:15:28.883161 peer_msg_handler.go:252: [0;37m[info] 7 processConfChange[0m
+2022/03/23 20:15:28.883251 peer_msg_handler.go:328: [0;37m[info] [confChange]region 1 region epoch is conf_ver:8 version:1 ,delete peer 4[0m
+2022/03/23 20:15:28.890496 peer_msg_handler.go:252: [0;37m[info] 7 processConfChange[0m
+2022/03/23 20:15:29.334647 raft.go:349: [0;37m[info] [becomeLeader]7 become leader[0m
+2022/03/23 20:15:30.325374 raft.go:349: [0;37m[info] [becomeLeader]6 become leader[0m
+2022/03/23 20:15:30.556738 peer_msg_handler.go:252: [0;37m[info] 6 processConfChange[0m
+2022/03/23 20:15:30.556824 peer_msg_handler.go:328: [0;37m[info] [confChange]region 1 region epoch is conf_ver:9 version:1 ,delete peer 7[0m
+2022/03/23 20:15:30.563729 peer_msg_handler.go:252: [0;37m[info] 7 processConfChange[0m
+2022/03/23 20:15:30.563788 peer_msg_handler.go:302: [0;37m[info] [confChange]region 1 region epoch is conf_ver:8 version:1 ,delete peer 7[0m
+2022/03/23 20:15:30.563804 peer_msg_handler.go:770: [0;37m[info] [region 1] 7 starts destroy[0m
+2022/03/23 20:15:30.563812 peer.go:209: [0;37m[info] [region 1] 7 begin to destroy[0m
+2022/03/23 20:15:30.563928 peer_storage.go:298: [0;37m[info] [region 1] clear peer 1 meta key 1 apply key 1 raft key and 160 raft logs, takes 100.973µs[0m
+2022/03/23 20:15:30.583625 peer.go:237: [0;37m[info] [region 1] 7 destroy itself, takes 19.809223ms[0m
+2022/03/23 20:15:30.598810 region_task.go:137: [0;37m[info] succeed in deleting data in range. [regionId: 1, startKey: , endKey: ][0m
+2022/03/23 20:15:30.632407 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:9 version:1  ignore it[0m
+2022/03/23 20:15:30.632439 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:9 version:1  ignore it[0m
+2022/03/23 20:15:30.632451 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:9 version:1  ignore it[0m
+2022/03/23 20:15:30.632459 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:9 version:1  ignore it[0m
+2022/03/23 20:15:30.632468 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:9 version:1  ignore it[0m
+2022/03/23 20:15:30.632477 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:9 version:1  ignore it[0m
+2022/03/23 20:15:30.632486 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:9 version:1  ignore it[0m
+2022/03/23 20:15:30.632512 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:9 version:1  ignore it[0m
+2022/03/23 20:15:30.632521 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:9 version:1  ignore it[0m
+2022/03/23 20:15:30.632534 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:9 version:1  ignore it[0m
+2022/03/23 20:15:30.632543 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:9 version:1  ignore it[0m
+2022/03/23 20:15:30.632551 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:9 version:1  ignore it[0m
+2022/03/23 20:15:30.632559 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:9 version:1  ignore it[0m
+2022/03/23 20:15:30.632568 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgHeartbeatResponse is stale, current conf_ver:9 version:1  ignore it[0m
+2022/03/23 20:15:30.632587 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:9 version:1  ignore it[0m
+2022/03/23 20:15:30.632597 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:9 version:1  ignore it[0m
+2022/03/23 20:15:30.632605 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:9 version:1  ignore it[0m
+2022/03/23 20:15:30.632613 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:9 version:1  ignore it[0m
+2022/03/23 20:15:30.632620 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:9 version:1  ignore it[0m
+2022/03/23 20:15:30.632628 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:9 version:1  ignore it[0m
+2022/03/23 20:15:30.632635 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:9 version:1  ignore it[0m
+2022/03/23 20:15:30.632643 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:9 version:1  ignore it[0m
+2022/03/23 20:15:30.632656 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:9 version:1  ignore it[0m
+2022/03/23 20:15:30.632669 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:9 version:1  ignore it[0m
+2022/03/23 20:15:30.632677 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:9 version:1  ignore it[0m
+2022/03/23 20:15:30.632684 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:9 version:1  ignore it[0m
+2022/03/23 20:15:30.632692 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:9 version:1  ignore it[0m
+2022/03/23 20:15:30.632710 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:9 version:1  ignore it[0m
+2022/03/23 20:15:30.632719 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:9 version:1  ignore it[0m
+2022/03/23 20:15:30.632728 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:9 version:1  ignore it[0m
+2022/03/23 20:15:30.632735 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:9 version:1  ignore it[0m
+2022/03/23 20:15:30.632743 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:9 version:1  ignore it[0m
+2022/03/23 20:15:30.632751 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:9 version:1  ignore it[0m
+2022/03/23 20:15:30.632758 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:9 version:1  ignore it[0m
+2022/03/23 20:15:30.632776 peer_msg_handler.go:679: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:9 version:1  ignore it[0m
+2022/03/23 20:15:30.694122 peer_msg_handler.go:252: [0;37m[info] 6 processConfChange[0m
+2022/03/23 20:15:30.774996 test_test.go:221: [0;31m[fatal] get wrong value, client 16
+want:x 16 0 yx 16 1 yx 16 2 yx 16 3 yx 16 4 yx 16 5 yx 16 6 yx 16 7 y
+got: x 16 0 yx 16 1 yx 16 2 yx 16 3 yx 16 4 yx 16 5 yx 16 7 y
+[0m
+FAIL	github.com/pingcap-incubator/tinykv/kv/test_raftstore	6.756s
 FAIL

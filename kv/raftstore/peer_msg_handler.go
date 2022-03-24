@@ -59,7 +59,7 @@ func (d *peerMsgHandler) HandleRaftReady() {
 	// 保存entry到磁盘中
 	apply, err := d.peerStorage.SaveReadyState(&rd)
 	if err != nil {
-		panic(err)
+		return
 	}
 	// 2C添加, 如果 Ready 中存在 snapshot，则应用它
 	if apply != nil {
@@ -69,7 +69,6 @@ func (d *peerMsgHandler) HandleRaftReady() {
 			d.ctx.storeMeta.Lock()
 			// 更新region信息
 			d.ctx.storeMeta.regions[d.regionId] = d.Region()
-			d.ctx.storeMeta.regionRanges.Delete(&regionItem{region: apply.PrevRegion})
 			d.ctx.storeMeta.regionRanges.ReplaceOrInsert(&regionItem{region: d.Region()})
 			d.ctx.storeMeta.Unlock()
 		}
@@ -97,9 +96,9 @@ func (d *peerMsgHandler) HandleRaftReady() {
 
 // 2B自定义函数，应用并回复消息
 func (d *peerMsgHandler) applyAndResponseEntry(kvWB *engine_util.WriteBatch, entry pb.Entry) {
-	// 3A修改这里
+	// 3B添加
 	if entry.EntryType == pb.EntryType_EntryConfChange {
-		//d.applyConfChangeEntry(kvWB, entry)
+		d.applyConfChangeEntry(kvWB, entry)
 		return
 	}
 	msg := raft_cmdpb.RaftCmdRequest{}
@@ -222,11 +221,6 @@ func (d *peerMsgHandler) handleProposal(entry *eraftpb.Entry, handle func(*propo
 		if entry.Index == proposal.index && entry.Term == proposal.term {
 			handle(proposal)
 			d.proposals = d.proposals[1:]
-			// if response.Header == nil {
-			// 	response.Header = &raft_cmdpb.RaftResponseHeader{}
-			// }
-			// // proposal.cb.Txn = txn
-			// proposal.cb.Done(response)
 		}
 	}
 }
@@ -255,7 +249,99 @@ func (d *peerMsgHandler) applyAdminRequest(kvWB *engine_util.WriteBatch, entry p
 
 // 3B自定义函数
 func (d *peerMsgHandler) applyConfChangeEntry(kvWB *engine_util.WriteBatch, entry pb.Entry) {
-	return
+	log.Infof("%d processConfChange", d.PeerId())
+	cc := eraftpb.ConfChange{}
+	cc.Unmarshal(entry.Data)
+	resp := new(raft_cmdpb.RaftCmdResponse)
+	resp.Header = new(raft_cmdpb.RaftResponseHeader)
+	resp.AdminResponse = &raft_cmdpb.AdminResponse{
+		CmdType:    raft_cmdpb.AdminCmdType_ChangePeer,
+		ChangePeer: &raft_cmdpb.ChangePeerResponse{},
+	}
+	msg := raft_cmdpb.RaftCmdRequest{}
+	msg.Unmarshal(cc.Context)
+	// 读取原有的 region
+	region := d.Region()
+	// 检查region的epoch
+	err := util.CheckRegionEpoch(&msg, region, true)
+	if err != nil {
+		d.handleProposal(&entry, func(p *proposal) {
+			p.cb.Done(ErrResp(err))
+		})
+		return
+	}
+	// 对于添加/删除节点分别进行处理
+	switch cc.ChangeType {
+	case eraftpb.ConfChangeType_AddNode:
+		// 判断节点是否已经存在
+		if !isPeerExists(region, cc.NodeId) {
+			// 将peer添加到region中
+			peer := &metapb.Peer{
+				Id:      cc.NodeId,
+				StoreId: msg.AdminRequest.ChangePeer.Peer.StoreId,
+			}
+			region.Peers = append(region.Peers, peer)
+			// 版本号递增
+			region.RegionEpoch.ConfVer++
+			// 持久化修改后的 Region，写到 kvDB 里面
+			meta.WriteRegionState(kvWB, region, rspb.PeerState_Normal)
+			// 在缓存中插入peer
+			d.insertPeerCache(peer)
+			// 这是必要的吗？
+			d.ctx.storeMeta.Lock()
+			d.ctx.storeMeta.regions[d.regionId] = region
+			d.ctx.storeMeta.regionRanges.ReplaceOrInsert(&regionItem{region: region})
+			d.ctx.storeMeta.Unlock()
+			// 调用 Raft 的 addNode() 方法
+			d.RaftGroup.ApplyConfChange(cc)
+			log.Infof("[confChange]region %d region epoch is %v,add peer %d", d.regionId, d.Region().RegionEpoch, msg.AdminRequest.ChangePeer.Peer.Id)
+		}
+	case eraftpb.ConfChangeType_RemoveNode:
+		// 如果删除的是自己，直接销毁并返回
+		if d.PeerId() == cc.NodeId {
+			log.Infof("[confChange]region %d region epoch is %v,delete peer %d", d.regionId, d.Region().RegionEpoch, cc.NodeId)
+			kvWB.DeleteMeta(meta.ApplyStateKey(d.regionId)) // 删除前写入
+			d.destroyPeer()
+			return
+		}
+		// 如果删除的是其他节点
+		if isPeerExists(region, cc.NodeId) {
+			// 从region中删除节点
+			for i, p := range region.Peers {
+				if p.Id == cc.NodeId {
+					region.Peers = append(region.Peers[:i], region.Peers[i+1:]...)
+				}
+			}
+			// 版本号递增
+			region.RegionEpoch.ConfVer++
+			// 持久化修改后的 Region，写到 kvDB 里面
+			meta.WriteRegionState(kvWB, region, rspb.PeerState_Normal)
+			// 从缓存中删除peer
+			d.removePeerCache(cc.NodeId)
+			// 这是必要的吗？
+			d.ctx.storeMeta.Lock()
+			d.ctx.storeMeta.regions[d.regionId] = region
+			d.ctx.storeMeta.regionRanges.ReplaceOrInsert(&regionItem{region: region})
+			d.ctx.storeMeta.Unlock()
+			// 调用 Raft 的 removeNode() 方法
+			d.RaftGroup.ApplyConfChange(cc)
+			log.Infof("[confChange]region %d region epoch is %v,delete peer %d", d.regionId, d.Region().RegionEpoch, cc.NodeId)
+		}
+	}
+	d.handleProposal(&entry, func(p *proposal) { p.cb.Done(resp) })
+	if d.IsLeader() {
+		d.HeartbeatScheduler(d.ctx.schedulerTaskSender)
+	}
+}
+
+// 3B自定义函数，判断节点在region中是否存在
+func isPeerExists(region *metapb.Region, id uint64) bool {
+	for _, p := range region.Peers {
+		if p.Id == id {
+			return true
+		}
+	}
+	return false
 }
 
 // 功能2：处理消息
@@ -363,23 +449,56 @@ func (d *peerMsgHandler) proposeRequest(msg *raft_cmdpb.RaftCmdRequest, cb *mess
 
 // 2C自定义函数，propose msg 的admin request 的第一个，别的不 propose
 func (d *peerMsgHandler) proposeAdminRequest(msg *raft_cmdpb.RaftCmdRequest, cb *message.Callback) {
-	//adminReq := msg.AdminRequest
+	adminReq := msg.AdminRequest
 	switch msg.AdminRequest.CmdType {
-	// 3A实现
+	// 3B实现
 	case raft_cmdpb.AdminCmdType_ChangePeer:
+		context, _ := msg.Marshal()
+		//包装消息
+		cc := eraftpb.ConfChange{
+			ChangeType: adminReq.ChangePeer.ChangeType,
+			NodeId:     adminReq.ChangePeer.Peer.Id,
+			Context:    context,
+		}
+		// 解决remove node出现request timeout的问题
+		// 只剩两个节点且被移除的节点刚好为leader，此时需要拒绝该propose并转移领导权给另一个节点
+		if cc.ChangeType == eraftpb.ConfChangeType_RemoveNode && len(d.Region().Peers) == 2 && cc.NodeId == d.LeaderId() {
+			for _, peer := range d.Region().Peers {
+				if peer.Id != cc.NodeId {
+					d.RaftGroup.TransferLeader(peer.Id)
+					// 将消息传给客户端
+					resp := new(raft_cmdpb.RaftCmdResponse)
+					resp.Header = new(raft_cmdpb.RaftResponseHeader)
+					resp.AdminResponse = &raft_cmdpb.AdminResponse{
+						CmdType:    raft_cmdpb.AdminCmdType_ChangePeer,
+						ChangePeer: &raft_cmdpb.ChangePeerResponse{},
+					}
+					cb.Done(resp)
+					return
+				}
+			}
+		}
+		// 保存proposal
+		p := &proposal{
+			index: d.nextProposalIndex(),
+			term:  d.Term(),
+			cb:    cb,
+		}
+		d.proposals = append(d.proposals, p)
+		d.RaftGroup.ProposeConfChange(cc)
 	case raft_cmdpb.AdminCmdType_InvalidAdmin:
 	// 3B实现
 	case raft_cmdpb.AdminCmdType_Split:
-	// 3A实现
+	// 3B实现
 	case raft_cmdpb.AdminCmdType_TransferLeader:
-		// resp := new(raft_cmdpb.RaftCmdResponse)
-		// resp.Header = new(raft_cmdpb.RaftResponseHeader)
-		// resp.AdminResponse = &raft_cmdpb.AdminResponse{
-		// 	CmdType:        raft_cmdpb.AdminCmdType_TransferLeader,
-		// 	TransferLeader: &raft_cmdpb.TransferLeaderResponse{},
-		// }
-		// cb.Done(resp)
-		// d.RaftGroup.TransferLeader(adminReq.TransferLeader.Peer.Id)
+		resp := new(raft_cmdpb.RaftCmdResponse)
+		resp.Header = new(raft_cmdpb.RaftResponseHeader)
+		resp.AdminResponse = &raft_cmdpb.AdminResponse{
+			CmdType:        raft_cmdpb.AdminCmdType_TransferLeader,
+			TransferLeader: &raft_cmdpb.TransferLeaderResponse{},
+		}
+		cb.Done(resp)
+		d.RaftGroup.TransferLeader(adminReq.TransferLeader.Peer.Id)
 	// 2C实现
 	case raft_cmdpb.AdminCmdType_CompactLog:
 		data, err := msg.Marshal()

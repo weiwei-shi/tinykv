@@ -149,7 +149,7 @@ type Raft struct {
 	electionElapsed int
 
 	// 3A添加，领导转换的过去的 tick 数，防止一直领导转换
-	transferLeaderElapsed int
+	//transferLeaderElapsed int
 	// leadTransferee is id of the leader transfer target when its value is not zero.
 	// Follow the procedure defined in section 3.10 of Raft phd thesis.
 	// (https://web.stanford.edu/~ouster/cgi-bin/papers/OngaroPhD.pdf)
@@ -339,7 +339,7 @@ func (r *Raft) becomeCandidate() {
 	r.votes[r.id] = true //给自己投票
 	r.voteNum = 1
 	r.refuseNum = 0
-	log.Infof("[becomeCandidate]%d become candidate,term is %v", r.id, r.Term)
+	//log.Infof("[becomeCandidate]%d become candidate,term is %v", r.id, r.Term)
 }
 
 // becomeLeader transform this peer's state to leader // 状态转换为Leader，转换为leader后有一些操作
@@ -407,12 +407,12 @@ func (r *Raft) Step(m pb.Message) error {
 		case pb.MessageType_MsgTransferLeader:
 			// 3A添加
 			// 由于可能有网络分区，所以转发给leader的方案不太好，所以采取直接进行选举的方案
-			//r.handleHup()
+			r.handleHup()
 		case pb.MessageType_MsgTimeoutNow:
 			// 3A添加
-			// if r.Prs[r.id] != nil {
-			// 	r.handleHup()
-			// }
+			if r.Prs[r.id] != nil {
+				r.handleHup()
+			}
 		}
 	case StateCandidate:
 		switch m.MsgType {
@@ -436,12 +436,12 @@ func (r *Raft) Step(m pb.Message) error {
 		case pb.MessageType_MsgTransferLeader:
 			// 3A添加
 			// 由于可能有网络分区，所以转发给leader的方案不太好，所以采取直接进行选举的方案
-			//r.handleHup()
+			r.handleHup()
 		case pb.MessageType_MsgTimeoutNow:
 			// 3A添加
-			// if r.Prs[r.id] != nil {
-			// 	r.handleHup()
-			// }
+			if r.Prs[r.id] != nil {
+				r.handleHup()
+			}
 		}
 	case StateLeader:
 		switch m.MsgType {
@@ -458,15 +458,13 @@ func (r *Raft) Step(m pb.Message) error {
 			r.handleRequestVote(m)
 		case pb.MessageType_MsgRequestVoteResponse:
 		case pb.MessageType_MsgSnapshot:
-			// 2C添加
-			//r.handleSnapshot(m)
 		case pb.MessageType_MsgHeartbeat:
 			r.handleHeartbeat(m) //假如领导换届
 		case pb.MessageType_MsgHeartbeatResponse:
 			r.handleAppendResponse(m)
 		case pb.MessageType_MsgTransferLeader:
 			// 3A添加
-			//r.handleTransferLeader(m)
+			r.handleTransferLeader(m)
 		case pb.MessageType_MsgTimeoutNow:
 		}
 	}
@@ -568,7 +566,7 @@ func (r *Raft) handleRequestVote(m pb.Message) {
 	}
 	// 请求者的任期大
 	if m.Term > r.Term {
-		log.Infof("++%v 【handleRequestVote】 become follower", r.id)
+		//log.Infof("++%v 【handleRequestVote】 become follower", r.id)
 		r.becomeFollower(m.Term, None)
 		msg.Term = r.Term // r的任期发生改变
 	}
@@ -582,7 +580,7 @@ func (r *Raft) handleRequestVote(m pb.Message) {
 	rTerm, _ := r.RaftLog.Term(rIndex)
 	if m.LogTerm > rTerm || (m.LogTerm == rTerm && m.Index >= rIndex) {
 		r.Vote = m.From
-		log.Infof("%v vote to %v", r.id, m.From)
+		//log.Infof("%v vote to %v", r.id, m.From)
 		msg.Reject = false
 		r.electionElapsed = 0
 		r.msgs = append(r.msgs, msg)
@@ -621,7 +619,7 @@ func (r *Raft) handleRequestVoteResponse(m pb.Message) {
 		return
 	}
 	if m.Term > r.Term {
-		log.Infof("++%v 【handleRequestVoteResponse】 become follower", r.id)
+		//log.Infof("++%v 【handleRequestVoteResponse】 become follower", r.id)
 		r.becomeFollower(m.Term, None)
 		return
 	}
@@ -636,7 +634,7 @@ func (r *Raft) handleRequestVoteResponse(m pb.Message) {
 	if m.Reject && !r.votes[m.From] {
 		r.refuseNum++
 		if r.refuseNum > len(r.Prs)/2 {
-			log.Infof("%v 选举失败成为follower", r.id)
+			//log.Infof("%v 选举失败成为follower", r.id)
 			r.becomeFollower(r.Term, None)
 		}
 	}
@@ -683,7 +681,7 @@ func (r *Raft) handlePropose(m pb.Message) {
 // 2A自定义函数，处理日志复制请求的响应
 func (r *Raft) handleAppendResponse(m pb.Message) {
 	if m.Term > r.Term {
-		log.Infof("++%v 【handleAppendResponse】 become follower", r.id)
+		//log.Infof("++%v 【handleAppendResponse】 become follower", r.id)
 		r.becomeFollower(m.Term, None)
 		return
 	}
@@ -722,7 +720,7 @@ func (r *Raft) handleAppendResponse(m pb.Message) {
 			})
 		}
 		r.leadTransferee = None
-		log.Infof("%v 领导换届成为follower", r.id)
+		//log.Infof("%v 领导换届成为follower", r.id)
 		r.becomeFollower(r.Term, r.leadTransferee)
 	}
 }
@@ -788,7 +786,7 @@ func (r *Raft) handleSnapshot(m pb.Message) {
 		return
 	}
 	// 否则，m比r的日志更多，m同时还是leader
-	log.Infof("++%v 【handleSnapshot】 become follower", r.id)
+	//log.Infof("++%v 【handleSnapshot】 become follower", r.id)
 	r.becomeFollower(max(meta.Term, m.Term), m.From)
 	// 根据快照修改r的信息
 	r.RaftLog.firstIndex = meta.Index + 1
@@ -809,25 +807,22 @@ func (r *Raft) handleSnapshot(m pb.Message) {
 // addNode add a new node to raft group
 func (r *Raft) addNode(id uint64) {
 	// Your Code Here (3A).
-	// if _, ok := r.Prs[id]; !ok {
-	// 	r.Prs[id] = &Progress{
-	// 		Match: 0,
-	// 		Next:  1,
-	// 	}
-	// }
-	// r.sendHeartbeat(id)
+	r.Prs[id] = &Progress{
+		Match: 0,
+		Next:  1,
+	}
+	// 发送心跳给添加的节点
+	r.sendHeartbeat(id)
 }
 
 // removeNode remove a node from raft group
 func (r *Raft) removeNode(id uint64) {
 	// Your Code Here (3A).
-	// if r.id == id {
-	// 	r.Prs = make(map[uint64]*Progress)
-	// 	return
-	// }
-	// _, ok := r.Prs[id]
-	// if ok {
-	// 	delete(r.Prs, id)
-	// }
-	// r.checkLeaderCommit()
+	// 删除自己，在apply时如果删除自己不会调用该函数
+	// 删除其他节点
+	delete(r.Prs, id)
+	// 检查是否需要更新commit
+	if len(r.Prs) != 0 {
+		r.checkLeaderCommit()
+	}
 }
