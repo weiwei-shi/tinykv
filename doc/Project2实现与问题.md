@@ -235,11 +235,11 @@ Raftstore 会根据配置 RaftLogGcCountLimit 时时检查是否需要 gc log，
 
 #### 2B测试
 
-![Project2bTest](imgs\Project2bTest.png)
+![Project2bTest](imgs/Project2bTest.png)
 
 #### 2C测试
 
-![Project2cTest](imgs\Project2bTest.png)
+![Project2cTest](imgs/Project2bTest.png)
 
 ## 问题
 

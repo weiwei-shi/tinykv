@@ -22,7 +22,7 @@ Server 依赖于 Storage，需要为位于 kv/storage/standalone_storage/standal
 
 通过project1测试
 
-![Project1Test](imgs\Project1Test.JPG)
+![Project1Test](imgs/Project1Test.JPG)
 
 
 
