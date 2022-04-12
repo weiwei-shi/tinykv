@@ -16,6 +16,16 @@ Server 依赖于 Storage，需要为位于 kv/storage/standalone_storage/standal
 * storage：主要关注modify.go、storage.go和standalone_storage/standalone_storage.go，这是引擎部分，Server结构体中用到的的storage也就是这里的standalone_storage，所以要先完成storage部分，再完成server部分。
 * util：重点关注engine_util下的几个文件，这里面的几个函数需要用到。
 
+
+
+## 测试
+
+通过project1测试
+
+![Project1Test](imgs\Project1Test.JPG)
+
+
+
 ## 问题
 
 #### 1.vscode安装go插件失败
@@ -24,7 +34,6 @@ Server 依赖于 Storage，需要为位于 kv/storage/standalone_storage/standal
 
 	go env -w GO111MODULE=on
 	go env -w GOPROXY=https://goproxy.io,direct
-#### 2.测试问题
+#### 2.项目中提到使用`make project1`来完成测试，但是并不知道如何使用
 
-项目中提到使用`make project1`来完成测试，但是并不知道如何使用
-
+解决：使用教研室服务器Ubuntu跑

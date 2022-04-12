@@ -217,6 +217,7 @@ func GenericTest(t *testing.T, part string, nclients int, unreliable bool, crash
 					//log.Infof("%d: client new scan %v-%v\n", cli, start, end)
 					values := cluster.Scan([]byte(start), []byte(end))
 					v := string(bytes.Join(values, []byte("")))
+					log.Infof("+++scan result: %v", v)
 					if v != last {
 						log.Fatalf("get wrong value, client %v\nwant:%v\ngot: %v\n", cli, last, v)
 					}

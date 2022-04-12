@@ -10,8 +10,8 @@ clearFunc() {
 }
 for ((i = 1; i <= 100; i++)); do
 	echo "$i"
-	check_results=$(make project3b)
-	#check_results=$( go test -v -run  TestConfChangeRecoverManyClients3B ./kv/test_raftstore )
+	#check_results=$(make project3b)
+	check_results=$( go test -v -run  TestSplitConfChangeSnapshotUnreliableRecoverConcurrentPartition3B ./kv/test_raftstore )
 	$(go clean -testcache)
 	clearFunc
 	if [[ $check_results =~ "FAIL" ]]; then

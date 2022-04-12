@@ -52,7 +52,7 @@ raft/rawnode.go 中的 raft.RawNode 是我们与上层应用交互的接口，ra
 
 ## 2B实现
 
-首先，你应该看的代码是位于 kv/storage/raft_storage/raft_server.go 的 RaftStorage 代码，它也实现了 Storage 接口。与 StandaloneStorage 直接从底层引擎写入或读取不同，它首先将每个写入或读取请求发送到 Raft，然后在 Raft 提交请求后对底层引擎进行实际的写入和读取。通过这种方式，可以保持多个 Store 之间的一致性。
+首先，位于 kv/storage/raft_storage/raft_server.go 的 RaftStorage 代码，它也实现了 Storage 接口。与 StandaloneStorage 直接从底层引擎写入或读取不同，它首先将每个写入或读取请求发送到 Raft，然后在 Raft 提交请求后对底层引擎进行实际的写入和读取。通过这种方式，可以保持多个 Store 之间的一致性。
 
 RaftStorage 主要是创建一个 Raftstore 来驱动 Raft。在调用Reader或Write函数时，实际上是通过channel将proto/proto/raft_cmdpb.proto中定义的具有四种基本命令类型（Get/Put/Delete/Snap）的RaftCmdRequest发送到raftstore（channel的接收者是raftWorker的raftCh ) 并在 Raft 提交并应用命令后返回响应。而现在Reader and Write函数的kvrpc.Context参数就派上用场了，它承载了客户端视角的Region信息，作为RaftCmdRequest的header传递。可能信息是错误的或陈旧的，所以 raftstore 需要检查它们并决定是否提出请求。
 
@@ -60,7 +60,7 @@ raftstore的入口是Raftstore，见kv/raftstore/raftstore.go。它会启动一�
 
 整个过程分为两部分：raft worker 轮询 raftCh 获取消息，消息包括驱动 Raft 模块的 base tick 和作为 Raft 条目提出的 Raft 命令；它从 Raft 模块获取并处理就绪，包括发送 raft 消息、持久化状态、将提交的条目应用到状态机。应用后，将响应返回给客户端。
 
-### 实现peer存储
+### 1.实现peer存储
 
 Peer storage 是通过 A 部分的 Storage 接口与之交互的东西，但是除了 raft log 之外，peer storage 还管理其他持久化的元数据，这对于在重启后恢复一致的状态机非常重要。此外，在 proto/proto/raft_serverpb.proto 中定义了三个重要的状态：
 
@@ -104,7 +104,7 @@ Peer storage 是通过 A 部分的 Storage 接口与之交互的东西，但是�
 
 1. 负责应用 Snapshot，先通过 `ps.clearMeta` 和 `ps.clearExtraData()` 清除原来的数据，因为新的 snapshot 会包含新的 meta 信息，需要先清除老的。
 2. 根据 Snapshot 的 Metadata 信息更新当前的 raftState 和 applyState。并保存信息到 WriteBatch 中，可以等到 `SaveReadyState()` 方法结束时统一写入 DB。
-3. 发送 `RegionTaskApply` 到 `regionSched` 安装 snapshot，因为 Snapshot 很大，所以这里通过异步的方式安装。我这里是等待 Snapshot 安装完成后才继续执行，相当于没异步，以防出错。
+3. 发送 `RegionTaskApply` 到 `regionSched` 安装 snapshot。
 
 #### SaveReadyState()
 
@@ -116,7 +116,7 @@ Peer storage 是通过 A 部分的 Storage 接口与之交互的东西，但是�
 4. 持久化 RaftLocalState 到 raftDB。
 5. 最后通过 `MustWriteToDB()` 方法写入。
 
-### 实现raft准备过程
+### 2.实现raft准备过程
 
 在 project2 A 部分中，已经构建了一个基于 Tick 的 Raft 模块。现在需要编写外部进程来驱动它。大部分代码已经在 kv/raftstore/peer_msg_handler.go 和 kv/raftstore/peer.go 下实现。所以需要学习代码，完成proposeRaftCommand和HandleRaftReady的逻辑。以下是对框架的一些解释。
 
@@ -197,23 +197,49 @@ for {
 
 
 
+## 2C实现
+
+在本部分中，将在上述两部分实现的基础上实现快照处理。一般来说，Snapshot 只是一个类似于 AppendEntries 的 raft 消息，用于将数据复制到 follower，不同的是它的大小，Snapshot 包含了某个时间点的整个状态机数据，并且一次构建和发送这么大的消息会消耗大量资源和时间，可能会阻塞其他 raft 消息的处理，为了解决这个问题，Snapshot 消息将使用独立的连接，并将数据拆分成块进行传输。
+
+需要更改的只是基于 A 部分和 B 部分中编写的代码。
+
+### 1.在 Raft 中实现
+
+见 proto 文件中eraftpb.Snapshot 的定义，eraftpb.Snapshot 上的data 字段并不代表实际的状态机数据，但上层应用使用了一些元数据，暂时可以忽略。当leader需要向follower发送Snapshot消息时，可以调用Storage.Snapshot()获取eraftpb.Snapshot，然后像其他raft消息一样发送snapshot消息。状态机数据实际是如何构建和发送的，是由raftstore实现的，下一步会介绍。可以假设，一旦 Storage.Snapshot() 返回成功，Raft leader 就可以安全地将快照消息发送给 follower，follower 应该调用 handleSnapshot 来处理，也就是像 term、commit index 一样恢复 raft 内部状态从消息中的eraftpb.SnapshotMetadata 中获取成员信息等，然后完成快照处理过程。
+
+### 2.在 raftstore 中实现
+
+在这一步，你需要再学习 raftstore 的两个 worker——raftlog-gc worker 和 region worker。
+
+Raftstore 会根据配置 RaftLogGcCountLimit 时时检查是否需要 gc log，见 onRaftGcLogTick()。如果是，它将提出一个 raft 管理命令 CompactLogRequest，它被包裹在 RaftCmdRequest 中，就像 project2 部分 B 中实现的四种基本命令类型（Get/Put/Delete/Snap）一样。然后您需要在 Raft 提交时处理此管理命令.但与 Get/Put/Delete/Snap 命令写入或读取状态机数据不同，CompactLogRequest 修改元数据，即更新 RaftApplyState 中的 RaftTruncatedState。之后，您应该通过 ScheduleCompactLog 将任务安排到 raftlog-gc worker。 Raftlog-gc worker 将异步执行实际的日志删除工作。
+
+然后由于日志压缩，Raft 模块可能需要发送快照。 PeerStorage 实现 Storage.Snapshot()。 TinyKV 生成快照并在 region worker 中应用快照。当调用 Snapshot() 时，它实际上是向 region worker 发送了一个任务 RegionTaskGen。 region worker 的消息处理器位于 kv/raftstore/runner/region_task.go。它扫描底层引擎以生成快照，并按通道发送快照元数据。 Raft 下次调用 Snapshot 时，会检查快照生成是否完成。如果是，Raft 应该将快照消息发送给其他节点，快照发送和接收工作由 kv/storage/raft_storage/snap_runner.go 处理。你不需要深入细节，只需要知道快照消息将在收到快照后由 onRaftMsg 处理。
+
+那么snapshot会反映在下一个Raft ready，所以你应该做的任务就是修改raft ready进程来处理snapshot的情况。当您确定应用快照时，您可以更新对等存储的内存状态，如 RaftLocalState、RaftApplyState 和 RegionLocalState。另外，不要忘记将这些状态持久化到 kvdb 和 raftdb，并从 kvdb 和 raftdb 中删除陈旧状态。此外，您还需要将 PeerStorage.snapState 更新为 snap.SnapState_Applying 并通过 PeerStorage.regionSched 将 runner.RegionTaskApply 任务发送给 region worker 并等待 region worker 完成。
+
+运行 make project2c 以通过所有测试。
+
+
+
 ##  测试
 
 #### 2A测试
 
 全部通过
 
-![Project2aaTest](/images/Project2aaTest.jpg)
+![Project2aaTest](imgs/Project2aaTest.JPG)
 
-![Project2abTest](/images/Project2abTest.jpg)
+![Project2abTest](imgs/Project2abTest.JPG)
 
-![Project2acTest](/images/Project2acTest.jpg)
+![Project2acTest](imgs/Project2acTest.JPG)
 
 #### 2B测试
 
+![Project2bTest](imgs\Project2bTest.png)
 
+#### 2C测试
 
-
+![Project2cTest](imgs\Project2bTest.png)
 
 ## 问题
 

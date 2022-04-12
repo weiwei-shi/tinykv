@@ -383,7 +383,7 @@ func (r *Raft) becomeLeader() {
 // Step the entrance of handle message, see `MessageType`
 // on `eraftpb.proto` for what msgs should be handled
 func (r *Raft) Step(m pb.Message) error {
-	// Your Code Here (2A)./
+	// Your Code Here (2A)
 	// 首先判断消息的类型，再执行对应的操作
 	switch r.State {
 	case StateFollower:
@@ -474,6 +474,10 @@ func (r *Raft) Step(m pb.Message) error {
 //---------Follower Handle func---------------
 // 2A自定义函数，处理选举超时
 func (r *Raft) handleHup() {
+	// 3b中避免两个节点时尚为同步的新节点与另一个节点竞选而出现的超时
+	if len(r.Prs) == 0 {
+		return
+	}
 	r.becomeCandidate()
 	// 如果集群只有自己，则直接成为领导者
 	if len(r.Prs) == 1 {

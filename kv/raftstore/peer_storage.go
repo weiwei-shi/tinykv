@@ -369,7 +369,6 @@ func (ps *PeerStorage) ApplySnapshot(snapshot *eraftpb.Snapshot, kvWB *engine_ut
 	// 发送 RegionTaskApply 到 regionSched 安装 snapshot
 	ch := make(chan bool, 1)
 	ps.regionSched <- &runner.RegionTaskApply{
-		//RegionId: ps.region.Id,
 		RegionId: snapData.Region.Id,
 		Notifier: ch,
 		SnapMeta: snapshot.Metadata,

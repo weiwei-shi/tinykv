@@ -21,6 +21,7 @@ import (
 	"time"
 
 	"github.com/gogo/protobuf/proto"
+	"github.com/pingcap-incubator/tinykv/kv/raftstore/util"
 	"github.com/pingcap-incubator/tinykv/proto/pkg/metapb"
 	"github.com/pingcap-incubator/tinykv/proto/pkg/schedulerpb"
 	"github.com/pingcap-incubator/tinykv/scheduler/pkg/logutil"
@@ -279,7 +280,38 @@ func (c *RaftCluster) handleStoreHeartbeat(stats *schedulerpb.StoreStats) error 
 // processRegionHeartbeat updates the region information.
 func (c *RaftCluster) processRegionHeartbeat(region *core.RegionInfo) error {
 	// Your Code Here (3C).
-
+	if region == nil {
+		return nil
+	}
+	// 检查本地存储中是否有相同Id的区域
+	localRegion := c.GetRegion(region.GetID())
+	if localRegion != nil {
+		// 检查区域是否已过时
+		if util.IsEpochStale(region.GetRegionEpoch(), localRegion.GetRegionEpoch()) {
+			return errors.New("epoch is stale")
+		}
+	} else {
+		// 扫描重叠的区域
+		localRegions := c.ScanRegions(region.GetStartKey(), region.GetEndKey(), -1)
+		for _, local := range localRegions {
+			// if region.GetRegionEpoch() == nil || local.GetRegionEpoch() == nil {
+			// 	return errors.New("epoch is nil")
+			// }
+			// 检查区域是否已过时
+			if util.IsEpochStale(region.GetRegionEpoch(), local.GetRegionEpoch()) {
+				return errors.New("epoch is stale")
+			}
+		}
+	}
+	// 更新区域树
+	err := c.putRegion(region)
+	if err != nil {
+		return err
+	}
+	// 更新相关存储状态
+	for storeId := range region.GetStoreIds() {
+		c.updateStoreStatusLocked(storeId)
+	}
 	return nil
 }
 
