@@ -1,5 +1,11 @@
 # Project1 StandaloneKV
 
+**【参考】**
+
+[LX-676655103/Tinykv-2021](https://github.com/LX-676655103/Tinykv-2021/blob/course/doc/project2.md )
+
+[Smith-Cruise/TinyKV-White-Paper](https://github.com/Smith-Cruise/TinyKV-White-Paper/blob/main/Project2-RaftKV.md )
+
 ## 实现
 
 需要完成两个部分：

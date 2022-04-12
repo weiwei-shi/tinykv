@@ -1,5 +1,11 @@
 # Project2 RaftKV
 
+**【参考】**
+
+[LX-676655103/Tinykv-2021](https://github.com/LX-676655103/Tinykv-2021/blob/course/doc/project2.md )
+
+[Smith-Cruise/TinyKV-White-Paper](https://github.com/Smith-Cruise/TinyKV-White-Paper/blob/main/Project2-RaftKV.md )
+
 ## 2A实现
 
 在这一部分中，将实现基本的 raft 算法。
@@ -41,12 +47,6 @@ raft/rawnode.go 中的 raft.RawNode 是我们与上层应用交互的接口，ra
 另一个重要的结构 Ready 也在这里定义。在处理消息或推进逻辑时钟时，raft.Raft 可能需要与上层应用交互。
 
 但这些交互不会立即发生，而是封装在 Ready 中，并由 RawNode.Ready() 返回给上层应用程序。何时调用 RawNode.Ready() 并处理它取决于上层应用程序。上层应用处理完返回的 Ready 后，还需要调用 RawNode.Advance() 等函数来更新 raft.Raft 的内部状态，如应用索引、稳定日志索引等。
-
-### 【参考】
-
-[LX-676655103/Tinykv-2021](https://github.com/LX-676655103/Tinykv-2021/blob/course/doc/project2.md )
-
-[Smith-Cruise/TinyKV-White-Paper](https://github.com/Smith-Cruise/TinyKV-White-Paper/blob/main/Project2-RaftKV.md )
 
 
 

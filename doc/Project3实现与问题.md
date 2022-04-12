@@ -1,5 +1,11 @@
 # Project3 MultiRaftKV
 
+**【参考】**
+
+[LX-676655103/Tinykv-2021](https://github.com/LX-676655103/Tinykv-2021/blob/course/doc/project2.md )
+
+[Smith-Cruise/TinyKV-White-Paper](https://github.com/Smith-Cruise/TinyKV-White-Paper/blob/main/Project2-RaftKV.md )
+
 在这个项目中，将实现一个基于多 raft 的 kv 服务器和 balance scheduler，它由多个 raft 组组成，每个 raft 组负责一个单独的键范围，这里命名为 region，布局将如图所示。对单个区域的请求像以前一样处理，但是多个区域可以同时处理请求，这提高了性能，但也带来了一些新的挑战，例如平衡对每个区域的请求等。
 
 ![multiraft](imgs/multiraft.png)
@@ -38,12 +44,6 @@
 - 将 MsgTransferLeader 消息的 Message.from 设置为受让人（即传输目标）
 - 要立即开始新的选举，可以使用 MsgHup 消息调用 Raft.Step
 - 调用 pb.ConfChange.Marshal 获取 pb.ConfChange 的字节表示并将其放入 pb.Entry.Data
-
-### 【参考】
-
-[LX-676655103/Tinykv-2021](https://github.com/LX-676655103/Tinykv-2021/blob/course/doc/project2.md )
-
-[Smith-Cruise/TinyKV-White-Paper](https://github.com/Smith-Cruise/TinyKV-White-Paper/blob/main/Project2-RaftKV.md )
 
 
 
