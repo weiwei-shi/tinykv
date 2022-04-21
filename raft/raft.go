@@ -225,6 +225,7 @@ func (r *Raft) sendAppend(to uint64) bool {
 	if nextIndex <= lastIndex {
 		next_ents, _ := r.RaftLog.Slice(nextIndex, lastIndex+1)
 		for _, entry := range next_ents {
+			// 一定要用temp防止使用entry的地址而 导致append的数据不变！
 			temp := entry
 			entries = append(entries, &temp)
 		}
