@@ -46,7 +46,7 @@ func (txn *MvccTxn) PutWrite(key []byte, ts uint64, write *Write) {
 	// Your Code Here (4A).
 	modify := storage.Modify{
 		Data: storage.Put{
-			Key:   EncodeKey(key, ts), // key 和时间戳组合成一个编码 key
+			Key:   EncodeKey(key, ts), // key 和提交时间戳组合成一个编码 key
 			Cf:    engine_util.CfWrite,
 			Value: write.ToBytes(),
 		},
