@@ -99,7 +99,7 @@ func (txn *MvccTxn) DeleteLock(key []byte) {
 
 // GetValue finds the value for key, valid at the start timestamp of this transaction.
 // I.e., the most recent value committed before the start of this transaction.
-// 查询当前事务开始时，传入 key 对应的最新的 Value
+// 查询当前事务下，传入 key 对应的 Value
 func (txn *MvccTxn) GetValue(key []byte) ([]byte, error) {
 	// Your Code Here (4A).
 	// 得到迭代器
