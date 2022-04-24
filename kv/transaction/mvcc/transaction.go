@@ -130,7 +130,7 @@ func (txn *MvccTxn) GetValue(key []byte) ([]byte, error) {
 	if parseWrite.Kind != WriteKindPut {
 		return nil, nil
 	}
-	// 从 Default 中通过获取值
+	// 从 Default 中获取值（由于parseWrite对应的时间戳不一定是该事务的开始时间戳）
 	return txn.Reader.GetCF(engine_util.CfDefault, EncodeKey(key, parseWrite.StartTS))
 }
 
