@@ -38,15 +38,15 @@ func (scan *Scanner) Next() ([]byte, []byte, error) {
 		return nil, nil, nil
 	}
 	item := scan.iter.Item()            // 迭代器对应的键值对
-	gotKey := item.KeyCopy(nil)         // 获得key的副本
-	decodedKey := DecodeUserKey(gotKey) // 之前对 key 和时间戳进行了encoder，这里要解码获得key
+	gotKey := item.KeyCopy(nil)         // 获得 key 的副本
+	decodedKey := DecodeUserKey(gotKey) // 之前对 key 和时间戳进行了 encoder，这里要解码获得key
 	scan.iter.Seek(EncodeKey(decodedKey, scan.txn.StartTS))
 	if !scan.iter.Valid() {
 		return nil, nil, nil
 	}
 	item = scan.iter.Item()      // 迭代器对应的键值对
-	gotKey = item.KeyCopy(nil)   // 获得key的副本
-	key := DecodeUserKey(gotKey) // 之前对 key 和时间戳进行了encoder，这里要解码获得key
+	gotKey = item.KeyCopy(nil)   // 获得 key 的副本
+	key := DecodeUserKey(gotKey) // 之前对 key 和时间戳进行了 encoder，这里要解码获得key
 	// 判断找到 Write 的 key 是不是就是需要的 key
 	if !bytes.Equal(decodedKey, key) {
 		return scan.Next()

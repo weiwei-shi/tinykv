@@ -8,6 +8,7 @@ import (
 	"github.com/pingcap-incubator/tinykv/kv/storage/raft_storage"
 	"github.com/pingcap-incubator/tinykv/kv/transaction/latches"
 	"github.com/pingcap-incubator/tinykv/kv/transaction/mvcc"
+	"github.com/pingcap-incubator/tinykv/kv/util/engine_util"
 	coppb "github.com/pingcap-incubator/tinykv/proto/pkg/coprocessor"
 	"github.com/pingcap-incubator/tinykv/proto/pkg/kvrpcpb"
 	"github.com/pingcap-incubator/tinykv/proto/pkg/tinykvpb"
@@ -64,7 +65,7 @@ func (server *Server) KvGet(_ context.Context, req *kvrpcpb.GetRequest) (*kvrpcp
 		return resp, err
 	}
 	// 如果 Lock 的 startTs 小于当前的 startTs，说明存在你之前存在尚未 commit 的请求，中断操作，返回 LockInfo
-	if lock != nil && lock.Ts <= req.Version {
+	if lock != nil && lock.Ts < req.Version {
 		resp.Error = &kvrpcpb.KeyError{
 			Locked: &kvrpcpb.LockInfo{
 				PrimaryLock: lock.Primary,
@@ -103,16 +104,16 @@ func (server *Server) KvPrewrite(_ context.Context, req *kvrpcpb.PrewriteRequest
 	txn := mvcc.NewMvccTxn(reader, req.StartVersion)
 	var keyError []*kvrpcpb.KeyError
 	for _, m := range req.Mutations {
-		// 检查所有 key 的最新 Write，如果存在，且其 startTs 大于当前事务的 startTs，说明存在 write conflict，终止操作
-		write, startTs, err := txn.MostRecentWrite(m.Key)
+		// 检查所有 key 的最新 Write，如果存在，且其 commitTs 大于当前事务的 startTs，说明存在 write conflict，终止操作
+		write, ts, err := txn.MostRecentWrite(m.Key)
 		if err != nil {
 			return resp, err
 		}
-		if write != nil && startTs > req.StartVersion {
+		if write != nil && ts > req.StartVersion {
 			keyError = append(keyError, &kvrpcpb.KeyError{
 				Conflict: &kvrpcpb.WriteConflict{
 					StartTs:    req.StartVersion,
-					ConflictTs: startTs,
+					ConflictTs: ts,
 					Key:        m.Key,
 					Primary:    req.PrimaryLock,
 				}})
@@ -310,22 +311,151 @@ func (server *Server) KvCheckTxnStatus(_ context.Context, req *kvrpcpb.CheckTxnS
 		return resp, nil
 	}
 	// 如果有锁
-	resp.LockTtl = req.LockTs
 	// 计算ttl是否超时(使用时间戳的物理部分)
-	if mvcc.PhysicalTime(lock.Ts)
+	if mvcc.PhysicalTime(lock.Ts)+lock.Ttl <= mvcc.PhysicalTime(req.CurrentTs) {
+		// 超时，移除该 Lock 和 Value
+		txn.DeleteLock(req.PrimaryKey)
+		txn.DeleteValue(req.PrimaryKey)
+		// 执行写入回滚操作
+		txn.PutWrite(req.PrimaryKey, req.LockTs, &mvcc.Write{
+			StartTS: req.LockTs,
+			Kind:    mvcc.WriteKindRollback,
+		})
+		// 将事务的write操作保存
+		err = server.storage.Write(req.Context, txn.Writes())
+		if err != nil {
+			return resp, err
+		}
+		resp.Action = kvrpcpb.Action_TTLExpireRollback
+		return resp, nil
+	}
+	// 不超时，返回ttl，等待 Lock 超时为止
+	resp.LockTtl = lock.Ttl
 	return resp, nil
 }
 
 // 批量回滚 key
 func (server *Server) KvBatchRollback(_ context.Context, req *kvrpcpb.BatchRollbackRequest) (*kvrpcpb.BatchRollbackResponse, error) {
 	// Your Code Here (4C).
-	return nil, nil
+	resp := &kvrpcpb.BatchRollbackResponse{}
+	// 如果请求的操作为空
+	if req.Keys == nil {
+		return resp, nil
+	}
+	reader, err := server.storage.Reader(req.Context)
+	if err != nil {
+		return resp, err
+	}
+	defer reader.Close()
+	txn := mvcc.NewMvccTxn(reader, req.StartVersion)
+	// 上锁？
+	server.Latches.WaitForLatches(req.Keys)
+	defer server.Latches.ReleaseLatches(req.Keys)
+	for _, key := range req.Keys {
+		// 获取每一个 key 的 write
+		write, _, err := txn.CurrentWrite(key)
+		if err != nil {
+			return resp, err
+		}
+		if write != nil {
+			// 如果已经是 WriteKindRollback，说明这个 key 已经被回滚完毕，跳过这个 key
+			if write.Kind == mvcc.WriteKindRollback {
+				continue
+			} else {
+				// 否则删除该事务的value
+				txn.DeleteValue(key)
+				// 写入Write
+				txn.PutWrite(key, req.StartVersion, &mvcc.Write{
+					StartTS: req.StartVersion,
+					Kind:    mvcc.WriteKindRollback,
+				})
+				resp.Error = &kvrpcpb.KeyError{Abort: "true"}
+				return resp, nil
+			}
+		}
+		// 获取Lock
+		lock, err := txn.GetLock(key)
+		if err != nil {
+			return resp, err
+		}
+		// 写入Write
+		txn.PutWrite(key, req.StartVersion, &mvcc.Write{
+			StartTS: req.StartVersion,
+			Kind:    mvcc.WriteKindRollback,
+		})
+		// 如果没有锁或者锁的 startTs 不是当前事务的 startTs，跳过这个 key,说明该 key 被其他事务拥有
+		if lock == nil || lock.Ts != req.StartVersion {
+			continue
+		}
+		// 删除该事务加的锁和该事务的value
+		txn.DeleteLock(key)
+		txn.DeleteValue(key)
+	}
+	// 将事务的write操作保存
+	err = server.storage.Write(req.Context, txn.Writes())
+	if err != nil {
+		return resp, err
+	}
+	return resp, nil
 }
 
 // 解决锁冲突
 func (server *Server) KvResolveLock(_ context.Context, req *kvrpcpb.ResolveLockRequest) (*kvrpcpb.ResolveLockResponse, error) {
 	// Your Code Here (4C).
-	return nil, nil
+	resp := &kvrpcpb.ResolveLockResponse{}
+	if req.StartVersion == 0 {
+		return resp, nil
+	}
+	reader, err := server.storage.Reader(req.Context)
+	if err != nil {
+		return resp, err
+	}
+	defer reader.Close()
+	// 得到Lock的迭代器
+	iter := reader.IterCF(engine_util.CfLock)
+	defer iter.Close() // 延迟调用
+	// 得到对应请求开始版本的已加锁的 key
+	var keys [][]byte
+	for ; iter.Valid(); iter.Next() {
+		item := iter.Item()               // 迭代器对应的键值对
+		value, err := item.ValueCopy(nil) // 获得value的副本
+		if err != nil {
+			return resp, err
+		}
+		lock, err := mvcc.ParseLock(value) // 因为put的时候进行了ToBytes()，此处需要还原为lock形式
+		if err != nil {
+			return resp, err
+		}
+		// 如果 lock 的 Ts 等于请求的开始版本，说明是想要的key
+		if lock.Ts == req.StartVersion {
+			keys = append(keys, item.KeyCopy(nil))
+		}
+	}
+	// 如果没有keys，说明没有锁冲突
+	if len(keys) == 0 {
+		return resp, nil
+	}
+	// 如果 CommitVersion 为0，回滚所有锁
+	if req.CommitVersion == 0 {
+		respRollback, err := server.KvBatchRollback(nil, &kvrpcpb.BatchRollbackRequest{
+			Context:      req.Context,
+			StartVersion: req.StartVersion,
+			Keys:         keys,
+		})
+		//resp.RegionError = respRollback.RegionError
+		resp.Error = respRollback.Error
+		return resp, err
+	} else { // 否则提交所有锁
+		respCommit, err := server.KvCommit(nil, &kvrpcpb.CommitRequest{
+			Context:       req.Context,
+			StartVersion:  req.StartVersion,
+			Keys:          keys,
+			CommitVersion: req.CommitVersion,
+		})
+		//resp.RegionError = respCommit.RegionError
+		resp.Error = respCommit.Error
+		return resp, err
+	}
 }
 
 // SQL push down commands.
