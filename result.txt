@@ -1,415 +1,176 @@
 === RUN   TestSplitConfChangeSnapshotUnreliableRecoverConcurrentPartition3B
-2022/04/12 10:46:55.405434 node.go:193: [0;37m[info] start raft store node, storeID: 1[0m
-2022/04/12 10:46:55.405850 peer.go:41: [0;37m[info] region id:1 region_epoch:<conf_ver:1 version:1 > peers:<id:1 store_id:1 > peers:<id:2 store_id:2 > peers:<id:3 store_id:3 > peers:<id:4 store_id:4 > peers:<id:5 store_id:5 >  create peer with ID 1[0m
-2022/04/12 10:46:55.405939 raftstore.go:177: [0;37m[info] start store 1, region_count 1, tombstone_count 0, takes 233.449µs[0m
-2022/04/12 10:46:55.406620 node.go:193: [0;37m[info] start raft store node, storeID: 2[0m
-2022/04/12 10:46:55.406760 peer.go:41: [0;37m[info] region id:1 region_epoch:<conf_ver:1 version:1 > peers:<id:1 store_id:1 > peers:<id:2 store_id:2 > peers:<id:3 store_id:3 > peers:<id:4 store_id:4 > peers:<id:5 store_id:5 >  create peer with ID 2[0m
-2022/04/12 10:46:55.406821 raftstore.go:177: [0;37m[info] start store 2, region_count 1, tombstone_count 0, takes 112.859µs[0m
-2022/04/12 10:46:55.407437 node.go:193: [0;37m[info] start raft store node, storeID: 3[0m
-2022/04/12 10:46:55.407569 peer.go:41: [0;37m[info] region id:1 region_epoch:<conf_ver:1 version:1 > peers:<id:1 store_id:1 > peers:<id:2 store_id:2 > peers:<id:3 store_id:3 > peers:<id:4 store_id:4 > peers:<id:5 store_id:5 >  create peer with ID 3[0m
-2022/04/12 10:46:55.407627 raftstore.go:177: [0;37m[info] start store 3, region_count 1, tombstone_count 0, takes 102.691µs[0m
-2022/04/12 10:46:55.408163 node.go:193: [0;37m[info] start raft store node, storeID: 4[0m
-2022/04/12 10:46:55.408285 peer.go:41: [0;37m[info] region id:1 region_epoch:<conf_ver:1 version:1 > peers:<id:1 store_id:1 > peers:<id:2 store_id:2 > peers:<id:3 store_id:3 > peers:<id:4 store_id:4 > peers:<id:5 store_id:5 >  create peer with ID 4[0m
-2022/04/12 10:46:55.408354 raftstore.go:177: [0;37m[info] start store 4, region_count 1, tombstone_count 0, takes 109.581µs[0m
-2022/04/12 10:46:55.408905 node.go:193: [0;37m[info] start raft store node, storeID: 5[0m
-2022/04/12 10:46:55.409029 peer.go:41: [0;37m[info] region id:1 region_epoch:<conf_ver:1 version:1 > peers:<id:1 store_id:1 > peers:<id:2 store_id:2 > peers:<id:3 store_id:3 > peers:<id:4 store_id:4 > peers:<id:5 store_id:5 >  create peer with ID 5[0m
-2022/04/12 10:46:55.409092 raftstore.go:177: [0;37m[info] start store 5, region_count 1, tombstone_count 0, takes 103.346µs[0m
-2022/04/12 10:46:55.914513 raft.go:349: [0;37m[info] [becomeLeader]4 become leader[0m
-2022/04/12 10:46:56.409480 test_test.go:220: [0;37m[info] +++scan result: [0m
-2022/04/12 10:46:56.409511 test_test.go:220: [0;37m[info] +++scan result: [0m
-2022/04/12 10:46:56.409529 test_test.go:220: [0;37m[info] +++scan result: [0m
-2022/04/12 10:46:56.409541 test_test.go:220: [0;37m[info] +++scan result: [0m
-2022/04/12 10:46:56.409553 test_test.go:220: [0;37m[info] +++scan result: [0m
-2022/04/12 10:46:56.409573 test_test.go:220: [0;37m[info] +++scan result: [0m
-2022/04/12 10:46:56.409600 test_test.go:220: [0;37m[info] +++scan result: [0m
-2022/04/12 10:46:56.409614 test_test.go:220: [0;37m[info] +++scan result: [0m
-2022/04/12 10:46:56.409626 test_test.go:220: [0;37m[info] +++scan result: [0m
-2022/04/12 10:46:56.409578 test_test.go:220: [0;37m[info] +++scan result: [0m
-2022/04/12 10:46:56.429427 peer_msg_handler.go:132: [0;37m[info] ****put key:1 00000000 ,value:x 1 0 y[0m
-2022/04/12 10:46:56.432203 peer_msg_handler.go:132: [0;37m[info] ****put key:1 00000000 ,value:x 1 0 y[0m
-2022/04/12 10:46:56.432270 peer_msg_handler.go:132: [0;37m[info] ****put key:1 00000000 ,value:x 1 0 y[0m
-2022/04/12 10:46:56.432288 peer_msg_handler.go:132: [0;37m[info] ****put key:1 00000000 ,value:x 1 0 y[0m
-2022/04/12 10:46:56.432302 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000000 ,value:x 0 0 y[0m
-2022/04/12 10:46:56.434721 peer_msg_handler.go:132: [0;37m[info] ****put key:1 00000000 ,value:x 1 0 y[0m
-2022/04/12 10:46:56.437227 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000000 ,value:x 4 0 y[0m
-2022/04/12 10:46:56.439571 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000000 ,value:x 0 0 y[0m
-2022/04/12 10:46:56.441917 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000000 ,value:x 0 0 y[0m
-2022/04/12 10:46:56.441982 peer_msg_handler.go:132: [0;37m[info] ****put key:2 00000000 ,value:x 2 0 y[0m
-2022/04/12 10:46:56.444568 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000000 ,value:x 0 0 y[0m
-2022/04/12 10:46:56.444579 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000000 ,value:x 0 0 y[0m
-2022/04/12 10:46:56.446967 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000000 ,value:x 4 0 y[0m
-2022/04/12 10:46:56.447104 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000000 ,value:x 3 0 y[0m
-2022/04/12 10:46:56.449625 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000000 ,value:x 4 0 y[0m
-2022/04/12 10:46:56.449637 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000000 ,value:x 4 0 y[0m
-2022/04/12 10:46:56.452068 peer_msg_handler.go:132: [0;37m[info] ****put key:2 00000000 ,value:x 2 0 y[0m
-2022/04/12 10:46:56.454563 peer_msg_handler.go:132: [0;37m[info] ****put key:2 00000000 ,value:x 2 0 y[0m
-2022/04/12 10:46:56.454597 peer_msg_handler.go:132: [0;37m[info] ****put key:2 00000000 ,value:x 2 0 y[0m
-2022/04/12 10:46:56.456993 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000000 ,value:x 3 0 y[0m
-2022/04/12 10:46:56.459447 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000000 ,value:x 3 0 y[0m
-2022/04/12 10:46:56.459502 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000000 ,value:x 3 0 y[0m
-2022/04/12 10:46:56.462135 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000000 ,value:x 4 0 y[0m
-2022/04/12 10:46:56.467157 peer_msg_handler.go:132: [0;37m[info] ****put key:2 00000000 ,value:x 2 0 y[0m
-2022/04/12 10:46:56.472154 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000000 ,value:x 3 0 y[0m
-2022/04/12 10:46:56.472412 test_test.go:220: [0;37m[info] +++scan result: x 1 0 y[0m
-2022/04/12 10:46:56.477476 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000001 ,value:x 0 1 y[0m
-2022/04/12 10:46:56.484983 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000001 ,value:x 0 1 y[0m
-2022/04/12 10:46:56.485033 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000001 ,value:x 0 1 y[0m
-2022/04/12 10:46:56.490266 test_test.go:220: [0;37m[info] +++scan result: x 4 0 y[0m
-2022/04/12 10:46:56.492965 test_test.go:220: [0;37m[info] +++scan result: x 2 0 y[0m
-2022/04/12 10:46:56.495246 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000001 ,value:x 0 1 y[0m
-2022/04/12 10:46:56.497831 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000001 ,value:x 0 1 y[0m
-2022/04/12 10:46:56.497870 test_test.go:220: [0;37m[info] +++scan result: x 3 0 y[0m
-2022/04/12 10:46:56.508211 test_test.go:220: [0;37m[info] +++scan result: x 1 0 y[0m
-2022/04/12 10:46:56.515285 test_test.go:220: [0;37m[info] +++scan result: x 0 0 yx 0 1 y[0m
-2022/04/12 10:46:56.532685 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000001 ,value:x 4 1 y[0m
-2022/04/12 10:46:56.537512 peer_msg_handler.go:132: [0;37m[info] ****put key:2 00000001 ,value:x 2 1 y[0m
-2022/04/12 10:46:56.539963 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000001 ,value:x 4 1 y[0m
-2022/04/12 10:46:56.542488 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000001 ,value:x 4 1 y[0m
-2022/04/12 10:46:56.542556 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000001 ,value:x 4 1 y[0m
-2022/04/12 10:46:56.542656 test_test.go:220: [0;37m[info] +++scan result: x 3 0 y[0m
-2022/04/12 10:46:56.544914 peer_msg_handler.go:132: [0;37m[info] ****put key:2 00000001 ,value:x 2 1 y[0m
-2022/04/12 10:46:56.545038 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000001 ,value:x 4 1 y[0m
-2022/04/12 10:46:56.547549 peer_msg_handler.go:132: [0;37m[info] ****put key:2 00000001 ,value:x 2 1 y[0m
-2022/04/12 10:46:56.547665 peer_msg_handler.go:132: [0;37m[info] ****put key:2 00000001 ,value:x 2 1 y[0m
-2022/04/12 10:46:56.550165 peer_msg_handler.go:132: [0;37m[info] ****put key:2 00000001 ,value:x 2 1 y[0m
-2022/04/12 10:46:56.553108 peer_msg_handler.go:132: [0;37m[info] ****put key:1 00000001 ,value:x 1 1 y[0m
-2022/04/12 10:46:56.557766 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000002 ,value:x 0 2 y[0m
-2022/04/12 10:46:56.560367 peer_msg_handler.go:132: [0;37m[info] ****put key:1 00000001 ,value:x 1 1 y[0m
-2022/04/12 10:46:56.562838 peer_msg_handler.go:132: [0;37m[info] ****put key:1 00000001 ,value:x 1 1 y[0m
-2022/04/12 10:46:56.562875 peer_msg_handler.go:132: [0;37m[info] ****put key:1 00000001 ,value:x 1 1 y[0m
-2022/04/12 10:46:56.565295 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000002 ,value:x 0 2 y[0m
-2022/04/12 10:46:56.565318 peer_msg_handler.go:132: [0;37m[info] ****put key:1 00000001 ,value:x 1 1 y[0m
-2022/04/12 10:46:56.567705 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000002 ,value:x 0 2 y[0m
-2022/04/12 10:46:56.567769 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000002 ,value:x 0 2 y[0m
-2022/04/12 10:46:56.568123 test_test.go:220: [0;37m[info] +++scan result: x 4 0 yx 4 1 y[0m
-2022/04/12 10:46:56.570352 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000002 ,value:x 0 2 y[0m
-2022/04/12 10:46:56.572975 peer_msg_handler.go:132: [0;37m[info] ****put key:2 00000002 ,value:x 2 2 y[0m
-2022/04/12 10:46:56.580563 peer_msg_handler.go:132: [0;37m[info] ****put key:2 00000002 ,value:x 2 2 y[0m
-2022/04/12 10:46:56.583183 peer_msg_handler.go:132: [0;37m[info] ****put key:2 00000002 ,value:x 2 2 y[0m
-2022/04/12 10:46:56.583442 test_test.go:220: [0;37m[info] +++scan result: x 3 0 y[0m
-2022/04/12 10:46:56.588343 peer_msg_handler.go:132: [0;37m[info] ****put key:2 00000002 ,value:x 2 2 y[0m
-2022/04/12 10:46:56.590826 peer_msg_handler.go:132: [0;37m[info] ****put key:2 00000002 ,value:x 2 2 y[0m
-2022/04/12 10:46:56.593611 test_test.go:220: [0;37m[info] +++scan result: x 1 0 yx 1 1 y[0m
-2022/04/12 10:46:56.598626 test_test.go:220: [0;37m[info] +++scan result: x 0 0 yx 0 1 yx 0 2 y[0m
-2022/04/12 10:46:56.614531 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000002 ,value:x 4 2 y[0m
-2022/04/12 10:46:56.619347 test_test.go:220: [0;37m[info] +++scan result: x 2 0 yx 2 1 yx 2 2 y[0m
-2022/04/12 10:46:56.625017 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000002 ,value:x 4 2 y[0m
-2022/04/12 10:46:56.630333 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000002 ,value:x 4 2 y[0m
-2022/04/12 10:46:56.630381 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000002 ,value:x 4 2 y[0m
-2022/04/12 10:46:56.630444 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000002 ,value:x 4 2 y[0m
-2022/04/12 10:46:56.630576 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000001 ,value:x 3 1 y[0m
-2022/04/12 10:46:56.638244 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000001 ,value:x 3 1 y[0m
-2022/04/12 10:46:56.640984 peer_msg_handler.go:132: [0;37m[info] ****put key:1 00000002 ,value:x 1 2 y[0m
-2022/04/12 10:46:56.643254 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000001 ,value:x 3 1 y[0m
-2022/04/12 10:46:56.645693 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000003 ,value:x 0 3 y[0m
-2022/04/12 10:46:56.645693 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000001 ,value:x 3 1 y[0m
-2022/04/12 10:46:56.645731 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000001 ,value:x 3 1 y[0m
-2022/04/12 10:46:56.648182 peer_msg_handler.go:132: [0;37m[info] ****put key:1 00000002 ,value:x 1 2 y[0m
-2022/04/12 10:46:56.653157 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000003 ,value:x 0 3 y[0m
-2022/04/12 10:46:56.653230 peer_msg_handler.go:132: [0;37m[info] ****put key:1 00000002 ,value:x 1 2 y[0m
-2022/04/12 10:46:56.657513 peer_msg_handler.go:132: [0;37m[info] ****put key:1 00000002 ,value:x 1 2 y[0m
-2022/04/12 10:46:56.657514 peer_msg_handler.go:132: [0;37m[info] ****put key:1 00000002 ,value:x 1 2 y[0m
-2022/04/12 10:46:56.657689 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000003 ,value:x 4 3 y[0m
-2022/04/12 10:46:56.660180 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000003 ,value:x 0 3 y[0m
-2022/04/12 10:46:56.662921 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000003 ,value:x 0 3 y[0m
-2022/04/12 10:46:56.663041 test_test.go:220: [0;37m[info] +++scan result: x 2 0 yx 2 1 yx 2 2 y[0m
-2022/04/12 10:46:56.665643 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000003 ,value:x 4 3 y[0m
-2022/04/12 10:46:56.668218 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000003 ,value:x 0 3 y[0m
-2022/04/12 10:46:56.670683 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000003 ,value:x 4 3 y[0m
-2022/04/12 10:46:56.673277 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000003 ,value:x 4 3 y[0m
-2022/04/12 10:46:56.673288 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000003 ,value:x 4 3 y[0m
-2022/04/12 10:46:56.673620 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000002 ,value:x 3 2 y[0m
-2022/04/12 10:46:56.681139 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000002 ,value:x 3 2 y[0m
-2022/04/12 10:46:56.683845 test_test.go:220: [0;37m[info] +++scan result: x 1 0 yx 1 1 yx 1 2 y[0m
-2022/04/12 10:46:56.686070 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000002 ,value:x 3 2 y[0m
-2022/04/12 10:46:56.688750 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000002 ,value:x 3 2 y[0m
-2022/04/12 10:46:56.691156 test_test.go:220: [0;37m[info] +++scan result: x 0 0 yx 0 1 yx 0 2 yx 0 3 y[0m
-2022/04/12 10:46:56.691188 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000002 ,value:x 3 2 y[0m
-2022/04/12 10:46:56.706357 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000004 ,value:x 4 4 y[0m
-2022/04/12 10:46:56.709564 test_test.go:104: [0;37m[info] partition: [3 4], [1 2 5][0m
-2022/04/12 10:46:56.710900 peer_msg_handler.go:132: [0;37m[info] ****put key:2 00000003 ,value:x 2 3 y[0m
-2022/04/12 10:46:56.713858 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000004 ,value:x 4 4 y[0m
-2022/04/12 10:46:56.715915 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000003 ,value:x 3 3 y[0m
-2022/04/12 10:46:56.716645 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000004 ,value:x 4 4 y[0m
-2022/04/12 10:46:56.718513 peer_msg_handler.go:132: [0;37m[info] ****put key:2 00000003 ,value:x 2 3 y[0m
-2022/04/12 10:46:56.719675 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000004 ,value:x 4 4 y[0m
-2022/04/12 10:46:56.719886 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000004 ,value:x 4 4 y[0m
-2022/04/12 10:46:56.721037 peer_msg_handler.go:132: [0;37m[info] ****put key:2 00000003 ,value:x 2 3 y[0m
-2022/04/12 10:46:56.723544 peer_msg_handler.go:132: [0;37m[info] ****put key:2 00000003 ,value:x 2 3 y[0m
-2022/04/12 10:46:56.723604 peer_msg_handler.go:132: [0;37m[info] ****put key:2 00000003 ,value:x 2 3 y[0m
-2022/04/12 10:46:56.723556 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000003 ,value:x 3 3 y[0m
-2022/04/12 10:46:56.726029 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000003 ,value:x 3 3 y[0m
-2022/04/12 10:46:56.728559 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000003 ,value:x 3 3 y[0m
-2022/04/12 10:46:56.729327 peer_msg_handler.go:461: [0;37m[info] [region 1] 4 on split with [51 32 48 48 48 48 48 48 48 48][0m
-2022/04/12 10:46:56.730936 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000003 ,value:x 3 3 y[0m
-2022/04/12 10:46:56.811638 peer_msg_handler.go:461: [0;37m[info] [region 1] 4 on split with [51 32 48 48 48 48 48 48 48 48][0m
-2022/04/12 10:46:56.911738 peer_msg_handler.go:461: [0;37m[info] [region 1] 4 on split with [51 32 48 48 48 48 48 48 48 48][0m
-2022/04/12 10:46:57.011652 peer_msg_handler.go:461: [0;37m[info] [region 1] 4 on split with [51 32 48 48 48 48 48 48 48 48][0m
-2022/04/12 10:46:57.111676 peer_msg_handler.go:461: [0;37m[info] [region 1] 4 on split with [51 32 48 48 48 48 48 48 48 48][0m
-2022/04/12 10:46:57.211747 peer_msg_handler.go:461: [0;37m[info] [region 1] 4 on split with [51 32 48 48 48 48 48 48 48 48][0m
-2022/04/12 10:46:57.311808 peer_msg_handler.go:461: [0;37m[info] [region 1] 4 on split with [51 32 48 48 48 48 48 48 48 48][0m
-2022/04/12 10:46:57.374769 test_test.go:104: [0;37m[info] partition: [1 3 5], [2 4][0m
-2022/04/12 10:46:57.411712 peer_msg_handler.go:461: [0;37m[info] [region 1] 4 on split with [51 32 48 48 48 48 48 48 48 48][0m
-2022/04/12 10:46:57.941958 test_test.go:104: [0;37m[info] partition: [1 2 3 4], [5][0m
-2022/04/12 10:46:58.364307 raft.go:349: [0;37m[info] [becomeLeader]4 become leader[0m
-2022/04/12 10:46:58.403664 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000004 ,value:x 0 4 y[0m
-2022/04/12 10:46:58.408361 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000004 ,value:x 0 4 y[0m
-2022/04/12 10:46:58.413913 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000005 ,value:x 4 5 y[0m
-2022/04/12 10:46:58.416585 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000004 ,value:x 0 4 y[0m
-2022/04/12 10:46:58.416588 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000004 ,value:x 0 4 y[0m
-2022/04/12 10:46:58.421619 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000005 ,value:x 4 5 y[0m
-2022/04/12 10:46:58.426906 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000004 ,value:x 3 4 y[0m
-2022/04/12 10:46:58.426921 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000005 ,value:x 4 5 y[0m
-2022/04/12 10:46:58.426923 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000005 ,value:x 4 5 y[0m
-2022/04/12 10:46:58.429490 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000004 ,value:x 3 4 y[0m
-2022/04/12 10:46:58.434423 peer_msg_handler.go:241: [0;37m[info] 4 start split region 1: splitKey:[51 32 48 48 48 48 48 48 48 48], startKey:[], endKey:[][0m
-2022/04/12 10:46:58.434558 peer.go:41: [0;37m[info] region id:6 start_key:"3 00000000" region_epoch:<conf_ver:1 version:2 > peers:<id:7 store_id:1 > peers:<id:8 store_id:2 > peers:<id:9 store_id:3 > peers:<id:10 store_id:4 > peers:<id:11 store_id:5 >  create peer with ID 10[0m
-2022/04/12 10:46:58.436704 peer_msg_handler.go:241: [0;37m[info] 3 start split region 1: splitKey:[51 32 48 48 48 48 48 48 48 48], startKey:[], endKey:[][0m
-2022/04/12 10:46:58.436762 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000004 ,value:x 3 4 y[0m
-2022/04/12 10:46:58.436821 peer.go:41: [0;37m[info] region id:6 start_key:"3 00000000" region_epoch:<conf_ver:1 version:2 > peers:<id:7 store_id:1 > peers:<id:8 store_id:2 > peers:<id:9 store_id:3 > peers:<id:10 store_id:4 > peers:<id:11 store_id:5 >  create peer with ID 9[0m
-2022/04/12 10:46:58.439192 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000004 ,value:x 3 4 y[0m
-2022/04/12 10:46:58.441665 peer_msg_handler.go:241: [0;37m[info] 1 start split region 1: splitKey:[51 32 48 48 48 48 48 48 48 48], startKey:[], endKey:[][0m
-2022/04/12 10:46:58.441735 peer.go:41: [0;37m[info] region id:6 start_key:"3 00000000" region_epoch:<conf_ver:1 version:2 > peers:<id:7 store_id:1 > peers:<id:8 store_id:2 > peers:<id:9 store_id:3 > peers:<id:10 store_id:4 > peers:<id:11 store_id:5 >  create peer with ID 7[0m
-2022/04/12 10:46:58.444267 peer_msg_handler.go:241: [0;37m[info] 2 start split region 1: splitKey:[51 32 48 48 48 48 48 48 48 48], startKey:[], endKey:[][0m
-2022/04/12 10:46:58.444384 peer.go:41: [0;37m[info] region id:6 start_key:"3 00000000" region_epoch:<conf_ver:1 version:2 > peers:<id:7 store_id:1 > peers:<id:8 store_id:2 > peers:<id:9 store_id:3 > peers:<id:10 store_id:4 > peers:<id:11 store_id:5 >  create peer with ID 8[0m
-2022/04/12 10:46:58.449211 peer_msg_handler.go:241: [0;37m[info] 4 start split region 1: splitKey:[51 32 48 48 48 48 48 48 48 48], startKey:[], endKey:[51 32 48 48 48 48 48 48 48 48][0m
-2022/04/12 10:46:58.451728 peer_msg_handler.go:241: [0;37m[info] 3 start split region 1: splitKey:[51 32 48 48 48 48 48 48 48 48], startKey:[], endKey:[51 32 48 48 48 48 48 48 48 48][0m
-2022/04/12 10:46:58.454291 peer_msg_handler.go:427: [0;37m[info] [confChange]region 1 delete peer 2 storeId 4[0m
-2022/04/12 10:46:58.456715 peer_msg_handler.go:427: [0;37m[info] [confChange]region 1 delete peer 2 storeId 3[0m
-2022/04/12 10:46:58.456733 peer_msg_handler.go:241: [0;37m[info] 1 start split region 1: splitKey:[51 32 48 48 48 48 48 48 48 48], startKey:[], endKey:[51 32 48 48 48 48 48 48 48 48][0m
-2022/04/12 10:46:58.460919 peer_msg_handler.go:241: [0;37m[info] 4 start split region 1: splitKey:[51 32 48 48 48 48 48 48 48 48], startKey:[], endKey:[51 32 48 48 48 48 48 48 48 48][0m
-2022/04/12 10:46:58.460962 peer_msg_handler.go:241: [0;37m[info] 2 start split region 1: splitKey:[51 32 48 48 48 48 48 48 48 48], startKey:[], endKey:[51 32 48 48 48 48 48 48 48 48][0m
-2022/04/12 10:46:58.463462 peer_msg_handler.go:241: [0;37m[info] 3 start split region 1: splitKey:[51 32 48 48 48 48 48 48 48 48], startKey:[], endKey:[51 32 48 48 48 48 48 48 48 48][0m
-2022/04/12 10:46:58.463548 peer_msg_handler.go:427: [0;37m[info] [confChange]region 1 delete peer 2 storeId 1[0m
-2022/04/12 10:46:58.466113 peer_msg_handler.go:401: [0;37m[info] [confChange]region 1 delete peer 2 storeId 2[0m
-2022/04/12 10:46:58.466159 peer_msg_handler.go:887: [0;37m[info] [region 1] 2 starts destroy[0m
-2022/04/12 10:46:58.466168 peer.go:209: [0;37m[info] [region 1] 2 begin to destroy[0m
-2022/04/12 10:46:58.466231 peer_storage.go:298: [0;37m[info] [region 1] clear peer 1 meta key 1 apply key 1 raft key and 61 raft logs, takes 51.198µs[0m
-2022/04/12 10:46:58.468668 peer_msg_handler.go:241: [0;37m[info] 1 start split region 1: splitKey:[51 32 48 48 48 48 48 48 48 48], startKey:[], endKey:[51 32 48 48 48 48 48 48 48 48][0m
-2022/04/12 10:46:58.471123 peer_msg_handler.go:241: [0;37m[info] 4 start split region 1: splitKey:[51 32 48 48 48 48 48 48 48 48], startKey:[], endKey:[51 32 48 48 48 48 48 48 48 48][0m
-2022/04/12 10:46:58.473549 peer_msg_handler.go:241: [0;37m[info] 3 start split region 1: splitKey:[51 32 48 48 48 48 48 48 48 48], startKey:[], endKey:[51 32 48 48 48 48 48 48 48 48][0m
-2022/04/12 10:46:58.476244 peer.go:237: [0;37m[info] [region 1] 2 destroy itself, takes 10.068122ms[0m
-2022/04/12 10:46:58.478690 peer_msg_handler.go:241: [0;37m[info] 1 start split region 1: splitKey:[51 32 48 48 48 48 48 48 48 48], startKey:[], endKey:[51 32 48 48 48 48 48 48 48 48][0m
-2022/04/12 10:46:58.481105 peer_msg_handler.go:241: [0;37m[info] 4 start split region 1: splitKey:[51 32 48 48 48 48 48 48 48 48], startKey:[], endKey:[51 32 48 48 48 48 48 48 48 48][0m
-2022/04/12 10:46:58.481169 region_task.go:137: [0;37m[info] succeed in deleting data in range. [regionId: 1, startKey: , endKey: 33203030303030303030][0m
-2022/04/12 10:46:58.483587 peer_msg_handler.go:241: [0;37m[info] 3 start split region 1: splitKey:[51 32 48 48 48 48 48 48 48 48], startKey:[], endKey:[51 32 48 48 48 48 48 48 48 48][0m
-2022/04/12 10:46:58.493179 peer_msg_handler.go:241: [0;37m[info] 1 start split region 1: splitKey:[51 32 48 48 48 48 48 48 48 48], startKey:[], endKey:[51 32 48 48 48 48 48 48 48 48][0m
-2022/04/12 10:46:58.495465 peer_msg_handler.go:241: [0;37m[info] 4 start split region 1: splitKey:[51 32 48 48 48 48 48 48 48 48], startKey:[], endKey:[51 32 48 48 48 48 48 48 48 48][0m
-2022/04/12 10:46:58.497839 peer_msg_handler.go:241: [0;37m[info] 3 start split region 1: splitKey:[51 32 48 48 48 48 48 48 48 48], startKey:[], endKey:[51 32 48 48 48 48 48 48 48 48][0m
-2022/04/12 10:46:58.507598 peer_msg_handler.go:241: [0;37m[info] 1 start split region 1: splitKey:[51 32 48 48 48 48 48 48 48 48], startKey:[], endKey:[51 32 48 48 48 48 48 48 48 48][0m
-2022/04/12 10:46:58.509938 peer_msg_handler.go:241: [0;37m[info] 4 start split region 1: splitKey:[51 32 48 48 48 48 48 48 48 48], startKey:[], endKey:[51 32 48 48 48 48 48 48 48 48][0m
-2022/04/12 10:46:58.512238 peer_msg_handler.go:241: [0;37m[info] 3 start split region 1: splitKey:[51 32 48 48 48 48 48 48 48 48], startKey:[], endKey:[51 32 48 48 48 48 48 48 48 48][0m
-2022/04/12 10:46:58.521812 peer_msg_handler.go:241: [0;37m[info] 1 start split region 1: splitKey:[51 32 48 48 48 48 48 48 48 48], startKey:[], endKey:[51 32 48 48 48 48 48 48 48 48][0m
-2022/04/12 10:46:58.524206 peer_msg_handler.go:241: [0;37m[info] 4 start split region 1: splitKey:[51 32 48 48 48 48 48 48 48 48], startKey:[], endKey:[51 32 48 48 48 48 48 48 48 48][0m
-2022/04/12 10:46:58.526578 peer_msg_handler.go:241: [0;37m[info] 3 start split region 1: splitKey:[51 32 48 48 48 48 48 48 48 48], startKey:[], endKey:[51 32 48 48 48 48 48 48 48 48][0m
-2022/04/12 10:46:58.535903 peer_msg_handler.go:241: [0;37m[info] 1 start split region 1: splitKey:[51 32 48 48 48 48 48 48 48 48], startKey:[], endKey:[51 32 48 48 48 48 48 48 48 48][0m
-2022/04/12 10:46:58.559596 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000004 ,value:x 0 4 y[0m
-2022/04/12 10:46:58.561941 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000004 ,value:x 0 4 y[0m
-2022/04/12 10:46:58.571390 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000004 ,value:x 0 4 y[0m
-2022/04/12 10:46:58.573793 peer_msg_handler.go:796: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:2  ignore it[0m
-2022/04/12 10:46:58.573836 peer_msg_handler.go:796: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:2  ignore it[0m
-2022/04/12 10:46:58.573849 peer_msg_handler.go:796: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:2  ignore it[0m
-2022/04/12 10:46:58.573860 peer_msg_handler.go:796: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:2 version:2  ignore it[0m
-2022/04/12 10:46:58.594358 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000005 ,value:x 0 5 y[0m
-2022/04/12 10:46:58.596836 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000005 ,value:x 0 5 y[0m
-2022/04/12 10:46:58.599317 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000005 ,value:x 0 5 y[0m
-2022/04/12 10:46:58.616968 test_test.go:220: [0;37m[info] +++scan result: x 0 0 yx 0 1 yx 0 2 yx 0 3 yx 0 4 yx 0 5 y[0m
-2022/04/12 10:46:58.637546 test_test.go:104: [0;37m[info] partition: [2 4 5], [1 3][0m
-2022/04/12 10:46:58.637595 test_test.go:220: [0;37m[info] +++scan result: x 0 0 yx 0 1 yx 0 2 yx 0 3 yx 0 4 yx 0 5 y[0m
-2022/04/12 10:46:58.665219 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000004 ,value:x 0 4 y[0m
-2022/04/12 10:46:58.670869 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000005 ,value:x 4 5 y[0m
-2022/04/12 10:46:58.675950 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000004 ,value:x 3 4 y[0m
-2022/04/12 10:46:58.678478 peer_msg_handler.go:241: [0;37m[info] 5 start split region 1: splitKey:[51 32 48 48 48 48 48 48 48 48], startKey:[], endKey:[][0m
-2022/04/12 10:46:58.678539 peer.go:41: [0;37m[info] region id:6 start_key:"3 00000000" region_epoch:<conf_ver:1 version:2 > peers:<id:7 store_id:1 > peers:<id:8 store_id:2 > peers:<id:9 store_id:3 > peers:<id:10 store_id:4 > peers:<id:11 store_id:5 >  create peer with ID 11[0m
-2022/04/12 10:46:58.686105 peer_msg_handler.go:241: [0;37m[info] 5 start split region 1: splitKey:[51 32 48 48 48 48 48 48 48 48], startKey:[], endKey:[51 32 48 48 48 48 48 48 48 48][0m
-2022/04/12 10:46:58.688659 peer_msg_handler.go:427: [0;37m[info] [confChange]region 1 delete peer 2 storeId 5[0m
-2022/04/12 10:46:58.691152 peer_msg_handler.go:241: [0;37m[info] 5 start split region 1: splitKey:[51 32 48 48 48 48 48 48 48 48], startKey:[], endKey:[51 32 48 48 48 48 48 48 48 48][0m
-2022/04/12 10:46:58.696020 peer_msg_handler.go:241: [0;37m[info] 5 start split region 1: splitKey:[51 32 48 48 48 48 48 48 48 48], startKey:[], endKey:[51 32 48 48 48 48 48 48 48 48][0m
-2022/04/12 10:46:58.701032 peer_msg_handler.go:241: [0;37m[info] 5 start split region 1: splitKey:[51 32 48 48 48 48 48 48 48 48], startKey:[], endKey:[51 32 48 48 48 48 48 48 48 48][0m
-2022/04/12 10:46:58.705858 peer_msg_handler.go:241: [0;37m[info] 5 start split region 1: splitKey:[51 32 48 48 48 48 48 48 48 48], startKey:[], endKey:[51 32 48 48 48 48 48 48 48 48][0m
-2022/04/12 10:46:58.710892 peer_msg_handler.go:241: [0;37m[info] 5 start split region 1: splitKey:[51 32 48 48 48 48 48 48 48 48], startKey:[], endKey:[51 32 48 48 48 48 48 48 48 48][0m
-2022/04/12 10:46:58.718286 peer_msg_handler.go:241: [0;37m[info] 5 start split region 1: splitKey:[51 32 48 48 48 48 48 48 48 48], startKey:[], endKey:[51 32 48 48 48 48 48 48 48 48][0m
-2022/04/12 10:46:58.731135 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000004 ,value:x 0 4 y[0m
-2022/04/12 10:46:58.736307 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000005 ,value:x 0 5 y[0m
-2022/04/12 10:46:59.301638 test_test.go:104: [0;37m[info] partition: [2 3], [1 4 5][0m
-2022/04/12 10:46:59.563912 raft.go:349: [0;37m[info] [becomeLeader]10 become leader[0m
-2022/04/12 10:46:59.593709 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000005 ,value:x 4 5 y[0m
-2022/04/12 10:46:59.598457 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000005 ,value:x 4 5 y[0m
-2022/04/12 10:46:59.600852 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000004 ,value:x 3 4 y[0m
-2022/04/12 10:46:59.603244 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000005 ,value:x 4 5 y[0m
-2022/04/12 10:46:59.605562 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000004 ,value:x 3 4 y[0m
-2022/04/12 10:46:59.610178 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000004 ,value:x 3 4 y[0m
-2022/04/12 10:46:59.632228 test_test.go:220: [0;37m[info] +++scan result: x 4 0 yx 4 1 yx 4 2 yx 4 3 yx 4 4 yx 4 5 y[0m
-2022/04/12 10:46:59.646578 test_test.go:220: [0;37m[info] +++scan result: x 3 0 yx 3 1 yx 3 2 yx 3 3 yx 3 4 y[0m
-2022/04/12 10:46:59.667196 test_test.go:220: [0;37m[info] +++scan result: x 4 0 yx 4 1 yx 4 2 yx 4 3 yx 4 4 yx 4 5 y[0m
-2022/04/12 10:46:59.687597 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000005 ,value:x 3 5 y[0m
-2022/04/12 10:46:59.696561 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000005 ,value:x 3 5 y[0m
-2022/04/12 10:46:59.698882 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000005 ,value:x 3 5 y[0m
-2022/04/12 10:46:59.701864 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000006 ,value:x 4 6 y[0m
-2022/04/12 10:46:59.716080 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000006 ,value:x 4 6 y[0m
-2022/04/12 10:46:59.721215 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000006 ,value:x 4 6 y[0m
-2022/04/12 10:46:59.723969 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000006 ,value:x 3 6 y[0m
-2022/04/12 10:46:59.733096 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000006 ,value:x 3 6 y[0m
-2022/04/12 10:46:59.735458 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000006 ,value:x 3 6 y[0m
-2022/04/12 10:46:59.745378 test_test.go:220: [0;37m[info] +++scan result: x 4 0 yx 4 1 yx 4 2 yx 4 3 yx 4 4 yx 4 5 yx 4 6 y[0m
-2022/04/12 10:46:59.762443 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000007 ,value:x 3 7 y[0m
-2022/04/12 10:46:59.771924 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000007 ,value:x 3 7 y[0m
-2022/04/12 10:46:59.775375 test_test.go:220: [0;37m[info] +++scan result: x 4 0 yx 4 1 yx 4 2 yx 4 3 yx 4 4 yx 4 5 yx 4 6 y[0m
-2022/04/12 10:46:59.776742 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000007 ,value:x 3 7 y[0m
-2022/04/12 10:46:59.797098 test_test.go:220: [0;37m[info] +++scan result: x 3 0 yx 3 1 yx 3 2 yx 3 3 yx 3 4 yx 3 5 yx 3 6 yx 3 7 y[0m
-2022/04/12 10:46:59.811410 test_test.go:220: [0;37m[info] +++scan result: x 4 0 yx 4 1 yx 4 2 yx 4 3 yx 4 4 yx 4 5 yx 4 6 y[0m
-2022/04/12 10:46:59.844452 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000008 ,value:x 3 8 y[0m
-2022/04/12 10:46:59.848746 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000008 ,value:x 3 8 y[0m
-2022/04/12 10:46:59.853552 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000008 ,value:x 3 8 y[0m
-2022/04/12 10:46:59.858907 test_test.go:220: [0;37m[info] +++scan result: x 4 0 yx 4 1 yx 4 2 yx 4 3 yx 4 4 yx 4 5 yx 4 6 y[0m
-2022/04/12 10:46:59.877134 test_test.go:220: [0;37m[info] +++scan result: x 3 0 yx 3 1 yx 3 2 yx 3 3 yx 3 4 yx 3 5 yx 3 6 yx 3 7 yx 3 8 y[0m
-2022/04/12 10:46:59.896563 test_test.go:220: [0;37m[info] +++scan result: x 4 0 yx 4 1 yx 4 2 yx 4 3 yx 4 4 yx 4 5 yx 4 6 y[0m
-2022/04/12 10:46:59.910612 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000009 ,value:x 3 9 y[0m
-2022/04/12 10:46:59.919427 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000009 ,value:x 3 9 y[0m
-2022/04/12 10:46:59.921669 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000009 ,value:x 3 9 y[0m
-2022/04/12 10:46:59.931546 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000007 ,value:x 4 7 y[0m
-2022/04/12 10:46:59.940584 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000007 ,value:x 4 7 y[0m
-2022/04/12 10:46:59.943004 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000007 ,value:x 4 7 y[0m
-2022/04/12 10:46:59.946059 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000010 ,value:x 3 10 y[0m
-2022/04/12 10:46:59.954724 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000010 ,value:x 3 10 y[0m
-2022/04/12 10:46:59.957208 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000010 ,value:x 3 10 y[0m
-2022/04/12 10:46:59.965268 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000008 ,value:x 4 8 y[0m
-2022/04/12 10:46:59.972081 peer_msg_handler.go:461: [0;37m[info] [region 6] 10 on split with [52 32 48 48 48 48 48 48 48 48][0m
-2022/04/12 10:46:59.974500 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000008 ,value:x 4 8 y[0m
-2022/04/12 10:46:59.976951 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000008 ,value:x 4 8 y[0m
-2022/04/12 10:46:59.979953 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000011 ,value:x 3 11 y[0m
-2022/04/12 10:46:59.988610 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000011 ,value:x 3 11 y[0m
-2022/04/12 10:46:59.991061 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000011 ,value:x 3 11 y[0m
-2022/04/12 10:46:59.998778 test_test.go:104: [0;37m[info] partition: [2 5], [1 3 4][0m
-2022/04/12 10:47:00.004373 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000009 ,value:x 4 9 y[0m
-2022/04/12 10:47:00.014109 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000009 ,value:x 4 9 y[0m
-2022/04/12 10:47:00.016711 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000005 ,value:x 4 5 y[0m
-2022/04/12 10:47:00.019571 peer_msg_handler.go:241: [0;37m[info] 10 start split region 6: splitKey:[52 32 48 48 48 48 48 48 48 48], startKey:[51 32 48 48 48 48 48 48 48 48], endKey:[][0m
-2022/04/12 10:47:00.019644 peer.go:41: [0;37m[info] region id:54 start_key:"4 00000000" region_epoch:<conf_ver:1 version:3 > peers:<id:55 store_id:1 > peers:<id:56 store_id:2 > peers:<id:57 store_id:3 > peers:<id:58 store_id:4 > peers:<id:59 store_id:5 >  create peer with ID 58[0m
-2022/04/12 10:47:00.021614 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000004 ,value:x 3 4 y[0m
-2022/04/12 10:47:00.031099 peer_msg_handler.go:241: [0;37m[info] 7 start split region 6: splitKey:[52 32 48 48 48 48 48 48 48 48], startKey:[51 32 48 48 48 48 48 48 48 48], endKey:[][0m
-2022/04/12 10:47:00.031166 peer.go:41: [0;37m[info] region id:54 start_key:"4 00000000" region_epoch:<conf_ver:1 version:3 > peers:<id:55 store_id:1 > peers:<id:56 store_id:2 > peers:<id:57 store_id:3 > peers:<id:58 store_id:4 > peers:<id:59 store_id:5 >  create peer with ID 55[0m
-2022/04/12 10:47:00.040439 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000012 ,value:x 3 12 y[0m
-2022/04/12 10:47:00.049820 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000005 ,value:x 3 5 y[0m
-2022/04/12 10:47:00.052155 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000012 ,value:x 3 12 y[0m
-2022/04/12 10:47:00.056862 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000006 ,value:x 4 6 y[0m
-2022/04/12 10:47:00.059535 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000006 ,value:x 3 6 y[0m
-2022/04/12 10:47:00.066736 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000007 ,value:x 3 7 y[0m
-2022/04/12 10:47:00.078825 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000008 ,value:x 3 8 y[0m
-2022/04/12 10:47:00.091679 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000009 ,value:x 3 9 y[0m
-2022/04/12 10:47:00.094148 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000007 ,value:x 4 7 y[0m
-2022/04/12 10:47:00.096570 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000010 ,value:x 3 10 y[0m
-2022/04/12 10:47:00.099072 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000008 ,value:x 4 8 y[0m
-2022/04/12 10:47:00.101471 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000011 ,value:x 3 11 y[0m
-2022/04/12 10:47:00.103969 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000009 ,value:x 4 9 y[0m
-2022/04/12 10:47:00.109089 peer_msg_handler.go:241: [0;37m[info] 9 start split region 6: splitKey:[52 32 48 48 48 48 48 48 48 48], startKey:[51 32 48 48 48 48 48 48 48 48], endKey:[][0m
-2022/04/12 10:47:00.109152 peer.go:41: [0;37m[info] region id:54 start_key:"4 00000000" region_epoch:<conf_ver:1 version:3 > peers:<id:55 store_id:1 > peers:<id:56 store_id:2 > peers:<id:57 store_id:3 > peers:<id:58 store_id:4 > peers:<id:59 store_id:5 >  create peer with ID 57[0m
-2022/04/12 10:47:00.123541 test_test.go:220: [0;37m[info] +++scan result: x 3 0 yx 3 1 yx 3 2 yx 3 3 yx 3 4 yx 3 5 yx 3 6 yx 3 7 yx 3 8 yx 3 9 yx 3 10 yx 3 11 yx 3 12 y[0m
-2022/04/12 10:47:00.125777 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000012 ,value:x 3 12 y[0m
-2022/04/12 10:47:00.152764 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000013 ,value:x 3 13 y[0m
-2022/04/12 10:47:00.155025 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000013 ,value:x 3 13 y[0m
-2022/04/12 10:47:00.157345 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000013 ,value:x 3 13 y[0m
-2022/04/12 10:47:00.185728 test_test.go:220: [0;37m[info] +++scan result: x 3 0 yx 3 1 yx 3 2 yx 3 3 yx 3 4 yx 3 5 yx 3 6 yx 3 7 yx 3 8 yx 3 9 yx 3 10 yx 3 11 yx 3 12 yx 3 13 y[0m
-2022/04/12 10:47:00.207403 test_test.go:220: [0;37m[info] +++scan result: x 3 0 yx 3 1 yx 3 2 yx 3 3 yx 3 4 yx 3 5 yx 3 6 yx 3 7 yx 3 8 yx 3 9 yx 3 10 yx 3 11 yx 3 12 yx 3 13 y[0m
-2022/04/12 10:47:00.227990 test_test.go:220: [0;37m[info] +++scan result: x 3 0 yx 3 1 yx 3 2 yx 3 3 yx 3 4 yx 3 5 yx 3 6 yx 3 7 yx 3 8 yx 3 9 yx 3 10 yx 3 11 yx 3 12 yx 3 13 y[0m
-2022/04/12 10:47:00.247917 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000014 ,value:x 3 14 y[0m
-2022/04/12 10:47:00.249775 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000014 ,value:x 3 14 y[0m
-2022/04/12 10:47:00.252084 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000014 ,value:x 3 14 y[0m
-2022/04/12 10:47:00.276395 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000015 ,value:x 3 15 y[0m
-2022/04/12 10:47:00.278744 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000015 ,value:x 3 15 y[0m
-2022/04/12 10:47:00.283396 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000015 ,value:x 3 15 y[0m
-2022/04/12 10:47:00.296698 test_test.go:220: [0;37m[info] +++scan result: x 3 0 yx 3 1 yx 3 2 yx 3 3 yx 3 4 yx 3 5 yx 3 6 yx 3 7 yx 3 8 yx 3 9 yx 3 10 yx 3 11 yx 3 12 yx 3 13 yx 3 14 yx 3 15 y[0m
-2022/04/12 10:47:00.366207 raft.go:349: [0;37m[info] [becomeLeader]4 become leader[0m
-2022/04/12 10:47:00.391119 peer_msg_handler.go:427: [0;37m[info] [confChange]region 1 delete peer 3 storeId 4[0m
-2022/04/12 10:47:00.396005 peer_msg_handler.go:427: [0;37m[info] [confChange]region 1 delete peer 3 storeId 1[0m
-2022/04/12 10:47:00.400600 peer_msg_handler.go:401: [0;37m[info] [confChange]region 1 delete peer 3 storeId 3[0m
-2022/04/12 10:47:00.400623 peer_msg_handler.go:887: [0;37m[info] [region 1] 3 starts destroy[0m
-2022/04/12 10:47:00.400631 peer.go:209: [0;37m[info] [region 1] 3 begin to destroy[0m
-2022/04/12 10:47:00.400682 peer_storage.go:298: [0;37m[info] [region 1] clear peer 1 meta key 1 apply key 1 raft key and 73 raft logs, takes 40.635µs[0m
-2022/04/12 10:47:00.417871 peer.go:237: [0;37m[info] [region 1] 3 destroy itself, takes 17.234561ms[0m
-2022/04/12 10:47:00.423027 region_task.go:137: [0;37m[info] succeed in deleting data in range. [regionId: 1, startKey: , endKey: 33203030303030303030][0m
-2022/04/12 10:47:00.430535 test_test.go:220: [0;37m[info] +++scan result: x 0 0 yx 0 1 yx 0 2 yx 0 3 yx 0 4 yx 0 5 y[0m
-2022/04/12 10:47:00.435445 peer_msg_handler.go:796: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:3 version:2  ignore it[0m
-2022/04/12 10:47:00.446033 test_test.go:220: [0;37m[info] +++scan result: x 0 0 yx 0 1 yx 0 2 yx 0 3 yx 0 4 yx 0 5 y[0m
-2022/04/12 10:47:00.453790 peer_msg_handler.go:427: [0;37m[info] [confChange]region 1 delete peer 5 storeId 4[0m
-2022/04/12 10:47:00.460755 peer_msg_handler.go:427: [0;37m[info] [confChange]region 1 delete peer 5 storeId 1[0m
-2022/04/12 10:47:00.468023 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000006 ,value:x 0 6 y[0m
-2022/04/12 10:47:00.478129 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000006 ,value:x 0 6 y[0m
-2022/04/12 10:47:00.493124 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000007 ,value:x 0 7 y[0m
-2022/04/12 10:47:00.495765 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000007 ,value:x 0 7 y[0m
-2022/04/12 10:47:00.501030 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000016 ,value:x 3 16 y[0m
-2022/04/12 10:47:00.503352 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000016 ,value:x 3 16 y[0m
-2022/04/12 10:47:00.508152 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000016 ,value:x 3 16 y[0m
-2022/04/12 10:47:00.527875 test_test.go:220: [0;37m[info] +++scan result: x 0 0 yx 0 1 yx 0 2 yx 0 3 yx 0 4 yx 0 5 yx 0 6 yx 0 7 y[0m
-2022/04/12 10:47:00.540515 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000017 ,value:x 3 17 y[0m
-2022/04/12 10:47:00.542648 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000017 ,value:x 3 17 y[0m
-2022/04/12 10:47:00.543943 test_test.go:104: [0;37m[info] partition: [1 4], [2 3 5][0m
-2022/04/12 10:47:00.547475 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000017 ,value:x 3 17 y[0m
-2022/04/12 10:47:00.560915 test_test.go:220: [0;37m[info] +++scan result: x 0 0 yx 0 1 yx 0 2 yx 0 3 yx 0 4 yx 0 5 yx 0 6 yx 0 7 y[0m
-2022/04/12 10:47:00.578246 test_test.go:220: [0;37m[info] +++scan result: x 0 0 yx 0 1 yx 0 2 yx 0 3 yx 0 4 yx 0 5 yx 0 6 yx 0 7 y[0m
-2022/04/12 10:47:00.595309 test_test.go:220: [0;37m[info] +++scan result: x 0 0 yx 0 1 yx 0 2 yx 0 3 yx 0 4 yx 0 5 yx 0 6 yx 0 7 y[0m
-2022/04/12 10:47:00.607966 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000008 ,value:x 0 8 y[0m
-2022/04/12 10:47:00.610709 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000008 ,value:x 0 8 y[0m
-2022/04/12 10:47:00.628464 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000009 ,value:x 0 9 y[0m
-2022/04/12 10:47:00.631259 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000009 ,value:x 0 9 y[0m
-2022/04/12 10:47:00.634077 raft.go:349: [0;37m[info] [becomeLeader]1 become leader[0m
-2022/04/12 10:47:00.654824 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000010 ,value:x 0 10 y[0m
-2022/04/12 10:47:00.657363 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000010 ,value:x 0 10 y[0m
-2022/04/12 10:47:00.668291 test_test.go:220: [0;37m[info] +++scan result: x 0 0 yx 0 1 yx 0 2 yx 0 3 yx 0 4 yx 0 5 yx 0 6 yx 0 7 yx 0 8 yx 0 9 yx 0 10 y[0m
-2022/04/12 10:47:00.681515 test_test.go:220: [0;37m[info] +++scan result: x 0 0 yx 0 1 yx 0 2 yx 0 3 yx 0 4 yx 0 5 yx 0 6 yx 0 7 yx 0 8 yx 0 9 yx 0 10 y[0m
-2022/04/12 10:47:00.708921 peer_msg_handler.go:461: [0;37m[info] [region 1] 1 on split with [49 32 48 48 48 48 48 48 48 48][0m
-2022/04/12 10:47:00.726931 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000011 ,value:x 0 11 y[0m
-2022/04/12 10:47:00.729626 peer_msg_handler.go:427: [0;37m[info] [confChange]region 1 delete peer 4 storeId 1[0m
-2022/04/12 10:47:00.732334 peer_msg_handler.go:796: [0;37m[info] [region 1] raft message MsgAppendResponse is stale, current conf_ver:5 version:2  ignore it[0m
-2022/04/12 10:47:00.734940 peer_msg_handler.go:241: [0;37m[info] 1 start split region 1: splitKey:[49 32 48 48 48 48 48 48 48 48], startKey:[], endKey:[51 32 48 48 48 48 48 48 48 48][0m
-2022/04/12 10:47:00.737525 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000012 ,value:x 0 12 y[0m
-2022/04/12 10:47:00.742823 test_test.go:220: [0;37m[info] +++scan result: x 0 0 yx 0 1 yx 0 2 yx 0 3 yx 0 4 yx 0 5 yx 0 6 yx 0 7 yx 0 8 yx 0 9 yx 0 10 yx 0 11 yx 0 12 y[0m
-2022/04/12 10:47:00.748156 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000013 ,value:x 0 13 y[0m
-2022/04/12 10:47:00.753404 test_test.go:220: [0;37m[info] +++scan result: x 0 0 yx 0 1 yx 0 2 yx 0 3 yx 0 4 yx 0 5 yx 0 6 yx 0 7 yx 0 8 yx 0 9 yx 0 10 yx 0 11 yx 0 12 yx 0 13 y[0m
-2022/04/12 10:47:00.758456 test_test.go:220: [0;37m[info] +++scan result: x 0 0 yx 0 1 yx 0 2 yx 0 3 yx 0 4 yx 0 5 yx 0 6 yx 0 7 yx 0 8 yx 0 9 yx 0 10 yx 0 11 yx 0 12 yx 0 13 y[0m
-2022/04/12 10:47:00.765732 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000014 ,value:x 0 14 y[0m
-2022/04/12 10:47:00.765869 store_worker.go:82: [0;31m[error] handle raft message failed storeID 3, tombstone peer [epoch: conf_ver:2 version:2 ] received an invalid message MsgRequestVote, ignore it[0m
-2022/04/12 10:47:00.770903 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000015 ,value:x 0 15 y[0m
-2022/04/12 10:47:00.776030 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000016 ,value:x 0 16 y[0m
-2022/04/12 10:47:00.781212 test_test.go:220: [0;37m[info] +++scan result: x 0 0 yx 0 1 yx 0 2 yx 0 3 yx 0 4 yx 0 5 yx 0 6 yx 0 7 yx 0 8 yx 0 9 yx 0 10 yx 0 11 yx 0 12 yx 0 13 yx 0 14 yx 0 15 yx 0 16 y[0m
-2022/04/12 10:47:00.786358 test_test.go:220: [0;37m[info] +++scan result: x 0 0 yx 0 1 yx 0 2 yx 0 3 yx 0 4 yx 0 5 yx 0 6 yx 0 7 yx 0 8 yx 0 9 yx 0 10 yx 0 11 yx 0 12 yx 0 13 yx 0 14 yx 0 15 yx 0 16 y[0m
-2022/04/12 10:47:00.791279 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000017 ,value:x 0 17 y[0m
-2022/04/12 10:47:00.796387 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000018 ,value:x 0 18 y[0m
-2022/04/12 10:47:00.801665 test_test.go:220: [0;37m[info] +++scan result: x 0 0 yx 0 1 yx 0 2 yx 0 3 yx 0 4 yx 0 5 yx 0 6 yx 0 7 yx 0 8 yx 0 9 yx 0 10 yx 0 11 yx 0 12 yx 0 13 yx 0 14 yx 0 15 yx 0 16 yx 0 17 yx 0 18 y[0m
-2022/04/12 10:47:00.806667 test_test.go:220: [0;37m[info] +++scan result: x 0 0 yx 0 1 yx 0 2 yx 0 3 yx 0 4 yx 0 5 yx 0 6 yx 0 7 yx 0 8 yx 0 9 yx 0 10 yx 0 11 yx 0 12 yx 0 13 yx 0 14 yx 0 15 yx 0 16 yx 0 17 yx 0 18 y[0m
-2022/04/12 10:47:00.816185 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000019 ,value:x 0 19 y[0m
-2022/04/12 10:47:00.821690 peer_msg_handler.go:461: [0;37m[info] [region 1] 1 on split with [48 32 48 48 48 48 48 48 49 49][0m
-2022/04/12 10:47:00.824333 peer_msg_handler.go:396: [0;37m[info] [confChange]region 1 add peer 63 storeId 4[0m
-2022/04/12 10:47:00.827017 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000020 ,value:x 0 20 y[0m
-2022/04/12 10:47:00.829652 peer_storage.go:182: [0;37m[info] [region 1] 1 requesting snapshot[0m
-2022/04/12 10:47:00.830416 snap.go:549: [0;37m[info] region 1 scan snapshot /tmp/test-raftstore233196654/snap/gen_1_13_113_(default|write|lock).sst, key count 28, size 711[0m
-2022/04/12 10:47:00.832267 peer_msg_handler.go:778: [0;37m[info] [region 1] 4 is stale as received a larger peer id:63 store_id:4 , destroying[0m
-2022/04/12 10:47:00.832295 peer_msg_handler.go:887: [0;37m[info] [region 1] 4 starts destroy[0m
-2022/04/12 10:47:00.832305 peer.go:209: [0;37m[info] [region 1] 4 begin to destroy[0m
-2022/04/12 10:47:00.832379 peer_storage.go:298: [0;37m[info] [region 1] clear peer 1 meta key 1 apply key 1 raft key and 90 raft logs, takes 60.63µs[0m
-2022/04/12 10:47:00.843287 peer.go:237: [0;37m[info] [region 1] 4 destroy itself, takes 10.978591ms[0m
-2022/04/12 10:47:00.843378 peer.go:51: [0;37m[info] [region 1] replicates peer with ID 63[0m
-2022/04/12 10:47:00.845931 region_task.go:137: [0;37m[info] succeed in deleting data in range. [regionId: 1, startKey: , endKey: 33203030303030303030][0m
-2022/04/12 10:47:00.850728 raft.go:258: [0;37m[info] [sendSnapshot]1 send snapshot to 63[0m
-2022/04/12 10:47:00.862126 peer_storage.go:341: [0;37m[info] [region 1] 63 begin to apply snapshot[0m
-2022/04/12 10:47:00.862170 region_task.go:93: [0;37m[info] begin apply snap data. [regionId: 1][0m
-2022/04/12 10:47:00.862216 region_task.go:137: [0;37m[info] succeed in deleting data in range. [regionId: 1, startKey: , endKey: 33203030303030303030][0m
-2022/04/12 10:47:00.903854 snap.go:704: [0;37m[info] apply snapshot ingested 1 tables[0m
-2022/04/12 10:47:00.903889 region_task.go:117: [0;37m[info] applying new data. [regionId: 1, timeTakes: 41.516181ms][0m
-2022/04/12 10:47:00.908927 peer_msg_handler.go:461: [0;37m[info] [region 1] 1 on split with [48 32 48 48 48 48 48 48 49 49][0m
-2022/04/12 10:47:00.931728 peer_msg_handler.go:241: [0;37m[info] 1 start split region 1: splitKey:[48 32 48 48 48 48 48 48 49 49], startKey:[], endKey:[51 32 48 48 48 48 48 48 48 48][0m
-panic: runtime error: index out of range [1] with length 1
-
-goroutine 292 [running]:
-github.com/pingcap-incubator/tinykv/kv/raftstore.(*peerMsgHandler).applyAdminRequest(0xc17bd97e08, 0xc17bd97ab8, 0x0, 0xd, 0x72, 0xc17c87ade0, 0x27, 0x27, 0x0, 0x0, ...)
-	/home/tinykv/kv/raftstore/peer_msg_handler.go:269 +0xf75
-github.com/pingcap-incubator/tinykv/kv/raftstore.(*peerMsgHandler).applyAndResponseEntry(0xc17bd97e08, 0xc17bd97ab8, 0x0, 0xd, 0x72, 0xc17c87ade0, 0x27, 0x27, 0x0, 0x0, ...)
-	/home/tinykv/kv/raftstore/peer_msg_handler.go:111 +0x233
-github.com/pingcap-incubator/tinykv/kv/raftstore.(*peerMsgHandler).HandleRaftReady(0xc17bd97e08)
-	/home/tinykv/kv/raftstore/peer_msg_handler.go:84 +0x214
-github.com/pingcap-incubator/tinykv/kv/raftstore.(*raftWorker).run(0xc0000eac40, 0xc09338e360, 0xc13fcc2520)
-	/home/tinykv/kv/raftstore/raft_worker.go:57 +0x33e
-created by github.com/pingcap-incubator/tinykv/kv/raftstore.(*Raftstore).startWorkers
-	/home/tinykv/kv/raftstore/raftstore.go:278 +0xe6
-FAIL	github.com/pingcap-incubator/tinykv/kv/test_raftstore	6.091s
+2022/05/05 18:31:25.493277 node.go:193: [0;37m[info] start raft store node, storeID: 3[0m
+2022/05/05 18:31:25.493664 peer.go:41: [0;37m[info] region id:1 region_epoch:<conf_ver:1 version:1 > peers:<id:3 store_id:3 > peers:<id:4 store_id:4 > peers:<id:5 store_id:5 > peers:<id:1 store_id:1 > peers:<id:2 store_id:2 >  create peer with ID 3[0m
+2022/05/05 18:31:25.493749 raftstore.go:177: [0;37m[info] start store 3, region_count 1, tombstone_count 0, takes 230.741µs[0m
+2022/05/05 18:31:25.494182 node.go:193: [0;37m[info] start raft store node, storeID: 4[0m
+2022/05/05 18:31:25.494290 peer.go:41: [0;37m[info] region id:1 region_epoch:<conf_ver:1 version:1 > peers:<id:3 store_id:3 > peers:<id:4 store_id:4 > peers:<id:5 store_id:5 > peers:<id:1 store_id:1 > peers:<id:2 store_id:2 >  create peer with ID 4[0m
+2022/05/05 18:31:25.494335 raftstore.go:177: [0;37m[info] start store 4, region_count 1, tombstone_count 0, takes 78.18µs[0m
+2022/05/05 18:31:25.494678 node.go:193: [0;37m[info] start raft store node, storeID: 5[0m
+2022/05/05 18:31:25.494776 peer.go:41: [0;37m[info] region id:1 region_epoch:<conf_ver:1 version:1 > peers:<id:3 store_id:3 > peers:<id:4 store_id:4 > peers:<id:5 store_id:5 > peers:<id:1 store_id:1 > peers:<id:2 store_id:2 >  create peer with ID 5[0m
+2022/05/05 18:31:25.494833 raftstore.go:177: [0;37m[info] start store 5, region_count 1, tombstone_count 0, takes 86.389µs[0m
+2022/05/05 18:31:25.495202 node.go:193: [0;37m[info] start raft store node, storeID: 1[0m
+2022/05/05 18:31:25.495297 peer.go:41: [0;37m[info] region id:1 region_epoch:<conf_ver:1 version:1 > peers:<id:3 store_id:3 > peers:<id:4 store_id:4 > peers:<id:5 store_id:5 > peers:<id:1 store_id:1 > peers:<id:2 store_id:2 >  create peer with ID 1[0m
+2022/05/05 18:31:25.495351 raftstore.go:177: [0;37m[info] start store 1, region_count 1, tombstone_count 0, takes 83.297µs[0m
+2022/05/05 18:31:25.495753 node.go:193: [0;37m[info] start raft store node, storeID: 2[0m
+2022/05/05 18:31:25.495851 peer.go:41: [0;37m[info] region id:1 region_epoch:<conf_ver:1 version:1 > peers:<id:3 store_id:3 > peers:<id:4 store_id:4 > peers:<id:5 store_id:5 > peers:<id:1 store_id:1 > peers:<id:2 store_id:2 >  create peer with ID 2[0m
+2022/05/05 18:31:25.495894 raftstore.go:177: [0;37m[info] start store 2, region_count 1, tombstone_count 0, takes 76.405µs[0m
+2022/05/05 18:31:26.005206 raft.go:349: [0;37m[info] [becomeLeader]5 become leader[0m
+2022/05/05 18:31:26.496238 test_test.go:220: [0;37m[info] +++scan result: [0m
+2022/05/05 18:31:26.496238 test_test.go:220: [0;37m[info] +++scan result: [0m
+2022/05/05 18:31:26.516085 peer_msg_handler.go:132: [0;37m[info] ****put key:2 00000000 ,value:x 2 0 y[0m
+2022/05/05 18:31:26.521446 peer_msg_handler.go:132: [0;37m[info] ****put key:2 00000000 ,value:x 2 0 y[0m
+2022/05/05 18:31:26.521493 peer_msg_handler.go:132: [0;37m[info] ****put key:2 00000000 ,value:x 2 0 y[0m
+2022/05/05 18:31:26.521517 peer_msg_handler.go:132: [0;37m[info] ****put key:2 00000000 ,value:x 2 0 y[0m
+2022/05/05 18:31:26.527332 peer_msg_handler.go:132: [0;37m[info] ****put key:1 00000000 ,value:x 1 0 y[0m
+2022/05/05 18:31:26.527300 peer_msg_handler.go:132: [0;37m[info] ****put key:2 00000000 ,value:x 2 0 y[0m
+2022/05/05 18:31:26.533287 peer_msg_handler.go:132: [0;37m[info] ****put key:1 00000000 ,value:x 1 0 y[0m
+2022/05/05 18:31:26.533316 peer_msg_handler.go:132: [0;37m[info] ****put key:1 00000000 ,value:x 1 0 y[0m
+2022/05/05 18:31:26.533292 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000000 ,value:x 4 0 y[0m
+2022/05/05 18:31:26.539055 peer_msg_handler.go:132: [0;37m[info] ****put key:1 00000000 ,value:x 1 0 y[0m
+2022/05/05 18:31:26.539088 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000000 ,value:x 4 0 y[0m
+2022/05/05 18:31:26.539126 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000000 ,value:x 0 0 y[0m
+2022/05/05 18:31:26.539097 peer_msg_handler.go:132: [0;37m[info] ****put key:1 00000000 ,value:x 1 0 y[0m
+2022/05/05 18:31:26.539096 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000000 ,value:x 4 0 y[0m
+2022/05/05 18:31:26.544613 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000000 ,value:x 3 0 y[0m
+2022/05/05 18:31:26.544638 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000000 ,value:x 4 0 y[0m
+2022/05/05 18:31:26.544672 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000000 ,value:x 4 0 y[0m
+2022/05/05 18:31:26.544645 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000000 ,value:x 0 0 y[0m
+2022/05/05 18:31:26.544665 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000000 ,value:x 0 0 y[0m
+2022/05/05 18:31:26.550468 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000000 ,value:x 3 0 y[0m
+2022/05/05 18:31:26.550510 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000000 ,value:x 3 0 y[0m
+2022/05/05 18:31:26.550473 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000000 ,value:x 0 0 y[0m
+2022/05/05 18:31:26.550476 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000000 ,value:x 0 0 y[0m
+2022/05/05 18:31:26.556098 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000000 ,value:x 3 0 y[0m
+2022/05/05 18:31:26.556112 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000000 ,value:x 3 0 y[0m
+2022/05/05 18:31:26.556333 peer_msg_handler.go:132: [0;37m[info] ****put key:2 00000001 ,value:x 2 1 y[0m
+2022/05/05 18:31:26.564334 peer_msg_handler.go:132: [0;37m[info] ****put key:2 00000001 ,value:x 2 1 y[0m
+2022/05/05 18:31:26.567276 peer_msg_handler.go:132: [0;37m[info] ****put key:2 00000001 ,value:x 2 1 y[0m
+2022/05/05 18:31:26.567284 peer_msg_handler.go:132: [0;37m[info] ****put key:2 00000001 ,value:x 2 1 y[0m
+2022/05/05 18:31:26.570079 peer_msg_handler.go:132: [0;37m[info] ****put key:2 00000001 ,value:x 2 1 y[0m
+2022/05/05 18:31:26.578480 peer_msg_handler.go:132: [0;37m[info] ****put key:1 00000001 ,value:x 1 1 y[0m
+2022/05/05 18:31:26.583625 peer_msg_handler.go:132: [0;37m[info] ****put key:1 00000001 ,value:x 1 1 y[0m
+2022/05/05 18:31:26.583675 peer_msg_handler.go:132: [0;37m[info] ****put key:1 00000001 ,value:x 1 1 y[0m
+2022/05/05 18:31:26.583750 peer_msg_handler.go:132: [0;37m[info] ****put key:1 00000001 ,value:x 1 1 y[0m
+2022/05/05 18:31:26.586460 peer_msg_handler.go:132: [0;37m[info] ****put key:1 00000001 ,value:x 1 1 y[0m
+2022/05/05 18:31:26.586490 test_test.go:220: [0;37m[info] +++scan result: x 4 0 y[0m
+2022/05/05 18:31:26.592307 test_test.go:220: [0;37m[info] +++scan result: x 0 0 y[0m
+2022/05/05 18:31:26.597365 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000001 ,value:x 3 1 y[0m
+2022/05/05 18:31:26.599902 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000001 ,value:x 3 1 y[0m
+2022/05/05 18:31:26.602737 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000001 ,value:x 3 1 y[0m
+2022/05/05 18:31:26.608380 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000001 ,value:x 3 1 y[0m
+2022/05/05 18:31:26.608412 peer_msg_handler.go:132: [0;37m[info] ****put key:3 00000001 ,value:x 3 1 y[0m
+2022/05/05 18:31:26.608858 test_test.go:220: [0;37m[info] +++scan result: x 2 0 yx 2 1 y[0m
+2022/05/05 18:31:26.622213 peer_msg_handler.go:132: [0;37m[info] ****put key:1 00000002 ,value:x 1 2 y[0m
+2022/05/05 18:31:26.627986 test_test.go:220: [0;37m[info] +++scan result: x 4 0 y[0m
+2022/05/05 18:31:26.627991 peer_msg_handler.go:132: [0;37m[info] ****put key:1 00000002 ,value:x 1 2 y[0m
+2022/05/05 18:31:26.633359 peer_msg_handler.go:132: [0;37m[info] ****put key:1 00000002 ,value:x 1 2 y[0m
+2022/05/05 18:31:26.633384 test_test.go:220: [0;37m[info] +++scan result: x 0 0 y[0m
+2022/05/05 18:31:26.633417 peer_msg_handler.go:132: [0;37m[info] ****put key:1 00000002 ,value:x 1 2 y[0m
+2022/05/05 18:31:26.633362 peer_msg_handler.go:132: [0;37m[info] ****put key:1 00000002 ,value:x 1 2 y[0m
+2022/05/05 18:31:26.647107 test_test.go:220: [0;37m[info] +++scan result: x 3 0 yx 3 1 y[0m
+2022/05/05 18:31:26.655280 peer_msg_handler.go:132: [0;37m[info] ****put key:2 00000002 ,value:x 2 2 y[0m
+2022/05/05 18:31:26.663580 peer_msg_handler.go:132: [0;37m[info] ****put key:2 00000002 ,value:x 2 2 y[0m
+2022/05/05 18:31:26.663614 peer_msg_handler.go:132: [0;37m[info] ****put key:2 00000002 ,value:x 2 2 y[0m
+2022/05/05 18:31:26.669379 peer_msg_handler.go:132: [0;37m[info] ****put key:2 00000002 ,value:x 2 2 y[0m
+2022/05/05 18:31:26.669657 test_test.go:220: [0;37m[info] +++scan result: x 1 0 yx 1 1 yx 1 2 y[0m
+2022/05/05 18:31:26.678975 test_test.go:220: [0;37m[info] +++scan result: x 4 0 y[0m
+2022/05/05 18:31:26.687423 peer_msg_handler.go:132: [0;37m[info] ****put key:2 00000002 ,value:x 2 2 y[0m
+2022/05/05 18:31:26.687462 test_test.go:220: [0;37m[info] +++scan result: x 0 0 y[0m
+2022/05/05 18:31:26.701866 test_test.go:220: [0;37m[info] +++scan result: x 3 0 yx 3 1 y[0m
+2022/05/05 18:31:26.707507 test_test.go:220: [0;37m[info] +++scan result: x 2 0 yx 2 1 yx 2 2 y[0m
+2022/05/05 18:31:26.724757 peer_msg_handler.go:132: [0;37m[info] ****put key:1 00000003 ,value:x 1 3 y[0m
+2022/05/05 18:31:26.730623 test_test.go:220: [0;37m[info] +++scan result: x 4 0 y[0m
+2022/05/05 18:31:26.736532 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000001 ,value:x 0 1 y[0m
+2022/05/05 18:31:26.739730 peer_msg_handler.go:132: [0;37m[info] ****put key:1 00000003 ,value:x 1 3 y[0m
+2022/05/05 18:31:26.742494 peer_msg_handler.go:132: [0;37m[info] ****put key:1 00000003 ,value:x 1 3 y[0m
+2022/05/05 18:31:26.742504 peer_msg_handler.go:132: [0;37m[info] ****put key:1 00000003 ,value:x 1 3 y[0m
+2022/05/05 18:31:26.742514 peer_msg_handler.go:132: [0;37m[info] ****put key:1 00000003 ,value:x 1 3 y[0m
+2022/05/05 18:31:26.751093 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000001 ,value:x 0 1 y[0m
+2022/05/05 18:31:26.751133 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000001 ,value:x 0 1 y[0m
+2022/05/05 18:31:26.754100 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000001 ,value:x 0 1 y[0m
+2022/05/05 18:31:26.754170 peer_msg_handler.go:132: [0;37m[info] ****put key:0 00000001 ,value:x 0 1 y[0m
+2022/05/05 18:31:26.757113 test_test.go:220: [0;37m[info] +++scan result: x 3 0 yx 3 1 y[0m
+2022/05/05 18:31:26.762838 peer_msg_handler.go:132: [0;37m[info] ****put key:2 00000003 ,value:x 2 3 y[0m
+2022/05/05 18:31:26.772208 peer_msg_handler.go:132: [0;37m[info] ****put key:2 00000003 ,value:x 2 3 y[0m
+2022/05/05 18:31:26.775181 peer_msg_handler.go:132: [0;37m[info] ****put key:2 00000003 ,value:x 2 3 y[0m
+2022/05/05 18:31:26.775370 peer_msg_handler.go:132: [0;37m[info] ****put key:1 00000004 ,value:x 1 4 y[0m
+2022/05/05 18:31:26.784966 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000001 ,value:x 4 1 y[0m
+2022/05/05 18:31:26.785021 peer_msg_handler.go:132: [0;37m[info] ****put key:2 00000003 ,value:x 2 3 y[0m
+2022/05/05 18:31:26.784986 peer_msg_handler.go:132: [0;37m[info] ****put key:2 00000003 ,value:x 2 3 y[0m
+2022/05/05 18:31:26.785222 peer_msg_handler.go:132: [0;37m[info] ****put key:1 00000004 ,value:x 1 4 y[0m
+2022/05/05 18:31:26.788140 peer_msg_handler.go:132: [0;37m[info] ****put key:1 00000004 ,value:x 1 4 y[0m
+2022/05/05 18:31:26.791149 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000001 ,value:x 4 1 y[0m
+2022/05/05 18:31:26.794028 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000001 ,value:x 4 1 y[0m
+2022/05/05 18:31:26.794092 peer_msg_handler.go:132: [0;37m[info] ****put key:1 00000004 ,value:x 1 4 y[0m
+2022/05/05 18:31:26.794342 test_test.go:220: [0;37m[info] +++scan result: x 0 0 yx 0 1 y[0m
+2022/05/05 18:31:26.796317 test_test.go:104: [0;37m[info] partition: [1 3 4], [2 5][0m
+2022/05/05 18:31:26.796911 peer_msg_handler.go:132: [0;37m[info] ****put key:1 00000004 ,value:x 1 4 y[0m
+2022/05/05 18:31:26.802224 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000001 ,value:x 4 1 y[0m
+2022/05/05 18:31:26.802306 peer_msg_handler.go:132: [0;37m[info] ****put key:4 00000001 ,value:x 4 1 y[0m
+2022/05/05 18:31:26.802348 test_test.go:220: [0;37m[info] +++scan result: x 3 0 yx 3 1 y[0m
+2022/05/05 18:31:26.808103 peer_msg_handler.go:132: [0;37m[info] ****put key:2 00000004 ,value:x 2 4 y[0m
+2022/05/05 18:31:26.813951 peer_msg_handler.go:132: [0;37m[info] ****put key:2 00000004 ,value:x 2 4 y[0m
+2022/05/05 18:31:26.816742 peer_msg_handler.go:132: [0;37m[info] ****put key:2 00000004 ,value:x 2 4 y[0m
+2022/05/05 18:31:26.834789 peer_msg_handler.go:132: [0;37m[info] ****put key:2 00000004 ,value:x 2 4 y[0m
+2022/05/05 18:31:27.328521 test_test.go:104: [0;37m[info] partition: [1 3 5], [2 4][0m
+2022/05/05 18:31:28.020656 test_test.go:104: [0;37m[info] partition: [4], [1 2 3 5][0m
+2022/05/05 18:31:28.606495 raft.go:349: [0;37m[info] [becomeLeader]5 become leader[0m
+2022/05/05 18:31:28.618811 test_test.go:104: [0;37m[info] partition: [1 2 3], [4 5][0m
+2022/05/05 18:31:28.749268 peer_msg_handler.go:405: [0;37m[info] [confChange]region 1 delete peer 5 storeId 5[0m
+2022/05/05 18:31:28.749294 peer_msg_handler.go:891: [0;37m[info] [region 1] 5 starts destroy[0m
+2022/05/05 18:31:28.749318 peer.go:209: [0;37m[info] [region 1] 5 begin to destroy[0m
+2022/05/05 18:31:28.749389 peer_storage.go:298: [0;37m[info] [region 1] clear peer 1 meta key 1 apply key 1 raft key and 48 raft logs, takes 51.66µs[0m
+2022/05/05 18:31:28.759258 peer_msg_handler.go:431: [0;37m[info] [confChange]region 1 delete peer 5 storeId 4[0m
+2022/05/05 18:31:28.768059 peer.go:237: [0;37m[info] [region 1] 5 destroy itself, takes 18.73654ms[0m
+2022/05/05 18:31:28.779051 region_task.go:137: [0;37m[info] succeed in deleting data in range. [regionId: 1, startKey: , endKey: ][0m
+2022/05/05 18:31:29.312923 test_test.go:104: [0;37m[info] partition: [2 3], [1 4 5][0m
+2022/05/05 18:31:29.814004 test_test.go:104: [0;37m[info] partition: [2 3 4 5], [1][0m
+2022/05/05 18:31:29.895879 store_worker.go:82: [0;31m[error] handle raft message failed storeID 5, tombstone peer [epoch: conf_ver:1 version:1 ] received an invalid message MsgRequestVote, ignore it[0m
+2022/05/05 18:31:30.429116 test_test.go:104: [0;37m[info] partition: [1 3 4 5], [2][0m
+2022/05/05 18:31:31.048228 test_test.go:104: [0;37m[info] partition: [1 3 5], [2 4][0m
+2022/05/05 18:31:31.148754 store_worker.go:82: [0;31m[error] handle raft message failed storeID 5, tombstone peer [epoch: conf_ver:1 version:1 ] received an invalid message MsgRequestVote, ignore it[0m
+2022/05/05 18:31:31.657384 test_test.go:104: [0;37m[info] partition: [1 3 4 5], [2][0m
+2022/05/05 18:31:32.004992 raft.go:349: [0;37m[info] [becomeLeader]4 become leader[0m
+2022/05/05 18:31:32.026520 peer_msg_handler.go:132: [0;37m[info] ****put key:2 00000004 ,value:x 2 4 y[0m
+2022/05/05 18:31:32.062812 peer_msg_handler.go:431: [0;37m[info] [confChange]region 1 delete peer 5 storeId 1[0m
+2022/05/05 18:31:32.067462 peer_msg_handler.go:431: [0;37m[info] [confChange]region 1 delete peer 5 storeId 3[0m
+2022/05/05 18:31:32.074592 test_test.go:220: [0;37m[info] +++scan result: x 0 0 yx 0 1 y[0m
+2022/05/05 18:31:32.083041 test_test.go:220: [0;37m[info] +++scan result: x 1 0 yx 1 1 yx 1 2 yx 1 3 yx 1 4 y[0m
+2022/05/05 18:31:32.088178 test_test.go:220: [0;37m[info] +++scan result: x 3 0 yx 3 1 y[0m
+2022/05/05 18:31:32.090715 test_test.go:220: [0;37m[info] +++scan result: x 2 0 yx 2 1 yx 2 2 yx 2 3 yx 2 4 y[0m
+2022/05/05 18:31:32.093323 test_test.go:220: [0;37m[info] +++scan result: x 4 0 yx 4 1 y[0m
+2022/05/05 18:31:32.333491 peer_msg_handler.go:431: [0;37m[info] [confChange]region 1 delete peer 5 storeId 2[0m
+2022/05/05 18:31:32.788650 test_test.go:258: [0;33m[warning] shutdown servers
+[0m
+2022/05/05 18:31:32.788710 node.go:198: [0;37m[info] stop raft store thread, storeID: 1[0m
+2022/05/05 18:31:32.788783 node.go:198: [0;37m[info] stop raft store thread, storeID: 2[0m
+2022/05/05 18:31:32.788839 node.go:198: [0;37m[info] stop raft store thread, storeID: 3[0m
+2022/05/05 18:31:32.788883 node.go:198: [0;37m[info] stop raft store thread, storeID: 4[0m
+2022/05/05 18:31:32.788923 node.go:198: [0;37m[info] stop raft store thread, storeID: 5[0m
+2022/05/05 18:31:33.289069 test_test.go:265: [0;33m[warning] restart servers
+[0m
+2022/05/05 18:31:33.289818 node.go:193: [0;37m[info] start raft store node, storeID: 1[0m
+2022/05/05 18:31:33.290144 peer.go:41: [0;37m[info] region id:1 region_epoch:<conf_ver:2 version:1 > peers:<id:3 store_id:3 > peers:<id:4 store_id:4 > peers:<id:1 store_id:1 > peers:<id:2 store_id:2 >  create peer with ID 1[0m
+2022/05/05 18:31:33.290320 raftstore.go:177: [0;37m[info] start store 1, region_count 1, tombstone_count 0, takes 311.274µs[0m
+2022/05/05 18:31:33.290944 node.go:193: [0;37m[info] start raft store node, storeID: 2[0m
+2022/05/05 18:31:33.291125 peer.go:41: [0;37m[info] region id:1 region_epoch:<conf_ver:2 version:1 > peers:<id:3 store_id:3 > peers:<id:4 store_id:4 > peers:<id:1 store_id:1 > peers:<id:2 store_id:2 >  create peer with ID 2[0m
+2022/05/05 18:31:33.291261 raftstore.go:177: [0;37m[info] start store 2, region_count 1, tombstone_count 0, takes 189.502µs[0m
+2022/05/05 18:31:33.291932 node.go:193: [0;37m[info] start raft store node, storeID: 3[0m
+2022/05/05 18:31:33.292131 peer.go:41: [0;37m[info] region id:1 region_epoch:<conf_ver:2 version:1 > peers:<id:3 store_id:3 > peers:<id:4 store_id:4 > peers:<id:1 store_id:1 > peers:<id:2 store_id:2 >  create peer with ID 3[0m
+2022/05/05 18:31:33.292251 raftstore.go:177: [0;37m[info] start store 3, region_count 1, tombstone_count 0, takes 177.347µs[0m
+2022/05/05 18:31:33.292874 node.go:193: [0;37m[info] start raft store node, storeID: 4[0m
+2022/05/05 18:31:33.293004 peer.go:41: [0;37m[info] region id:1 region_epoch:<conf_ver:2 version:1 > peers:<id:3 store_id:3 > peers:<id:4 store_id:4 > peers:<id:1 store_id:1 > peers:<id:2 store_id:2 >  create peer with ID 4[0m
+2022/05/05 18:31:33.293154 raftstore.go:177: [0;37m[info] start store 4, region_count 1, tombstone_count 0, takes 189.794µs[0m
+2022/05/05 18:31:33.293715 node.go:193: [0;37m[info] start raft store node, storeID: 5[0m
+2022/05/05 18:31:33.293839 raftstore.go:177: [0;37m[info] start store 5, region_count 1, tombstone_count 1, takes 34.1µs[0m
+2022/05/05 18:31:33.954500 raft.go:349: [0;37m[info] [becomeLeader]3 become leader[0m
+2022/05/05 18:31:35.500430 node.go:198: [0;37m[info] stop raft store thread, storeID: 3[0m
+2022/05/05 18:31:35.500473 node.go:198: [0;37m[info] stop raft store thread, storeID: 4[0m
+2022/05/05 18:31:35.500503 node.go:198: [0;37m[info] stop raft store thread, storeID: 5[0m
+2022/05/05 18:31:35.500550 node.go:198: [0;37m[info] stop raft store thread, storeID: 1[0m
+2022/05/05 18:31:35.500577 node.go:198: [0;37m[info] stop raft store thread, storeID: 2[0m
+--- FAIL: TestSplitConfChangeSnapshotUnreliableRecoverConcurrentPartition3B (11.50s)
+    test_test.go:328: region is not split
+FAIL
+FAIL	github.com/pingcap-incubator/tinykv/kv/test_raftstore	11.625s
 FAIL

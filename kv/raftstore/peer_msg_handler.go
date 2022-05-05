@@ -264,6 +264,10 @@ func (d *peerMsgHandler) applyAdminRequest(kvWB *engine_util.WriteBatch, entry p
 			})
 			return
 		}
+		// 如果两者长度不相同，直接拒绝本次 split request
+		if len(d.Region().Peers) != len(req.Split.NewPeerIds) {
+			return
+		}
 		peers := make([]*metapb.Peer, 0)
 		for i, peer := range d.Region().Peers {
 			peers = append(peers, &metapb.Peer{Id: req.Split.NewPeerIds[i], StoreId: peer.StoreId})

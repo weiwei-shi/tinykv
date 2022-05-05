@@ -1,4 +1,4 @@
-# Project3 Transactions
+# Project4 Transactions
 
 **【参考】**
 
@@ -163,28 +163,32 @@ TinyKV 可以同时处理多个请求，因此存在局部竞争条件的可能�
 
 #### KvGet()
 
-获取单个 key 的 Value，步骤如下：
+获取单个 key 的最新的 Value。
 
-1. 通过 Latches 上锁对应的 key。
-2. 获取 Lock，如果 Lock 的 startTs 小于当前的 startTs，说明存在你之前存在尚未 commit 的请求，中断操作，返回 `LockInfo`。
+1. 获取 Lock。
+2. 如果 Lock 的 startTs 小于当前的 startTs，说明该 key 存在尚未 commit 的请求，中断操作，返回 `LockInfo`。
 3. 否则直接获取 Value，如果 Value 不存在，则设置 `NotFound = true`。
 
 #### KvPrewrite()
 
-进行 2PC 阶段中的第一阶段。
+进行 2PC 阶段中的第一阶段，将值实际写入数据库的位置。
 
-1. 对所有的 key 上锁。
-2. 通过 `MostRecentWrite` 检查所有 key 的最新 Write，如果存在，且其 commitTs 大于当前事务的 startTs，说明存在 write conflict，终止操作。
-3. 通过 `GetLock()` 检查所有 key 是否有 Lock，如果存在 Lock，说明当前 key 被其他事务使用中，终止操作。
-4. 到这一步说明可以正常执行 Prewrite 操作了，写入 Default 数据和 Lock。
+1. 判断请求中的 mutations 是否为空，如果为空，直接返回。
+2. 通过 `MostRecentWrite` 检查所有 key 的最新 Write，如果存在，且其 commitTs 大于当前事务的 startTs，说明存在 write conflict，返回错误，继续循环。
+3. 通过 `GetLock()` 检查所有 key 是否有 Lock，如果存在 Lock，说明当前 key 被其他事务使用中，返回错误，继续循环。
+4. 此时已通过前面的检查，开始执行 Prewrite 操作，根据mutation的类型做出相应操作，并完成该 key 的加锁操作。
+5. 完成所有的预写操作后，将事务的write操作保存。
 
 #### KvCommit()
 
-进行 2PC 阶段中的第二阶段。
+进行 2PC 阶段中的第二阶段，不更改数据库中的值，但会记录该值已提交。
 
-1. 通过 Latches 上锁对应的 key。
-2. 尝试获取每一个 key 的 Lock，并检查 `Lock.StartTs` 和当前事务的 startTs 是否一致，不一致直接取消。因为存在这种情况，客户端 Prewrite 阶段耗时过长，Lock 的 TTL 已经超时，被其他事务回滚，所以当客户端要 commit 的时候，需要先检查一遍 Lock。
-3. 如果成功则写入 Write 并移除 Lock。
+1. 判断请求中的 Keys 是否为空，如果为空，直接返回。
+2. 获取每一个 key 的 Lock。
+3. 如果 Lock 为空，说明该键未锁定，无法进行 Commit 操作。
+4. 检查 Lock 的 StartTs 和当前事务的 startTs 是否一致，如果不一致，说明可能是 Prewrite 阶段耗时过长，Lock 的 TTL 已经超时，被其他事务回滚，所以直接返回。
+5. 此时获取的 Lock 就是当前事务对该 key 加的锁，开始执行 Commit 操作，写入 Write 并移除该 Lock。
+6. 完成所有的预写操作后，将事务的write操作保存。
 
 
 
@@ -211,35 +215,41 @@ KvResolveLock 检查一批锁定的 key，然后将它们全部回滚或全部�
 
 #### KvScan()
 
-这里需要自己实现一个 Scanner 先，其实和 Get 的流程差不多，无非就是单个 key 变成了批量 key，这里不说了。
+先在 `scanner.go` 中实现一个 Scanner 。在这里使用自己实现的 Scanner 从数据库中读取许多值。
+
+1. 获取 scanner。
+2. 根据请求中的 Limit ，扫描对应数量的键值对。
+3. 对于每一对键值对，首先获取 Lock。
+4. 如果 Lock 的 startTs 小于当前的 startTs，说明该 key 存在尚未 commit 的请求，返回错误，继续循环。否则如果 value 存在，直接返回 Value。 
 
 #### KvCheckTxnStatus()
 
-用于 Client failure 后，想继续执行时先检查 Primary Key 的状态，以此决定是回滚还是继续推进 commit。
+在 Client failure 后，如果想继续执行，要先检查 Primary Key 的状态，以此决定是回滚还是继续提交。
 
 1. 检查 primary key 是否有 Lock。
-2. 如果没有锁，通过 `CurrentWrite()` 获取 primary key 的 Write，如果不是 `WriteKindRollback`，则说明已经被 commit，不用管了，返回其 commitTs；如果是，说明 primary key 已经被回滚了，创建一个 `WriteKindRollback` 并直接返回。
-3. 如果有锁，检查 Lock 的 TTL，判断 Lock 是否超时，如果超时，移除该 Lock 和 Value，并创建一个 `WriteKindRollback` 标记回滚。否则直接返回，等待 Lock 超时为止。
+2. 如果没有锁，通过 `CurrentWrite()` 获取 primary key 的 Write，如果不是 `WriteKindRollback`，则说明已经被 commit，直接返回其 commitTs；如果是`WriteKindRollback`，说明 primary key 已经被回滚了，执行写入回滚操作，并将事务的write操作保存。
+3. 如果有锁，需要判断 Lock 的 TtL 是否超时，如果超时，移除该 Lock 和 Value，并执行写入回滚操作并将事务的write操作保存。否则直接返回 Ttl 。
 
 #### KvBatchRollback()
 
 用于批量回滚 key 的操作。
 
-1. 通过 `CurrentWrite` 获取 Write，如果已经是 `WriteKindRollback`，说明这个 key 已经被回滚完毕，跳过这个 key。否则删除 Value 并增加 `WriteKindRollback`。
-2. 否则先获取 Lock，如果没有锁或者锁的 startTs 不是当前事务的 startTs，则终止操作，说明该 key 被其他事务拥有。
-3. 否则移除 Lock，删除 Value 并增加 `WriteKindRollback`。
+1. 判断请求中的 Keys 是否为空，如果为空，直接返回。
+2. 通过 `CurrentWrite` 获取每一个 key 对应的 Write。
+3. 如果 Write 不为空，判断 Write 的类型是否为 `WriteKindRollback`，如果是，说明这个 key 已经被回滚完毕，则跳过这个 key。否则删除该事务的 Value 并写入 Write 。
+4. 否则先获取 Lock，写入 Write 。
+5. 如果没有锁或者锁的 startTs 不是当前事务的 startTs，说明该 key 被其他事务拥有，则跳过这个 key 。否则删除该事务加的锁，删除该事务的 Value 。
+6. 将事务的write操作保存。
 
 #### KvResolveLock()
 
-这个方法主要用于解决锁冲突，当客户端已经通过 `KvCheckTxnStatus()` 检查了 primary key 的状态，这里打算要么全部回滚，要么全部提交，具体取决于 `ResolveLockRequest` 的 CommitVersion。
+用于解决锁冲突，当客户端已经通过 `KvCheckTxnStatus()` 检查了 primary key 的状态，然后根据 `ResolveLockRequest` 的 CommitVersion，来决定是全部回滚，还是全部提交。
 
-```go
-if req.CommitVersion == 0 {
-  // server.KvBatchRollback()
-} else {
-  // server.KvCommit()
-}
-```
+1. 获取 Lock 的迭代器。
+2. 使用迭代器得到对应请求的开始版本的已加锁的 key。
+3. 如果得到的 key 为空，说明没有锁冲突，直接返回。
+4. 判断`ResolveLockRequest` 的 CommitVersion。
+5. 如果为0，回滚所有的锁。否则提交所有的锁。
 
 
 
