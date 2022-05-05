@@ -2,9 +2,9 @@
 
 **【参考】**
 
-[LX-676655103/Tinykv-2021](https://github.com/LX-676655103/Tinykv-2021/blob/course/doc/project2.md )
+[LX-676655103/Tinykv-2021](https://github.com/LX-676655103/Tinykv-2021/blob/course/doc/project4.md )
 
-[Smith-Cruise/TinyKV-White-Paper](https://github.com/Smith-Cruise/TinyKV-White-Paper/blob/main/Project2-RaftKV.md )
+[Smith-Cruise/TinyKV-White-Paper](https://github.com/Smith-Cruise/TinyKV-White-Paper/blob/main/Project4-Transaction.md )
 
 在之前的项目中，已经构建了一个键/值数据库，通过使用 Raft，该数据库在多个节点之间是一致的。为了真正具有可扩展性，数据库必须能够处理多个客户端。对于多个客户端，存在一个问题：如果两个客户端尝试“同时”写入相同的 key 会发生什么？如果客户端写入然后立即读取该 key，是否应该期望读取的值与写入的值相同？在 project4 中，将解决此类问题。
 
